@@ -1,0 +1,10 @@
+.password-text {
+  cursor: pointer;
+  padding: 20px 20px; 
+  border-radius: 5px; 
+  transition: background-color 0.2s ease; 
+}
+
+.password-text:hover {
+  background-color: #f0f0f0; 
+}

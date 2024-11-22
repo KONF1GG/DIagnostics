@@ -1,0 +1,55 @@
+/* Основные стили для элементов с анимацией */
+.item {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.item:hover a {
+    background-color: #007bff !important;
+}
+
+.navbar-nav {
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    text-align: center;
+}
+
+.nav-item {
+    margin: 0 15px;
+}
+
+/* Адаптивные стили */
+@media (max-width: 1200px) {
+    .item {
+        transform: scale(1.01);
+    }
+
+    .item:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+}
+
+@media (max-width: 768px) {
+    .item {
+        transform: scale(1);
+        box-shadow: none;
+        padding: 1;
+        margin: 10px;
+        display: block;
+    }
+
+    .item:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .item:hover a {
+        background-color: #007bff;
+    }
+}
+

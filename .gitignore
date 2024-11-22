@@ -1,0 +1,6 @@
+.venv/
+.env
+__pycache__/
+/React/node_modules/
+venv/
+.vscode/

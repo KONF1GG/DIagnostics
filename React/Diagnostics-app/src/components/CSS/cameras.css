@@ -1,0 +1,82 @@
+.differences-container {
+    margin-top: 20px;
+}
+
+.difference-card {
+    border: 1px solid #d9534f; /* Красная рамка */
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #fce4e4; /* Светло-красный фон */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease; /* Плавный переход для эффекта увеличения */
+}
+
+.difference-card:hover {
+    transform: scale(1.05); /* Увеличиваем при наведении */
+}
+
+.difference-card h3 {
+    margin-bottom: 10px;
+    color: #c9302c; /* Темно-красный для заголовков */
+    font-size: 2.2em; /* Увеличиваем размер заголовка */
+}
+
+.difference-item {
+    margin: 5px 0;
+    padding: 5px;
+    border-left: 4px solid #d9534f; /* Красная левая граница */
+    background-color: #ffe5e5; /* Еще светлее для фона элемента */
+    font-size: 1.5em; /* Увеличиваем размер текста */
+    line-height: 1.5; /* Улучшаем читаемость */
+}
+
+.no-services-message {
+    color: #d9534f; /* Красный цвет */
+    font-size: 1.5rem; /* Увеличиваем размер */
+    font-weight: bold; /* Жирный текст */
+    text-align: center; /* Центрируем текст */
+    margin: 20px 0; /* Отступы */
+}
+
+.error-message {
+    text-align: center; /* Центрируем текст */
+    margin: 20px 0; /* Добавляем отступы, если нужно */
+}
+
+/* Адаптивные стили */
+@media (max-width: 1200px) {
+    .difference-card {
+        padding: 12px; /* Уменьшаем отступы для более узких экранов */
+    }
+
+    .difference-card h3 {
+        font-size: 1.8em; /* Уменьшаем размер заголовка */
+    }
+
+    .difference-item {
+        font-size: 1.3em; /* Уменьшаем размер текста для элементов различий */
+    }
+}
+
+@media (max-width: 768px) {
+    .difference-card {
+        padding: 10px; /* Еще меньше отступы */
+    }
+
+    .difference-card h3 {
+        font-size: 1.5em; /* Уменьшаем заголовок */
+    }
+
+    .difference-item {
+        font-size: 1.1em; /* Уменьшаем размер текста для элементов различий */
+    }
+
+    .no-services-message {
+        font-size: 1.2rem; /* Уменьшаем размер текста */
+    }
+
+    .error-message {
+        font-size: 1.2rem; /* Уменьшаем размер текста */
+    }
+}

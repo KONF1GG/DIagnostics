@@ -1,0 +1,71 @@
+.title-red {
+  font-size: 2.5rem; /* Размер шрифта заголовка */
+  color: #007bff; /* Цвет текста заголовка */
+  text-shadow: 0 2px 10px rgba(0, 123, 255, 0.3); /* Тень для текста */
+  margin-bottom: 20px; /* Отступ снизу */
+}
+
+.title-red::after {
+  content: ''; /* Создаем псевдоэлемент */
+  display: block;
+  width: 50%;
+  height: 5px; /* Высота линии под заголовком */
+  background: linear-gradient(90deg, #ff0000, #eca3a3); /* Градиент */
+  margin: 10px auto; /* Центрируем линию */
+  border-radius: 5px; /* Закругляем углы */
+}
+
+/* Анимация появления */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(20px); /* Поднимаем элемент снизу */
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Анимация исчезновения */
+.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+      opacity: 1;
+      transform: translateY(0);
+  }
+  to {
+      opacity: 0;
+      transform: translateY(-20px); /* Убираем элемент вверх */
+  }
+}
+
+/* Адаптивные стили для различных экранов */
+@media (max-width: 1200px) { /* Планшеты и большие мобильные устройства */
+  .title-red {
+      font-size: 2rem; /* Уменьшаем размер шрифта */
+      margin-bottom: 15px; /* Уменьшаем отступ снизу */
+  }
+
+  .title-red::after {
+      width: 60%; /* Увеличиваем ширину линии */
+  }
+}
+
+@media (max-width: 768px) { /* Мобильные устройства */
+  .title-red {
+      font-size: 1.5rem; /* Еще больше уменьшаем размер шрифта */
+      margin-bottom: 10px; /* Уменьшаем отступ снизу */
+  }
+
+  .title-red::after {
+      width: 70%; /* Увеличиваем ширину линии для мобильных */
+  }
+}
