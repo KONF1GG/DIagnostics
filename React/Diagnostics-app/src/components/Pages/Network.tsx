@@ -5,6 +5,7 @@ import InfoList from "./InfoList";
 import "../CSS/Network.css";
 import "../CSS/Loading.css";
 import { useDataContext } from "../../DataContext/NetworkContext";
+import { getQueryParams } from "./Deafault/getData";
 
 interface Differences {
   radius: Record<string, unknown>;
@@ -26,14 +27,7 @@ const Network = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  const getQueryParams = () => {
-    const params = new URLSearchParams(location.search);
-    return {
-      login: params.get("login") || "",
-    };
-  };
-
-  const queriedLogin = getQueryParams().login;
+  const queriedLogin = getQueryParams();
 
   useEffect(() => {
     if (queriedLogin !== login) {
@@ -120,7 +114,7 @@ const Network = () => {
         </div>
       ) : (
         <div className={`container ${isVisible ? "fade-in" : "fade-out"}`}>
-          <h2 className="title">Данные о подключении</h2>
+          <h2 className="title fade-in">Данные о подключении</h2>
           {combinedData.length > 0 ? (
             <table className="table table-bordered table-striped">
               <thead className="table-primary">
@@ -147,7 +141,7 @@ const Network = () => {
           {(Object.keys(differences.radius).length > 0 ||
             Object.keys(differences.redis).length > 0) && (
             <div>
-              <h2 className="title-red text-danger">Различия:</h2>
+              <h2 className="title-red text-danger fade-in">Различия:</h2>
               <table className="table table-bordered table-striped">
                 <thead className="table-danger">
                   <tr>

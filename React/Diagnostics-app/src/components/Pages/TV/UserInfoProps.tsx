@@ -6,9 +6,8 @@ interface UserInfoProps {
 }
 
 const UserInfo: React.FC<UserInfoProps> = ({ login, password }) => {
-  const [isHovered, setIsHovered] = useState(false); // Состояние для отслеживания наведения
+  const [isHovered, setIsHovered] = useState(false);
 
-  // Функция для создания строки с звездочками
   const createStars = (password: string | null) => {
     return password ? '*'.repeat(password.length) : "Не указан";
   };

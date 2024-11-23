@@ -55,6 +55,7 @@
 
 .btn {
   margin-right: 10px;
+  width: 100%;
 }
 
 /* Адаптивные стили */
@@ -109,11 +110,7 @@
   margin: 5px 0;
 }
 
-.btn {
-  margin-top: 10px;
-  width: 100%;
-}
-
 body {
   overflow-x: hidden;
 }
+

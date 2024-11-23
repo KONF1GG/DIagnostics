@@ -32,7 +32,7 @@ async def get_connection_data(
     # Подготовка данных и асинхронных запросов
     for service in services_from_1c:
         operator = service.operator
-        if operator not in operators:
+        if operator not in operators and operator != '24ТВ' or operator != '24ТВ КРД':
             update_service_data(response_data, service)
             tasks.append(prepare_operator_task(service))
             operators.add(operator)
@@ -43,7 +43,6 @@ async def get_connection_data(
     results = await asyncio.gather(*tasks, return_exceptions=True)
     # Обработка результатов и сравнение данных
     await process_results(response_data, results, services_from_1c)
-    print(response_data)
     return response_data
 
 def initialize_response_data():
@@ -62,7 +61,10 @@ def update_service_data(response_data, service):
         response_data["tvip"]['password'] = service.password
         response_data['tvip']['service1c'].append(Service1c(id=service.serviceId, name=service.service, status=service.status))
     elif service.operator in ("24ТВ", "24ТВ КРД"):
-        response_data["tv24"]['phone'] = service.login
+        if service.password == 'Второй номер':
+            response_data['tv24']['additional_phones'].append(service.login)
+        else:
+            response_data["tv24"]['phone'] = service.login
         response_data['tv24']['service1c'].append(Service1c(id=service.serviceId, name=service.service, status=service.status))
     elif service.operator == 'Смотрешка':
         response_data["smotreshka"]['login'] = service.login
@@ -100,15 +102,15 @@ async def process_results(response_data, results, services_from_1c):
             if operator == "ТВИП":
                 response_data["tvip"]['serviceOp'] = results[result_idx]
                 if not compare_service_data(response_data['tvip']):
-                    response_data["tvip"]["error"] = "Данные TVIP не совпадают"
+                    response_data["tvip"]["error"] = "Данные не совпадают"
             elif operator in ("24ТВ", "24ТВ КРД"):
                 response_data["tv24"]['serviceOp'] = results[result_idx]
                 if not compare_service_data(response_data['tv24']):
-                    response_data["tv24"]["error"] = "Данные 24ТВ не совпадают"
+                    response_data["tv24"]["error"] = "Данные не совпадают"
             elif operator == "Смотрешка":
                 response_data["smotreshka"]['serviceOp'] = results[result_idx]
                 if not compare_service_data(response_data['smotreshka']):
-                    response_data["smotreshka"]["error"] = "Данные Смотрешка не совпадают"
+                    response_data["smotreshka"]["error"] = "Данные не совпадают"
             result_idx += 1
         except Exception as e:
             response_data["errors"][operator] = str(e)
@@ -116,6 +118,9 @@ async def process_results(response_data, results, services_from_1c):
 def compare_service_data(service_data):
     """Сравнение данных service1c и serviceOp по id и status"""
 
-    service1c_data = [(int(s.id), s.status) for s in service_data['service1c'] if s.id != '0' or s.status == 'Активный']
-    serviceOp_data = [(int(s.id), s.status) for s in service_data['serviceOp']]
+    service1c_data = [(int(s.id), s.status) for s in service_data['service1c'] if s.id != '0' and s.status == 'Активный']
+    serviceOp_data = [(int(s.id), 's.status') for s in service_data['serviceOp']]
+
+    print(set(service1c_data) == set(serviceOp_data))
+    
     return set(service1c_data) == set(serviceOp_data)

@@ -6,6 +6,7 @@ import "../CSS/Loading.css";
 import "../CSS/Network.css";
 import { useDataContext } from "../../DataContext/FailureContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getQueryParams } from "./Deafault/getData";
 
 const Accidents = () => {
   const location = useLocation();
@@ -22,14 +23,7 @@ const Accidents = () => {
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  const getQueryParams = () => {
-    const params = new URLSearchParams(location.search);
-    return {
-      login: params.get("login") || "",
-    };
-  };
-
-  const queriedLogin = getQueryParams().login;
+  const queriedLogin = getQueryParams();
 
   useEffect(() => {
     if (queriedLogin) {

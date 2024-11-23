@@ -8,17 +8,25 @@ interface Service {
 
 interface ServiceTableProps {
   title: string;
-  services: Service[];
+  services: Service[] | null; // Учитываем возможность отсутствия данных
   emptyMessage: string;
+  highlight?: boolean; // Новое поле для выделения таблицы
 }
 
-const ServiceTable: React.FC<ServiceTableProps> = ({ title, services, emptyMessage }) => {
+const ServiceTable: React.FC<ServiceTableProps> = ({
+  title,
+  services,
+  emptyMessage,
+  highlight = false, 
+}) => {
   return (
-    <div className="services-section">
+    <div
+      className={`services-section`}
+    >
       <h3 className="mb-3">{title}</h3>
-      {services? (
+      {services && services.length > 0 ? (
         <table className="table table-bordered table-striped">
-          <thead className="table-primary">
+          <thead className={highlight? 'table-danger' : 'table-primary'}>
             <tr>
               <th>Название</th>
               <th>ID</th>
@@ -33,7 +41,9 @@ const ServiceTable: React.FC<ServiceTableProps> = ({ title, services, emptyMessa
                 <td>
                   <span
                     className={`badge ${
-                      service.status === "Активный" ? "bg-success" : "bg-secondary"
+                      service.status === "Активный"
+                        ? "bg-success"
+                        : "bg-secondary"
                     }`}
                   >
                     {service.status}

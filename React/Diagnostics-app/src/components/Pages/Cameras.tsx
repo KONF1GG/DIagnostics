@@ -5,6 +5,7 @@ import { GetNetwork } from "../../API/Cameras";
 import "../CSS/cameras.css";
 import { useDataContext } from "../../DataContext/CamerasContext";
 import Modal from "../Modals/CameraModal";
+import { getQueryParams } from "./Deafault/getData";
 
 const Cameras = () => {
   const { data, setData, login, setLogin } = useDataContext();
@@ -15,14 +16,7 @@ const Cameras = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
 
-  const getQueryParams = () => {
-    const params = new URLSearchParams(location.search);
-    return {
-      login: params.get("login") || "",
-    };
-  };
-
-  const queriedLogin = getQueryParams().login;
+  const queriedLogin = getQueryParams();
 
   useEffect(() => {
     if (queriedLogin !== login) {
@@ -99,7 +93,7 @@ const Cameras = () => {
           {/* Услуги */}
           {data.services && data.services.length > 0 ? (
             <div className="fade-in">
-              <h2 className="title">Услуги</h2>
+              <h2 className="title fade-in">Услуги</h2>
               {isMobile ? (
                 <div className="card-container">
                   {data.services.map((service) => (
@@ -141,13 +135,13 @@ const Cameras = () => {
               )}
             </div>
           ) : (
-            <p className="no-services-message">Услуги отсутствуют</p>
+            <p className="no-services-message fade-in">Услуги отсутствуют</p>
           )}
 
           {/* Камеры из 1C */}
           {data.cameras_from_1c?.cameras?.length > 0 && (
             <div className="fade-in">
-              <h2 className="title">Камеры (1C)</h2>
+              <h2 className="title fade-in">Камеры (1C)</h2>
               {isMobile ? (
                 <div className="card-container">
                   {data.cameras_from_1c.cameras
@@ -274,7 +268,7 @@ const Cameras = () => {
           {data.cameras_from_redis?.length > 0 &&
           !data.cameras_from_1c?.cameras?.length ? (
             <div className="fade-in">
-              <h2 className="title">Камеры (Redis)</h2>
+              <h2 className="title fade-in">Камеры (Redis)</h2>
               {isMobile ? (
                 <div className="card-container">
                   {data.cameras_from_redis
@@ -376,7 +370,7 @@ const Cameras = () => {
           {/* Различия */}
           {data.cameras_difference?.length > 0 && (
             <div className="fade-in differences-container">
-              <h2 className="title-red text-danger">Различия</h2>
+              <h2 className="title-red text-danger fade-in">Различия</h2>
               {(() => {
                 const missingCameras: string[] = [];
                 const cameraDifferences: JSX.Element[] = [];
@@ -465,7 +459,7 @@ const Cameras = () => {
             Object.entries(data.flus_diffs).some(
               ([, errors]) => errors.length > 0
             ) && (
-              <div className="fade-in difference-card">
+              <div className="fade-in difference-card fade-in">
                 <h3>Ошибки Flussonic</h3>
                 <ul>
                   {Object.values(data.flus_diffs)

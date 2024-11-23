@@ -8,6 +8,7 @@ import ServiceTable from "./ServiceTable";
 import UserInfo from "./UserInfoProps";
 import InfoList from "../InfoList";
 import Checkbox from "./CheckBox";
+import { getQueryParams } from "../Deafault/getData";
 
 const updateSettings = async (
   login: string,
@@ -22,7 +23,6 @@ const updateSettings = async (
     ban_on_app,
   };
 
-  console.log(requestData)
   try {
     await fetch("http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/settingsTV", {
       method: "POST",
@@ -44,12 +44,6 @@ const TV = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-
-  // Функция для получения параметра "login" из URL
-  const getQueryParams = () => {
-    const params = new URLSearchParams(location.search);
-    return params.get("login") || "";
-  };
 
   const queriedLogin = getQueryParams();
 
@@ -122,7 +116,6 @@ const TV = () => {
 
       const result = await GetTV(queriedLogin);
       setData(result);
-
     } catch (error) {
       console.error("Ошибка при обновлении настроек:", error);
     }
@@ -133,10 +126,40 @@ const TV = () => {
 
     try {
       await updateSettings(queriedLogin, "24ТВ", false, value);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       const result = await GetTV(queriedLogin);
       setData(result);
     } catch (error) {
       console.error("Ошибка при обновлении настроек:", error);
+    }
+  };
+
+  const handleMakePrimary = async (phone: string, login: string) => {
+    console.log(`Кнопка для телефона ${phone} нажата!`);
+    try {
+      const payload = {
+        login: login,
+        phone: phone,
+      };
+
+      await fetch(
+        "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone",
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      console.log("Запрос успешно отправлен!");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      const result = await GetTV(queriedLogin);
+      setData(result);
+    } catch (error) {
+      console.error("Ошибка при изменении освновного номера:", error);
     }
   };
 
@@ -176,22 +199,35 @@ const TV = () => {
       <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
         {data?.smotreshka?.login && (
           <>
-            <h2 className="title">Смотрешка</h2>
-            <div className="d-flex align-items-center">
+            <h2
+              className={
+                data.smotreshka.error ? "title-red text-danger fade-in" : "title fade-in"
+              }
+            >
+              Смотрешка
+            </h2>
+            <div className="d-flex align-items-center justify-content-between">
               <div className="me-3">
                 <UserInfo
                   login={data.smotreshka.login}
                   password={data.smotreshka.password}
                 />
               </div>
+              {data.smotreshka.error && (
+                <div className="ms-auto">
+                  <button className="btn btn-danger btn-danger-hover">
+                    Исправить
+                  </button>
+                </div>
+              )}
             </div>
-
             <div className="row mt-3">
               <div className="col-md-6">
                 <ServiceTable
                   title="1С"
                   services={data.smotreshka.service1c}
                   emptyMessage="Нет данных"
+                  highlight={data.smotreshka.error ? true : false}
                 />
               </div>
               <div className="col-md-6">
@@ -199,34 +235,42 @@ const TV = () => {
                   title="Смотрешка"
                   services={data.smotreshka.serviceOp}
                   emptyMessage="Нет данных"
+                  highlight={data.smotreshka.error ? true : false}
                 />
               </div>
-              <div className="d-flex flex-column align-items-start">
-                <Checkbox
-                  id="NotTurnOffIfNotUsed-smotreshka"
-                  label="Не отключать при неиспользовании"
-                  checked={smotreshkaCheckboxes.notTurnOffIfNotUsed}
-                  disabled={
-                    data.smotreshka.not_turnoff_if_not_used === undefined
-                  }
-                  className="checkbox-item"
-                  onChange={(e) =>
-                    handleSmotreshkaCheckboxChange(
-                      "notTurnOffIfNotUsed",
-                      e.target.checked
-                    )
-                  }
-                />
-                <Checkbox
-                  id="BanOnApp-smotreshka"
-                  label="Запретить включать пакеты из приложения"
-                  checked={smotreshkaCheckboxes.banOnApp}
-                  disabled={data.smotreshka.ban_on_app === undefined}
-                  className="checkbox-item"
-                  onChange={(e) =>
-                    handleSmotreshkaCheckboxChange("banOnApp", e.target.checked)
-                  }
-                />
+              <div className="d-flex flex-column">
+                <div className="d-flex align-items-start justify-content-between">
+                  <div className="d-flex flex-column align-items-start">
+                    <Checkbox
+                      id="NotTurnOffIfNotUsed-smotreshka"
+                      label="Не отключать при неиспользовании"
+                      checked={smotreshkaCheckboxes.notTurnOffIfNotUsed}
+                      disabled={
+                        data.smotreshka.not_turnoff_if_not_used === undefined
+                      }
+                      className="checkbox-item"
+                      onChange={(e) =>
+                        handleSmotreshkaCheckboxChange(
+                          "notTurnOffIfNotUsed",
+                          e.target.checked
+                        )
+                      }
+                    />
+                    <Checkbox
+                      id="BanOnApp-smotreshka"
+                      label="Запретить включать пакеты из приложения"
+                      checked={smotreshkaCheckboxes.banOnApp}
+                      disabled={data.smotreshka.ban_on_app === undefined}
+                      className="checkbox-item"
+                      onChange={(e) =>
+                        handleSmotreshkaCheckboxChange(
+                          "banOnApp",
+                          e.target.checked
+                        )
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </>
@@ -234,9 +278,27 @@ const TV = () => {
 
         {data?.tvip?.login && (
           <>
-            <h2 className="title mt-5">ТВИП</h2>
-            <div className="d-flex align-items-center">
-              <UserInfo login={data.tvip.login} password={data.tvip.password} />
+            <h2
+              className={
+                data.tvip.error ? "title-red text-danger mt-5" : "title mt-5"
+              }
+            >
+              ТВИП
+            </h2>
+            <div className="d-flex align-items-center justify-content-between">
+              <div className="me-3">
+                <UserInfo
+                  login={data.tvip.login}
+                  password={data.tvip.password}
+                />
+              </div>
+              {data.tvip.error && (
+                <div className="ms-auto">
+                  <button className="btn btn-danger btn-danger-hover">
+                    Исправить
+                  </button>
+                </div>
+              )}
             </div>
             <div className="row mt-3">
               <div className="col-md-6">
@@ -244,6 +306,7 @@ const TV = () => {
                   title="1С"
                   services={data.tvip.service1c}
                   emptyMessage="Нет данных"
+                  highlight={data.tvip.error ? true : false}
                 />
               </div>
               <div className="col-md-6">
@@ -251,6 +314,7 @@ const TV = () => {
                   title="ТВИП"
                   services={data.tvip.serviceOp}
                   emptyMessage="Нет данных"
+                  highlight={data.tvip.error ? true : false}
                 />
               </div>
             </div>
@@ -259,16 +323,34 @@ const TV = () => {
 
         {data?.tv24?.phone && (
           <>
-            <h2 className="title mt-5">24ТВ</h2>
-            <p className="text-start fs-4">
-              <strong>Номер:</strong> {data.tv24.phone || "Не указан"}
-            </p>
+            <h2
+              className={
+                data.tv24.error ? "title-red text-danger mt-5" : "title mt-5"
+              }
+            >
+              24ТВ
+            </h2>
+            <div className="d-flex align-items-center justify-content-between">
+              <div className="me-3">
+                <p className="text-start fs-4">
+                  <strong>Номер:</strong> {data.tv24.phone || "Не указан"}
+                </p>
+              </div>
+              {data.tv24.error && (
+                <div className="ms-auto">
+                  <button className="btn btn-danger btn-danger-hover">
+                    Исправить
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="row mt-3">
               <div className="col-md-6">
                 <ServiceTable
                   title="1С"
                   services={data.tv24.service1c}
                   emptyMessage="Нет данных"
+                  highlight={data.tv24.error ? true : false}
                 />
               </div>
               <div className="col-md-6">
@@ -276,15 +358,35 @@ const TV = () => {
                   title="24ТВ"
                   services={data.tv24.serviceOp}
                   emptyMessage="Нет данных"
+                  highlight={data.tv24.error ? true : false}
                 />
               </div>
-              <Checkbox
-                id="banOnAppCheckbox-tv24"
-                label="Запретить включать пакеты из приложения"
-                checked={tv24Checkbox.banOnApp}
-                disabled={data.tv24.ban_on_app === undefined}
-                onChange={(e) => handleTv24CheckboxChange(e.target.checked)}
-              />
+              <div>
+                <Checkbox
+                  id="banOnAppCheckbox-tvip"
+                  label="Запретить включать пакеты из приложения"
+                  checked={tv24Checkbox.banOnApp}
+                  disabled={data.tv24.ban_on_app === undefined}
+                  onChange={(e) => handleTv24CheckboxChange(e.target.checked)}
+                />
+              </div>
+            </div>
+            <div className="phone-list">
+              {data?.tv24?.additional_phones?.map((phone, index) => (
+                <div key={index} className="phone-card">
+                  <div className="phone-info">
+                    <span className="phone-number">{phone}</span>
+                  </div>
+                  <div className="button-container">
+                    <button
+                      onClick={() => handleMakePrimary(phone, queriedLogin)}
+                      className="btn btn-primary make-primary-btn"
+                    >
+                      Сделать основным
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </>
         )}
