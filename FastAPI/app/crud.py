@@ -10,9 +10,10 @@ from aiohttp import ClientTimeout
 import aiohttp
 from fastapi import HTTPException
 from jinja2 import DictLoader
-
+import psycopg2
+from redis.commands.search.result import Result
 from app.depencies import RedisDependency
-from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
+from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_flat, RBT_phones, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
 from app.models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 from app import crud
@@ -556,3 +557,77 @@ async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange, old_
                 return await response.json()
     except Exception as e:
         return e
+    
+
+
+async def get_redis_key_data(login: str, redis) -> Result:
+    value = await redis.json().get(f"login:{login}")
+    if not value:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    return value
+
+async def get_logins_by_flatId_redis(flat_id: int, redis: RedisDependency):
+
+    query = f"@flatId:[{flat_id} {flat_id}]"
+    search_result: Result = await redis.ft("idx:client").search(query)
+    if not search_result:
+        raise HTTPException(status_code=404, detail="Логины не найдены по flatId")
+    return search_result.docs
+
+async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phones]:
+    async with rbt.transaction():
+        query = """
+        SELECT fs.house_subscriber_id, fs.role, sm.id, sm.subscriber_name, sm.subscriber_patronymic
+        FROM houses_flats_subscribers fs
+        JOIN houses_subscribers_mobile sm
+        ON fs.house_subscriber_id = sm.house_subscriber_id
+        WHERE fs.house_flat_id = $1
+        """
+        result = await rbt.fetch(query, flat_id)
+        
+        subs_list = [
+            RBT_phones(
+                house_id=row['house_subscriber_id'],
+                role=row['role'],
+                name=row['subscriber_name'],
+                id=row['id'],
+                patronymic=row['subscriber_patronymic'],
+
+            ) 
+            for row in result
+        ]
+
+    return subs_list
+
+
+async def get_flats(house_id: int, rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT *
+        FROM "houses_flats_subscribers"
+        WHERE "house_subscriber_id" = $1
+        """
+        result = await rbt.fetch(query, house_id)
+        
+        flats_list = [
+            RBT_flat(
+                house_id=row['house_subscriber_id'],
+                role=row['role'],
+                flat_id=row['house_flat_id']
+            ) 
+            for row in result
+        ]
+
+    return flats_list
+
+
+async def get_logins_from_redis(flat_ids: List[int], redis):
+    search_query = " | ".join([f"@flatId:[{flat_id} {flat_id}]" for flat_id in flat_ids])
+    
+    result = await redis.ft('idx:client').search(search_query)
+    
+    logins = []
+    for doc in result.docs:
+        logins.append(doc)
+    
+    return logins

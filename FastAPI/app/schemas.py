@@ -247,3 +247,15 @@ class CameraDataToChange(BaseModel):
     """Данные, которые можно поменять в форме изменения данных камеры 1С"""
     name: Optional[str] = None
     ip: Optional[str] = None
+
+class RBT(BaseModel):
+    house_id: int
+    role: int
+
+class RBT_phones(RBT):
+    id: int
+    name: str
+    patronymic: str
+
+class RBT_flat(RBT):
+    flat_id: int

@@ -64,6 +64,11 @@ const InfoList = () => {
             value={login}
             onChange={handleInputChange}
             className="form-control"
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && login) {
+                handleSearch();
+              }
+            }}
             style={{ maxWidth: "300px" }}
           />
           <button

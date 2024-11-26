@@ -24,15 +24,19 @@ const updateSettings = async (
   };
 
   try {
-    await fetch("http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/settingsTV", {
+    console.log(requestData)
+    await fetch("http://dev1c/UNF_TEST_WS2/hs/mwapi/settingsTV", {
       method: "POST",
-      mode: "no-cors",
+      // mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
       },
+
       body: JSON.stringify(requestData),
     });
-  } catch (error) {
+    
+  } 
+  catch (error) {
     console.error("Ошибка при отправке данных на сервер:", error);
   }
 };
@@ -201,7 +205,9 @@ const TV = () => {
           <>
             <h2
               className={
-                data.smotreshka.error ? "title-red text-danger fade-in" : "title fade-in"
+                data.smotreshka.error
+                  ? "title-red text-danger fade-in"
+                  : "title fade-in"
               }
             >
               Смотрешка

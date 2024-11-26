@@ -9,6 +9,7 @@ from app.routes.failure_routes import router as failure_router
 from app.routes.network_routes import router as network_router
 from app.routes.cameras_routes import router as cameras_router
 from app.routes.TV_routes import router as TV_router
+from app.routes.App_routes import router as app_router
 
 from app.lifespan import lifespan
 
@@ -41,6 +42,7 @@ app.include_router(failure_router)
 app.include_router(network_router)
 app.include_router(cameras_router)
 app.include_router(TV_router)
+app.include_router(app_router)
 
 
 # if __name__ == "__main__":
