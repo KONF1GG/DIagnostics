@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from typing import Dict, Optional, Any
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import text
@@ -8,6 +9,7 @@ from app.depencies import TokenDependency, RedisDependency, SessionRediusDepende
 from app.schemas import LoginConnData, RedisConnData, RediusConnData
 
 router = APIRouter()
+
 
 @router.get('/v1/network', response_model=Dict[str, Any])
 async def get_connection_data(
@@ -40,12 +42,22 @@ async def get_connection_data(
                 if radius_data:
                     keys = ['password', 'GMT', 'ip_addr', 'time_to', 'onu_mac', 'json_data']
                     radius_data_dict = dict(zip(keys, radius_data))
-                    radius_data_dict = {key: (value if value not in ('', 'null', 'None') else None) for key, value in radius_data_dict.items()}
+
+                    radius_data_dict = {
+                        key: (
+                            await safe_json_parse(value) if key == 'json_data' else 
+                            None if value in ('', 'null', 'None') else 
+                            value
+                        )
+                        for key, value in radius_data_dict.items()
+                    }
+
             except Exception:
                 response_data['errors'].append("Ошибка получения данных из Радиуса")
         else:
             response_data['errors'].append("Радиус недоступен")
 
+        print(radius_data_dict.get('json_data', '2222222'))
         # Проверка данных из Redis
         redis_data_dict = None
         if redis:
@@ -75,9 +87,6 @@ async def get_connection_data(
             # Удаляем ненужные данные
             radius_data_dict.pop('password', None)
             redis_data_dict.pop('password', None)
-
-            # Обработка json_data из Radius
-            json_data = await safe_json_parse(radius_data_dict.get('json_data'))
 
             # Собираем ответ
             response_data['radius'] = radius_data_dict

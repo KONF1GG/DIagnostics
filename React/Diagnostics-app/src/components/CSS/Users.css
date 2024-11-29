@@ -11,36 +11,31 @@ body {
 }
 
 .table {
-
+  table-layout: fixed; /* Фиксированная ширина столбцов */
   width: 100%;
   border-collapse: collapse;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Легкая тень для глубины */
-  transition: transform 0.3s, box-shadow 0.3s; /* Плавный эффект увеличения и тени */
-}
-
-
-.table:hover {
-  /* transform: scale(1.03); Увеличение таблицы при наведении */
-  /* box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); Увеличиваем тень при наведении */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 th, td {
-  padding: 15px; /* Уменьшены отступы */
+  width: 33.33%; /* Устанавливаем равную ширину для каждого столбца */
+  padding: 15px;
   text-align: left;
-  font-weight: 600; /* Увеличенный вес шрифта */
-  position: relative; /* Для псевдоэлементов */
-  transition: background-color 0.3s; /* Плавный переход для фона */
-  overflow: hidden; /* Скрываем лишнее */
+  font-weight: 600;
+  position: relative;
+  transition: background-color 0.3s;
+  overflow: hidden;
 }
 
 thead {
-  background: linear-gradient(135deg, #007bff, #00c6ff); /* Градиент для шапки */
+  background: linear-gradient(135deg, #007bff, #00c6ff);
   color: white;
-  font-size: 1.2rem; /* Размер шрифта заголовка */
-  text-transform: uppercase; /* Заглавные буквы */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Тень для заголовка */
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .user-row {

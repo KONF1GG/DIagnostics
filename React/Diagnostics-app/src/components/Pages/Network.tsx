@@ -46,7 +46,6 @@ const Network = () => {
       const result = await GetNetwork(login);
       if (typeof result === "string") {
         setError(result);
-        navigate("/login");
       } else {
         setNetworkData(result);
       }
@@ -58,6 +57,7 @@ const Network = () => {
     }
   };
 
+  console.log(networkData)
   const combinedData = networkData
     ? [
         {
@@ -120,7 +120,7 @@ const Network = () => {
               <thead className="table-primary">
                 <tr>
                   <th>Параметр</th>
-                  <th>Redius</th>
+                  <th>Radius</th>
                   <th>Redis</th>
                 </tr>
               </thead>
