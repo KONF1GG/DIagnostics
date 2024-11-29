@@ -40,6 +40,7 @@ async def get_cameras_data(
 
     service_list = await crud.get_services_from_1C(services)
 
+
     flussonic_diffs, cameras_difference, service_differences, flussonic_cameras = await asyncio.gather(
         crud.check_flussonic_streams(cameras_from_1c if cameras_from_1c else cameras_from_redis),
         crud.get_cameras_difference(cameras_from_1c, cameras_from_redis),

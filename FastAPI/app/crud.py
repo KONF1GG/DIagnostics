@@ -262,6 +262,7 @@ async def check_cameras_dif(redis_cameras: List[CameraCheckModel],
 
 
 async def get_services_from_1C(services_from_1c):
+    print(services_from_1c)
     return [
         {
             'name': service['name'],
@@ -271,7 +272,7 @@ async def get_services_from_1C(services_from_1c):
         }
         for service_list in services_from_1c
         for service in service_list.get('services', [])
-        if service['name'].startswith('Услуга видеонаблюдения')
+        if service['productName'].startswith('Услуга видеонаблюдения')
     ]
 
 

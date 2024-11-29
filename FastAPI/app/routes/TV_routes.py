@@ -2,6 +2,7 @@ import asyncio
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, List, Optional
 
+from pydantic import ValidationError
 from redis import ResponseError
 from app import crud
 from app.depencies import RedisDependency, SessionRediusDependency, TokenDependency
@@ -29,19 +30,16 @@ async def get_connection_data(
     operators = set()
     tasks = []
 
-    # Подготовка данных и асинхронных запросов
     for service in services_from_1c:
-        operator = service.operator
-        if operator not in operators and operator != '24ТВ' or operator != '24ТВ КРД':
+        if service.operator not in operators and service.operator != '24ТВ' or service.operator != '24ТВ КРД':
             update_service_data(response_data, service)
             tasks.append(prepare_operator_task(service))
-            operators.add(operator)
+            operators.add(service.operator)
         else:
             append_service_data(response_data, service)
 
-    # Выполнение асинхронных запросов параллельно
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    # Обработка результатов и сравнение данных
+
     await process_results(response_data, results, services_from_1c)
     return response_data
 

@@ -185,7 +185,7 @@ class Service1C(BaseModel):
     operator: str
     userId: str
     serviceId: str
-    type: int
+    type: Optional[int] = None
     not_turnoff_if_not_used: bool
     ban_on_app: bool
 

@@ -130,6 +130,7 @@ const TV = () => {
     try {
       const result = await GetTV(login);
       setData(result);
+      console.log(result);
     } catch {
       setError("Ошибка загрузки данных");
       setData(null);
@@ -238,22 +239,20 @@ const TV = () => {
           { position: "bottom-right" }
         );
         setchangeIsLoading(false);
-        return { success: false, message: "Ошибка сервера" };
       }
 
-      const responseData = await response.json();
       toast.success("Синхронизация статусов запущена", {
         position: "bottom-right",
       });
 
       setTimeout(() => setchangeIsLoading(false), 5000);
-      return responseData;
+      const result = await GetTV(login);
+      setData(result);
     } catch (error) {
       toast.error(`Ошибка: ${error || "Не удалось обновить настройки"}`, {
         position: "bottom-right",
       });
       setchangeIsLoading(false);
-      return { success: false, message: "Ошибка подключения к серверу" };
     }
   };
 
