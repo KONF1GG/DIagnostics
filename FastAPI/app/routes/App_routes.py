@@ -1,17 +1,18 @@
 import asyncio
 import json
+from operator import add
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, List, Optional
 
 from redis import ResponseError
 from app import crud
 from app.depencies import RedisDependency, SessionRediusDependency, TokenDependency, RBTDependency
-from app.schemas import TV24, TVIP, Service1C, Service1c, ServiceOp, Smotreshka, TVResponse
+from app.schemas import TV24, TVIP, AppResponse, LoginsData, Phone, RBT_phone, RedisLogin, Service1C, Service1c, ServiceOp, Smotreshka, TVResponse
 from app import config
 
 router = APIRouter()
 
-@router.get('/v1/app', response_model=List)
+@router.get('/v1/app', response_model=AppResponse | Dict)
 async def get_connection_data(
     token: TokenDependency,
     redis: RedisDependency,
@@ -20,41 +21,50 @@ async def get_connection_data(
 ):
     """Эндпоинт для получения информации приложения"""
 
-    # redis_data = await crud.get_redis_key_data(login, redis)
-    # flat_id = redis_data.get("flatId", 0)
+    redis_data = await crud.get_redis_key_data(login, redis)
+    flat_id = redis_data.get("flatId", 0)
 
-    # if flat_id == 0:
-    #     return {"message": "Договор не зарегистрирован в приложении"}
-    
-    # logins_list = await crud.get_logins_by_flatId_redis(flat_id, redis)
+    if flat_id == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="Договор не зарегистрирован в приложении"
+        )
 
-    # data_list = []
-    # for doc in logins_list:
-    #     data = json.loads(doc.json) 
-    #     login = data.get('login')
-    #     name = data.get('name')
-    #     address = data.get('address')
-    #     contract = data.get('contract')
+    # Получение адреса из данных Redis
+    address_in_the_app = redis_data.get("address", "Неизвестно")
 
-    #     data_list.append({
-    #         'login': login,
-    #         'name': name,
-    #         'address': address,
-    #         'contract': contract
-    #     })
+    # Получение списка логинов
+    logins_list = await crud.get_logins_by_flatId_redis(flat_id, redis)
+    contracts = []
+    for doc in logins_list:
+        data = json.loads(doc.json)
+        contracts.append(LoginsData(
+            login=data.get('login', ''),
+            name=data.get('name', 'Неизвестно'),
+            address=data.get('address', 'Неизвестно'),
+            contract=data.get('contract', 'Неизвестно')
+        ))
 
-    flat_id = 126458
-    rbt_data = await crud.get_numbers_rbt(flat_id, rbt)
-    
-    for data in rbt_data:
-        flats = await crud.get_flats(data.house_id, rbt)
-        print(f"Flats for house_id {data.house_id}: {flats}")
-    
-    flat_ids = [flat.flat_id for flat in flats]
-    logins = await crud.get_logins_from_redis(flat_ids, redis)
+    # Получение данных о номерах RBT
+    rbt_phones = await crud.get_numbers_rbt(flat_id, rbt)
+    phones = []
+    for rbt_phone in rbt_phones:
+        flats = await crud.get_flats(rbt_phone.house_id, rbt)
+        redis_logins = await crud.get_logins_from_redis(flats, redis)
+        redis_contracts = [
+            RedisLogin(
+                login=data.get('login', ''),
+                address=data.get('address', 'Неизвестно'),
+                contract=data.get('contract', 'Неизвестно')
+            )
+            for login in redis_logins
+            for data in [json.loads(login.json)]
+        ]
 
-    print("Logins and addresses from Redis:", logins)
+        phones.append(Phone(**rbt_phone.dict(), contracts=redis_contracts))
 
-    
-
-    return rbt_data 
+    return AppResponse(
+        address_in_app=address_in_the_app,
+        contracts=contracts,
+        phones=phones
+    )

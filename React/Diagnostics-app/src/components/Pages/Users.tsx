@@ -49,7 +49,7 @@ const Users: React.FC = () => {
         </div>
       ) : (
         <table className="table">
-          <thead>
+          <thead className='table-primary'>
             <tr>
               <th>ID</th>
               <th>Имя</th>

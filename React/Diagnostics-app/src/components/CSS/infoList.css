@@ -1,0 +1,41 @@
+/* Стили для табов */
+.nav-tabs {
+    position: relative;
+  }
+  
+  /* Псевдоэлемент для динамической линии */
+  .nav-tabs::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    height: 3px; /* Толщина линии */
+    width: 0;
+    background-color: #0d6efd; /* Цвет линии */
+    transition: transform 0.3s ease, width 0.3s ease; /* Анимация перемещения */
+    pointer-events: none;
+  }
+  
+  /* Стили для каждой вкладки */
+  .nav-item .nav-link {
+    position: relative;
+    font-weight: normal;  /* Убирает жирность у всех ссылок, включая активные */
+    text-decoration: none; /* Убирает подчеркивание */
+  }
+  
+  /* Активная вкладка */
+  .nav-item .nav-link.active {
+    font-weight: normal; /* Убирает жирность на активной вкладке */
+  }
+  
+  /* Линия под активной вкладкой */
+  .nav-item .nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -3px; /* Расстояние от текста до линии */
+    left: 0;
+    height: 3px; /* Толщина линии */
+    width: 100%;
+    background-color: #0d6efd; /* Цвет линии для активной ссылки */
+    transform-origin: left center;
+  }
+  

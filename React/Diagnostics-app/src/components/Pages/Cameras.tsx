@@ -5,7 +5,7 @@ import { GetNetwork } from "../../API/Cameras";
 import "../CSS/cameras.css";
 import { useDataContext } from "../../DataContext/CamerasContext";
 import Modal from "../Modals/CameraModal";
-import { getQueryParams } from "./Deafault/getData";
+import { getQueryParams } from "./Default/getData";
 
 const Cameras = () => {
   const { data, setData, login, setLogin } = useDataContext();
@@ -135,7 +135,7 @@ const Cameras = () => {
               )}
             </div>
           ) : (
-            <p className="no-services-message fade-in">Услуги отсутствуют</p>
+            <p className="no-services-message">Услуги отсутствуют</p>
           )}
 
           {/* Камеры из 1C */}
@@ -235,7 +235,7 @@ const Cameras = () => {
                               onClick={() =>
                                 openModal(
                                   data.cameras_from_1c.cameras.find(
-                                    (cam) => cam.id === camera.id 
+                                    (cam) => cam.id === camera.id
                                   ),
                                   data.cameras_from_redis.find(
                                     (cam) => cam.id === camera.id

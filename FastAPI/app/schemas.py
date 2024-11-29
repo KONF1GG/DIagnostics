@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import ABC
+import string
 import uuid
 from typing import Any, Literal, Dict, List, Optional, Union
 from typing import Any, Literal, Dict, List, Optional, Union
@@ -252,10 +253,30 @@ class RBT(BaseModel):
     house_id: int
     role: int
 
-class RBT_phones(RBT):
-    id: int
+# class RBT_flat(BaseModel):
+#     flat_id: int
+
+class RedisLogin(BaseModel):
+    login: str
+    address: str
+    contract: str
+
+
+class RBT_phone(RBT):
+    phone: int # id
     name: str
     patronymic: str
 
-class RBT_flat(RBT):
-    flat_id: int
+class LoginsData(BaseModel):
+    login: str
+    name: str
+    address: str
+    contract: str
+
+class Phone(RBT_phone):
+    contracts: List[RedisLogin]
+
+class AppResponse(BaseModel):
+    address_in_app: str
+    contracts: List[LoginsData]
+    phones: List[Phone]

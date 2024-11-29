@@ -6,7 +6,7 @@ import "../CSS/Loading.css";
 import "../CSS/Network.css";
 import { useDataContext } from "../../DataContext/FailureContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getQueryParams } from "./Deafault/getData";
+import { getQueryParams } from "./Default/getData";
 
 const Accidents = () => {
   const location = useLocation();

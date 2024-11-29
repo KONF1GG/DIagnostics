@@ -1,4 +1,3 @@
-import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDataContext } from "../../../DataContext/TVContext";
 import { GetTV } from "../../../API/TV";
@@ -8,15 +7,38 @@ import ServiceTable from "./ServiceTable";
 import UserInfo from "./UserInfoProps";
 import InfoList from "../InfoList";
 import Checkbox from "./CheckBox";
-import { getQueryParams } from "../Deafault/getData";
+import { getQueryParams } from "../Default/getData";
+import { toast } from "react-toastify";
+
+interface UpdateSettingsRequest {
+  login: string;
+  operator: string;
+  not_turnoff_if_not_used: boolean;
+  ban_on_app: boolean;
+}
+
+interface CorrecrtTVData {
+  login: string;
+  operator: string;
+}
+
+interface UpdateSettingsResponse {
+  success: boolean;
+  message?: string;
+}
+
+interface CheckboxState {
+  notTurnOffIfNotUsed: boolean;
+  banOnApp: boolean;
+}
 
 const updateSettings = async (
   login: string,
   operator: string,
   not_turnoff_if_not_used: boolean,
   ban_on_app: boolean
-) => {
-  const requestData = {
+): Promise<UpdateSettingsResponse> => {
+  const requestData: UpdateSettingsRequest = {
     login,
     operator,
     not_turnoff_if_not_used,
@@ -24,28 +46,45 @@ const updateSettings = async (
   };
 
   try {
-    console.log(requestData)
-    await fetch("http://dev1c/UNF_TEST_WS2/hs/mwapi/settingsTV", {
-      method: "POST",
-      // mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    console.log("Отправляем запрос с данными:", requestData);
 
-      body: JSON.stringify(requestData),
-    });
-    
-  } 
-  catch (error) {
+    const response = await fetch(
+      "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/settingsTV",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      }
+    );
+
+    if (!response.ok) {
+      console.error(
+        "Ошибка ответа от сервера:",
+        response.status,
+        response.statusText
+      );
+      return { success: false, message: "Ошибка сервера" };
+    }
+    console.log(response);
+    const responseData = (await response.json()) as UpdateSettingsResponse;
+    return { success: true, message: responseData.message };
+  } catch (error) {
     console.error("Ошибка при отправке данных на сервер:", error);
+    return { success: false, message: "Ошибка подключения к серверу" };
   }
 };
 
+// const showError = (message: string) => {
+//   alert(message);
+// };
+
 const TV = () => {
-  const location = useLocation();
   const { data, setData, login, setLogin } = useDataContext();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [ischangeLoading, setchangeIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -100,10 +139,12 @@ const TV = () => {
   };
 
   const handleSmotreshkaCheckboxChange = async (
-    checkbox: string,
+    checkbox: keyof CheckboxState,
     value: boolean
   ) => {
-    const updatedState = {
+    const previousState = { ...smotreshkaCheckboxes }; // Сохранение текущего состояния
+
+    const updatedState: CheckboxState = {
       ...smotreshkaCheckboxes,
       [checkbox]: value,
     };
@@ -111,30 +152,108 @@ const TV = () => {
     setSmotreshkaCheckboxes(updatedState);
 
     try {
-      await updateSettings(
+      const result = await updateSettings(
         queriedLogin,
         "Смотрешка",
         updatedState.notTurnOffIfNotUsed,
         updatedState.banOnApp
       );
 
-      const result = await GetTV(queriedLogin);
-      setData(result);
+      if (!result.success) {
+        setSmotreshkaCheckboxes(previousState); // Откат состояния при ошибке
+        toast.error(
+          `Ошибка: ${result.message || "Не удалось обновить настройки"}`,
+          {
+            position: "bottom-right",
+          }
+        );
+      } else {
+        toast.success("Настройки успешно обновлены!", {
+          position: "bottom-right",
+        });
+      }
     } catch (error) {
-      console.error("Ошибка при обновлении настроек:", error);
+      setSmotreshkaCheckboxes(previousState); // Откат состояния при исключении
+      toast.error("Ошибка: Не удалось обновить настройки", {
+        position: "bottom-right",
+      });
     }
   };
 
   const handleTv24CheckboxChange = async (value: boolean) => {
+    const previousState = { ...tv24Checkbox };
+
     setTv24Checkbox({ banOnApp: value });
 
     try {
-      await updateSettings(queriedLogin, "24ТВ", false, value);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      const result = await GetTV(queriedLogin);
-      setData(result);
+      const result = await updateSettings(queriedLogin, "24ТВ", false, value);
+
+      if (!result.success) {
+        setTv24Checkbox(previousState); // Откат состояния при ошибке
+        toast.error(
+          `Ошибка: ${result.message || "Не удалось обновить настройки"}`,
+          {
+            position: "bottom-right",
+          }
+        );
+      } else {
+        toast.success("Настройки успешно обновлены!", {
+          position: "bottom-right",
+        });
+      }
     } catch (error) {
+      setTv24Checkbox(previousState); // Откат состояния при исключении
       console.error("Ошибка при обновлении настроек:", error);
+      toast.error("Ошибка: Не удалось обновить настройки", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  const handleChangeButton = async (operator: string, login: string) => {
+    console.log(`Кнопка для исправить ${operator} нажата!`);
+    setchangeIsLoading(true);
+
+    try {
+      const requestData = {
+        login,
+        operator,
+      };
+
+      console.log("Отправляем запрос с данными:", requestData);
+      const response = await fetch(
+        "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/correctTV",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+
+      if (!response.ok) {
+        toast.error(
+          `Ошибка: ${response.statusText || "Не удалось обновить настройки"}`,
+          { position: "bottom-right" }
+        );
+        setchangeIsLoading(false);
+        return { success: false, message: "Ошибка сервера" };
+      }
+
+      const responseData = await response.json();
+      toast.success("Синхронизация статусов запущена", {
+        position: "bottom-right",
+      });
+
+      setTimeout(() => setchangeIsLoading(false), 5000);
+      return responseData;
+    } catch (error) {
+      toast.error(`Ошибка: ${error || "Не удалось обновить настройки"}`, {
+        position: "bottom-right",
+      });
+      setchangeIsLoading(false);
+      return { success: false, message: "Ошибка подключения к серверу" };
     }
   };
 
@@ -146,11 +265,10 @@ const TV = () => {
         phone: phone,
       };
 
-      await fetch(
+      const response = await fetch(
         "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone",
         {
           method: "POST",
-          mode: "no-cors",
           headers: {
             "Content-Type": "application/json",
           },
@@ -158,12 +276,18 @@ const TV = () => {
         }
       );
 
-      console.log("Запрос успешно отправлен!");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      console.log(response);
+      if (response.ok) {
+        toast.success("Телефон сделан основным", {
+          position: "bottom-right",
+        });
+      }
       const result = await GetTV(queriedLogin);
       setData(result);
     } catch (error) {
-      console.error("Ошибка при изменении освновного номера:", error);
+      toast.error("Ошибка: Не удалось изменить основной номер", {
+        position: "bottom-right",
+      });
     }
   };
 
@@ -196,7 +320,6 @@ const TV = () => {
       </div>
     );
   }
-
   return (
     <div>
       <InfoList />
@@ -221,8 +344,26 @@ const TV = () => {
               </div>
               {data.smotreshka.error && (
                 <div className="ms-auto">
-                  <button className="btn btn-danger btn-danger-hover">
-                    Исправить
+                  <button
+                    className={`btn ${
+                      ischangeLoading ? "btn-secondary" : "btn-danger"
+                    } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                    onClick={() =>
+                      !ischangeLoading &&
+                      handleChangeButton("Смотрешка", queriedLogin)
+                    }
+                    disabled={ischangeLoading}
+                  >
+                    {ischangeLoading ? (
+                      <div
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                      >
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    ) : (
+                      "Исправить"
+                    )}
                   </button>
                 </div>
               )}
@@ -300,8 +441,26 @@ const TV = () => {
               </div>
               {data.tvip.error && (
                 <div className="ms-auto">
-                  <button className="btn btn-danger btn-danger-hover">
-                    Исправить
+                  <button
+                    className={`btn ${
+                      ischangeLoading ? "btn-secondary" : "btn-danger"
+                    } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                    onClick={() =>
+                      !ischangeLoading &&
+                      handleChangeButton("ТВИП", queriedLogin)
+                    }
+                    disabled={ischangeLoading}
+                  >
+                    {ischangeLoading ? (
+                      <div
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                      >
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    ) : (
+                      "Исправить"
+                    )}
                   </button>
                 </div>
               )}
@@ -344,8 +503,27 @@ const TV = () => {
               </div>
               {data.tv24.error && (
                 <div className="ms-auto">
-                  <button className="btn btn-danger btn-danger-hover">
-                    Исправить
+                  <button
+                    className={`btn ${
+                      ischangeLoading ? "btn-secondary" : "btn-danger"
+                    } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                    onClick={() =>
+                      data.tv24.isKRD
+                        ? handleChangeButton("24ТВ КРД", queriedLogin)
+                        : handleChangeButton("24ТВ", queriedLogin)
+                    }
+                    disabled={ischangeLoading}
+                  >
+                    {ischangeLoading ? (
+                      <div
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                      >
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    ) : (
+                      "Исправить"
+                    )}
                   </button>
                 </div>
               )}
@@ -378,8 +556,8 @@ const TV = () => {
               </div>
             </div>
             <div className="phone-list">
-              {data?.tv24?.additional_phones?.map((phone, index) => (
-                <div key={index} className="phone-card">
+              {data?.tv24?.additional_phones?.map((phone) => (
+                <div key={phone} className="phone-card">
                   <div className="phone-info">
                     <span className="phone-number">{phone}</span>
                   </div>

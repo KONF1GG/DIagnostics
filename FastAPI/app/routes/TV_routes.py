@@ -50,7 +50,7 @@ def initialize_response_data():
     return {
         "smotreshka": {"login": None, "password": None, "not_turnoff_if_not_used": None, "service1c": [], "serviceOp": [], "ban_on_app": False, "error": None},
         "tvip": {"login": None, "password": None, "service1c": [], "serviceOp": [], "error": None},
-        "tv24": {"phone": None, "service1c": [], "serviceOp": [], "error": None, "additional_phones": [], "ban_on_app": False},
+        "tv24": {"phone": None, "service1c": [], "serviceOp": [], "error": None, "additional_phones": [], "ban_on_app": False, "isKRD": None},
         "errors": {}
     }
 
@@ -61,6 +61,10 @@ def update_service_data(response_data, service):
         response_data["tvip"]['password'] = service.password
         response_data['tvip']['service1c'].append(Service1c(id=service.serviceId, name=service.service, status=service.status))
     elif service.operator in ("24ТВ", "24ТВ КРД"):
+        if service.operator == '24ТВ':
+            response_data['tv24']['isKRD'] = False
+        if service.operator == '24ТВ КРД':
+            response_data['tv24']['isKRD'] = True
         if service.password == 'Второй номер':
             response_data['tv24']['additional_phones'].append(service.login)
         else:
@@ -119,8 +123,6 @@ def compare_service_data(service_data):
     """Сравнение данных service1c и serviceOp по id и status"""
 
     service1c_data = [(int(s.id), s.status) for s in service_data['service1c'] if s.id != '0' and s.status == 'Активный']
-    serviceOp_data = [(int(s.id), 's.status') for s in service_data['serviceOp']]
-
-    print(set(service1c_data) == set(serviceOp_data))
+    serviceOp_data = [(int(s.id), s.status) for s in service_data['serviceOp']]
     
     return set(service1c_data) == set(serviceOp_data)

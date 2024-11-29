@@ -20,9 +20,10 @@ body {
   transition: transform 0.3s, box-shadow 0.3s; /* Плавный эффект увеличения и тени */
 }
 
+
 .table:hover {
-  transform: scale(1.03); /* Увеличение таблицы при наведении */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Увеличиваем тень при наведении */
+  /* transform: scale(1.03); Увеличение таблицы при наведении */
+  /* box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); Увеличиваем тень при наведении */
 }
 
 th, td {
@@ -88,7 +89,7 @@ thead {
 .title::after {
   content: ''; /* Создаем псевдоэлемент */
   display: block;
-  width: 50%;
+  width: 70%;
   height: 5px; /* Высота линии под заголовком */
   background: linear-gradient(90deg, #007bff, #00c6ff); /* Градиент */
   margin: 10px auto; /* Центрируем линию */

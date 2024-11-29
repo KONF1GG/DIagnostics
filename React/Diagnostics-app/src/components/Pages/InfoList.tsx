@@ -1,10 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import "../CSS/infoList.css";
 
 const InfoList = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [login, setLogin] = useState("");
+  const [login, setLogin] = useState<string>("");
 
   // Обработка изменения ввода
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +91,7 @@ const InfoList = () => {
         </div>
       </div>
 
-      {/* Вкладки навигации */}
+      {/* Навигация по вкладкам */}
       <ul className="nav nav-tabs justify-content-center mb-3">
         {[
           { path: "network", label: "Сеть" },
@@ -98,8 +99,8 @@ const InfoList = () => {
           { path: "cameras", label: "Камеры" },
           { path: "TV", label: "ТВ" },
           { path: "app", label: "Приложение" },
-        ].map(({ path, label }) => (
-          <li key={path} className="nav-item">
+        ].map(({ path, label }, index) => (
+          <li key={index} className="nav-item">
             <Link
               to={
                 login
@@ -109,9 +110,7 @@ const InfoList = () => {
               className={`nav-link ${
                 location.pathname === `/${path}` ? "active" : ""
               }`}
-              style={{
-                transition: "color 0.3s, text-decoration 0.3s",
-              }}
+              style={{ textDecoration: "none" }}
             >
               {label}
             </Link>

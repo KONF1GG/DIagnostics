@@ -5,7 +5,7 @@ import InfoList from "./InfoList";
 import "../CSS/Network.css";
 import "../CSS/Loading.css";
 import { useDataContext } from "../../DataContext/NetworkContext";
-import { getQueryParams } from "./Deafault/getData";
+import { getQueryParams } from "./Default/getData";
 
 interface Differences {
   radius: Record<string, unknown>;

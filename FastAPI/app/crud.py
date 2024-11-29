@@ -13,7 +13,7 @@ from jinja2 import DictLoader
 import psycopg2
 from redis.commands.search.result import Result
 from app.depencies import RedisDependency
-from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_flat, RBT_phones, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
+from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
 from app.models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 from app import crud
@@ -574,7 +574,7 @@ async def get_logins_by_flatId_redis(flat_id: int, redis: RedisDependency):
         raise HTTPException(status_code=404, detail="Логины не найдены по flatId")
     return search_result.docs
 
-async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phones]:
+async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
     async with rbt.transaction():
         query = """
         SELECT fs.house_subscriber_id, fs.role, sm.id, sm.subscriber_name, sm.subscriber_patronymic
@@ -586,11 +586,11 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phones]:
         result = await rbt.fetch(query, flat_id)
         
         subs_list = [
-            RBT_phones(
+            RBT_phone(
                 house_id=row['house_subscriber_id'],
                 role=row['role'],
                 name=row['subscriber_name'],
-                id=row['id'],
+                phone=row['id'],
                 patronymic=row['subscriber_patronymic'],
 
             ) 
@@ -603,20 +603,13 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phones]:
 async def get_flats(house_id: int, rbt):
     async with rbt.transaction():
         query = """
-        SELECT *
+        SELECT house_flat_id
         FROM "houses_flats_subscribers"
         WHERE "house_subscriber_id" = $1
         """
         result = await rbt.fetch(query, house_id)
         
-        flats_list = [
-            RBT_flat(
-                house_id=row['house_subscriber_id'],
-                role=row['role'],
-                flat_id=row['house_flat_id']
-            ) 
-            for row in result
-        ]
+        flats_list = [row['house_flat_id'] for row in result]
 
     return flats_list
 

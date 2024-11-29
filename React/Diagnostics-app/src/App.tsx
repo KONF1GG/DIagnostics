@@ -8,17 +8,23 @@ import Network from "./components/Pages/Network";
 import Accidents from "./components/Pages/Accidents";
 import Cameras from "./components/Pages/Cameras";
 import TV from "./components/Pages/TV/TV";
+import App_page from "./components/Pages/App_/app"
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const location = useLocation();
 
   return (
     <>
+      <ToastContainer />
       {location.pathname !== "/login" && location.pathname !== "/register" && (
         <Navbar />
       )}
 
-      <div style={{ paddingBottom: '60px' }}> {/* Отступ снизу для контента */}
+      <div style={{ paddingBottom: "60px" }}>
+        {" "}
+        {/* Отступ снизу для контента */}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Reg />} />
@@ -28,9 +34,9 @@ const App = () => {
           <Route path="/accidents" element={<Accidents />} />
           <Route path="/cameras" element={<Cameras />} />
           <Route path="/TV" element={<TV />} />
+          <Route path="/app" element={<App_page />}></Route>
         </Routes>
       </div>
-
     </>
   );
 };

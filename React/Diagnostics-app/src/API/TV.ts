@@ -35,6 +35,7 @@ export interface TV24 {
     serviceOp: Service[];
     additional_phones: string[];
     ban_on_app: boolean | null;
+    isKRD: boolean | null
     error: string | null;
 }
 
@@ -62,7 +63,7 @@ export const GetTV = async (login: string): Promise<ResponseData | null> => {
         console.log(response.data)
         if (response.status === 401) {
             window.location.href = "/login";
-            return null; // Возвращаем null вместо строки
+            return null;
         }
 
         return response.data;
@@ -75,6 +76,6 @@ export const GetTV = async (login: string): Promise<ResponseData | null> => {
             console.error("Произошла ошибка получения данных о TV");
         }
 
-        return null; // Возвращаем null в случае ошибки
+        return null; 
     }
 };

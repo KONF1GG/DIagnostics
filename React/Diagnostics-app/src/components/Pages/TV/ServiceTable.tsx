@@ -17,16 +17,14 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
   title,
   services,
   emptyMessage,
-  highlight = false, 
+  highlight = false,
 }) => {
   return (
-    <div
-      className={`services-section`}
-    >
+    <div className="services-section">
       <h3 className="mb-3">{title}</h3>
       {services && services.length > 0 ? (
         <table className="table table-bordered table-striped">
-          <thead className={highlight? 'table-danger' : 'table-primary'}>
+          <thead className={highlight ? "table-danger" : "table-primary"}>
             <tr>
               <th>Название</th>
               <th>ID</th>
@@ -34,8 +32,10 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {services.map((service) => (
-              <tr key={service.id}>
+            {services.map((service, index) => (
+              <tr key={`${service.id}-${index}`}>
+                {" "}
+                {/* Используем уникальный ключ */}
                 <td>{service.name}</td>
                 <td>{service.id}</td>
                 <td>
