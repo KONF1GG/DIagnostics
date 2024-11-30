@@ -31,7 +31,7 @@ async def get_connection_data(
     tasks = []
 
     for service in services_from_1c:
-        if service.operator not in operators and service.operator != '24ТВ' or service.operator != '24ТВ КРД':
+        if service.operator not in operators or service.operator == '24ТВ' or service.operator == '24ТВ КРД':
             update_service_data(response_data, service)
             tasks.append(prepare_operator_task(service))
             operators.add(service.operator)
