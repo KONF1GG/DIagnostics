@@ -13,7 +13,7 @@ from jinja2 import DictLoader
 import psycopg2
 from redis.commands.search.result import Result
 from app.depencies import RedisDependency
-from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
+from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
 from app.models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 from app import crud
@@ -625,3 +625,14 @@ async def get_logins_from_redis(flat_ids: List[int], redis):
         logins.append(doc)
     
     return logins
+
+
+async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
+    result = await redis.ft('idx:searchLogin').search(search_login)
+    logins_list = []
+    for doc in result.docs:
+        data = json.loads(doc.json)
+        if 'loginserv' not in doc.id:
+            logins_list.append(RedisLoginSearch(login=data.get('login', ''), name=data.get('name', ''), contract=data.get('contract', ''), address=data.get('address', '')))
+
+    return logins_list

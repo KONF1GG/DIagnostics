@@ -62,56 +62,59 @@ const Accidents = () => {
 
   return (
     <div>
-      <InfoList />
-      {loading ? (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Загрузка данных...</p>
-        </div>
-      ) : error ? (
-        <div className="no-services-message fade-in">{error}</div>
-      ) : FailureData && FailureData.failure.length > 0 ? (
-        <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
-          <div className="fade-in">
-            <h2 className="title">Данные об авариях</h2>
-            {FailureData.failure.map((failure: FailureData) => (
-              <div key={failure.id} className="failure-table">
-                <h3>Авария ID: {failure.id}</h3>
-                <table className="table table-bordered table-striped">
-                  <tbody>
-                    <tr>
-                      <td>Статус</td>
-                      <td>{failure.active ? "Активен" : "Неактивен"}</td>
-                    </tr>
-                    <tr>
-                      <td>Хост</td>
-                      <td>{failure.host}</td>
-                    </tr>
-                    <tr>
-                      <td>Адрес</td>
-                      <td>{failure.address}</td>
-                    </tr>
-                    <tr>
-                      <td>Сообщение</td>
-                      <td>{failure.message}</td>
-                    </tr>
-                    <tr>
-                      <td>Дата создания</td>
-                      <td>{failure.createdDate}</td>
-                    </tr>
-                    <tr>
-                      <td>Дата изменения</td>
-                      <td>{failure.modified_date}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            ))}
+      <InfoList>
+        {loading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Загрузка данных...</p>
           </div>
-        </div>
-      ) : (
-        <div className="no-services-message fade-in">Аварии не обнаружены</div>
-      )}
+        ) : error ? (
+          <div className="no-services-message fade-in">{error}</div>
+        ) : FailureData && FailureData.failure.length > 0 ? (
+          <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
+            <div className="fade-in">
+              <h2 className="title">Данные об авариях</h2>
+              {FailureData.failure.map((failure: FailureData) => (
+                <div key={failure.id} className="failure-table">
+                  <h3>Авария ID: {failure.id}</h3>
+                  <table className="table table-bordered table-striped">
+                    <tbody>
+                      <tr>
+                        <td>Статус</td>
+                        <td>{failure.active ? "Активен" : "Неактивен"}</td>
+                      </tr>
+                      <tr>
+                        <td>Хост</td>
+                        <td>{failure.host}</td>
+                      </tr>
+                      <tr>
+                        <td>Адрес</td>
+                        <td>{failure.address}</td>
+                      </tr>
+                      <tr>
+                        <td>Сообщение</td>
+                        <td>{failure.message}</td>
+                      </tr>
+                      <tr>
+                        <td>Дата создания</td>
+                        <td>{failure.createdDate}</td>
+                      </tr>
+                      <tr>
+                        <td>Дата изменения</td>
+                        <td>{failure.modified_date}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="no-services-message fade-in">
+            Аварии не обнаружены
+          </div>
+        )}
+      </InfoList>
     </div>
   );
 };

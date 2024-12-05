@@ -1,122 +1,133 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { GetSearchLogins } from "../../API/getSearchLogins";
+import { AxiosError } from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import SideMenu from "./SideMenu";
 import "../CSS/infoList.css";
 
-const InfoList = () => {
+interface InfoListProps {
+  children: React.ReactNode;
+}
+
+const InfoList: React.FC<InfoListProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [login, setLogin] = useState<string>("");
+  const [loginsList, setLoginsList] = useState<string[]>([]);
+  const [error, setError] = useState<string>("");
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  // Обработка изменения ввода
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLogin(e.target.value);
   };
 
-  // Обработка поиска
-  const handleSearch = () => {
-    if (login) {
-      let redirectUrl = "";
-      switch (location.pathname) {
-        case "/":
-          redirectUrl = `/network?login=${encodeURIComponent(login)}`;
-          break;
-        case "/accidents":
-          redirectUrl = `/accidents?login=${encodeURIComponent(login)}`;
-          break;
-        case "/cameras":
-          redirectUrl = `/cameras?login=${encodeURIComponent(login)}`;
-          break;
-        case "/TV":
-          redirectUrl = `/TV?login=${encodeURIComponent(login)}`;
-          break;
-        case "/app":
-          redirectUrl = `/app?login=${encodeURIComponent(login)}`;
-          break;
-        default:
-          redirectUrl = `/network?login=${encodeURIComponent(login)}`; // По умолчанию
-      }
+  useEffect(() => {
+    if (login.length > 2) {
+      const fetchLogins = async () => {
+        try {
+          const result = await GetSearchLogins(login);
+          if ("logins" in result) {
+            setLoginsList(result.logins.map((item) => item.login));
+            setError("");
+          } else {
+            setLoginsList([]);
+            setError(result.message);
+          }
+        } catch (err) {
+          setLoginsList([]);
+          setError((err as AxiosError).message || "Ошибка при запросе.");
+        }
+      };
+      fetchLogins();
+    } else {
+      setLoginsList([]);
+      setError("");
+    }
+  }, [login]);
 
+  const handleLoginSearchChoice = () => {
+    if (login) {
+      const redirectUrl = `${location.pathname}?login=${encodeURIComponent(
+        login
+      )}`;
       navigate(redirectUrl);
+      setLoginsList([]);
     }
   };
 
-  // Эффект для получения логина из параметров запроса
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+
+  const shouldShowDropdown = loginsList.length > 0 && (isFocused || isHovered);
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    if (queryParams.has("login")) {
-      setLogin(queryParams.get("login") || "");
-    } else {
-      setLogin(""); // Сбрасываем логин, если его нет
-    }
+    setLogin(queryParams.get("login") || "");
   }, [location]);
 
   return (
-    <div className="container mt-4">
-      {/* Поисковая форма */}
-      <div className="container mt-4">
-        <div
-          className="d-flex justify-content-center align-items-center mb-4"
-          style={{ gap: "10px" }}
-        >
-          <input
-            id="loginInput"
-            type="text"
-            placeholder="Введите логин"
-            value={login}
-            onChange={handleInputChange}
-            className="form-control"
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && login) {
-                handleSearch();
-              }
-            }}
-            style={{ maxWidth: "300px" }}
-          />
-          <button
-            onClick={handleSearch}
-            className="btn btn-outline-primary"
-            disabled={!login}
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "20%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "0",
-            }}
-          >
-            <i className="fas fa-search" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
+    <div className="info-list-layout">
+      <SideMenu login={login} />
 
-      {/* Навигация по вкладкам */}
-      <ul className="nav nav-tabs justify-content-center mb-3">
-        {[
-          { path: "network", label: "Сеть" },
-          { path: "accidents", label: "Аварии" },
-          { path: "cameras", label: "Камеры" },
-          { path: "TV", label: "ТВ" },
-          { path: "app", label: "Приложение" },
-        ].map(({ path, label }, index) => (
-          <li key={index} className="nav-item">
-            <Link
-              to={
-                login
-                  ? `/${path}?login=${encodeURIComponent(login)}`
-                  : `/${path}`
+      <div className="content-wrapper">
+        <div className="search-container">
+          <div className="input-wrapper">
+            <input
+              id="loginInput"
+              type="text"
+              placeholder="Введите логин"
+              value={login}
+              onChange={handleInputChange}
+              className="form-control"
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onKeyDown={(event) =>
+                event.key === "Enter" && handleLoginSearchChoice()
               }
-              className={`nav-link ${
-                location.pathname === `/${path}` ? "active" : ""
-              }`}
-              style={{ textDecoration: "none" }}
+              ref={inputRef}
+            />
+            <button
+              onClick={handleLoginSearchChoice}
+              className="btn-outline-primary"
+              disabled={!login}
             >
-              {label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <i className="fas fa-search" />
+            </button>
+          </div>
+
+          {shouldShowDropdown && (
+            <div
+              className={`dropdown-container ${
+                shouldShowDropdown ? "show" : ""
+              }`}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <ul className="dropdown-list">
+                {loginsList.map((loginItem, index) => (
+                  <li
+                    key={index}
+                    className="dropdown-item"
+                    onClick={() => {
+                      setLogin(loginItem);
+                      setLoginsList([]);
+                    }}
+                  >
+                    {loginItem}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {children}
+      </div>
     </div>
   );
 };

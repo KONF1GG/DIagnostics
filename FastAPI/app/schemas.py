@@ -280,3 +280,12 @@ class AppResponse(BaseModel):
     address_in_app: str
     contracts: List[LoginsData]
     phones: List[Phone]
+
+class RedisLoginSearch(BaseModel):
+    login: str
+    contract: str
+    name: str
+    address: str
+
+class SearchLogins(BaseModel):
+    logins: List[RedisLoginSearch]

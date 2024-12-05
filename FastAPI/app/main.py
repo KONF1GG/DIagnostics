@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.auth_routes import router as auth_router
-from app.routes.role_routes import router as role_router
+from app.routes.default_routes import router as def_routes
 from app.routes.user_routes import router as user_router
 from app.routes.failure_routes import router as failure_router
 from app.routes.network_routes import router as network_router
@@ -37,7 +37,7 @@ app.add_middleware(
 
 app.include_router(user_router)
 app.include_router(auth_router)
-app.include_router(role_router)
+app.include_router(def_routes)
 app.include_router(failure_router)
 app.include_router(network_router)
 app.include_router(cameras_router)

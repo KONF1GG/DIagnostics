@@ -293,8 +293,9 @@ const TV = () => {
   if (!queriedLogin && !login) {
     return (
       <div>
-        <InfoList />
-        <p className="no-services-message fade-in">Логин не указан</p>
+        <InfoList>
+          <p className="no-services-message fade-in">Логин не указан</p>
+        </InfoList>
       </div>
     );
   }
@@ -302,11 +303,12 @@ const TV = () => {
   if (loading) {
     return (
       <div>
-        <InfoList />
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Загрузка...</p>
-        </div>
+        <InfoList>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Загрузка...</p>
+          </div>
+        </InfoList>
       </div>
     );
   }
@@ -314,266 +316,268 @@ const TV = () => {
   if (data?.errors._1c) {
     return (
       <div>
-        <InfoList />
-        <p className="no-services-message fade-in">Услуги отсутствуют</p>
+        <InfoList>
+          <p className="no-services-message fade-in">Услуги отсутствуют</p>
+        </InfoList>
       </div>
     );
   }
   return (
     <div>
-      <InfoList />
-      <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
-        {data?.smotreshka?.login && (
-          <>
-            <h2
-              className={
-                data.smotreshka.error
-                  ? "title-red text-danger fade-in"
-                  : "title fade-in"
-              }
-            >
-              Смотрешка
-            </h2>
-            <div className="d-flex align-items-center justify-content-between">
-              <div className="me-3">
-                <UserInfo
-                  login={data.smotreshka.login}
-                  password={data.smotreshka.password}
-                />
-              </div>
-              {data.smotreshka.error && (
-                <div className="ms-auto">
-                  <button
-                    className={`btn ${
-                      ischangeLoading ? "btn-secondary" : "btn-danger"
-                    } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
-                    onClick={() =>
-                      !ischangeLoading &&
-                      handleChangeButton("Смотрешка", queriedLogin)
-                    }
-                    disabled={ischangeLoading}
-                  >
-                    {ischangeLoading ? (
-                      <div
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                      >
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    ) : (
-                      "Исправить"
-                    )}
-                  </button>
+      <InfoList>
+        <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
+          {data?.smotreshka?.login && (
+            <>
+              <h2
+                className={
+                  data.smotreshka.error
+                    ? "title-red text-danger fade-in"
+                    : "title fade-in"
+                }
+              >
+                Смотрешка
+              </h2>
+              <div className="d-flex align-items-center justify-content-between">
+                <div className="me-3">
+                  <UserInfo
+                    login={data.smotreshka.login}
+                    password={data.smotreshka.password}
+                  />
                 </div>
-              )}
-            </div>
-            <div className="row mt-3">
-              <div className="col-md-6">
-                <ServiceTable
-                  title="1С"
-                  services={data.smotreshka.service1c}
-                  emptyMessage="Нет данных"
-                  highlight={data.smotreshka.error ? true : false}
-                />
-              </div>
-              <div className="col-md-6">
-                <ServiceTable
-                  title="Смотрешка"
-                  services={data.smotreshka.serviceOp}
-                  emptyMessage="Нет данных"
-                  highlight={data.smotreshka.error ? true : false}
-                />
-              </div>
-              <div className="d-flex flex-column">
-                <div className="d-flex align-items-start justify-content-between">
-                  <div className="d-flex flex-column align-items-start">
-                    <Checkbox
-                      id="NotTurnOffIfNotUsed-smotreshka"
-                      label="Не отключать при неиспользовании"
-                      checked={smotreshkaCheckboxes.notTurnOffIfNotUsed}
-                      disabled={
-                        data.smotreshka.not_turnoff_if_not_used === undefined
-                      }
-                      className="checkbox-item"
-                      onChange={(e) =>
-                        handleSmotreshkaCheckboxChange(
-                          "notTurnOffIfNotUsed",
-                          e.target.checked
-                        )
-                      }
-                    />
-                    <Checkbox
-                      id="BanOnApp-smotreshka"
-                      label="Запретить включать пакеты из приложения"
-                      checked={smotreshkaCheckboxes.banOnApp}
-                      disabled={data.smotreshka.ban_on_app === undefined}
-                      className="checkbox-item"
-                      onChange={(e) =>
-                        handleSmotreshkaCheckboxChange(
-                          "banOnApp",
-                          e.target.checked
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {data?.tvip?.login && (
-          <>
-            <h2
-              className={
-                data.tvip.error ? "title-red text-danger mt-5" : "title mt-5"
-              }
-            >
-              ТВИП
-            </h2>
-            <div className="d-flex align-items-center justify-content-between">
-              <div className="me-3">
-                <UserInfo
-                  login={data.tvip.login}
-                  password={data.tvip.password}
-                />
-              </div>
-              {data.tvip.error && (
-                <div className="ms-auto">
-                  <button
-                    className={`btn ${
-                      ischangeLoading ? "btn-secondary" : "btn-danger"
-                    } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
-                    onClick={() =>
-                      !ischangeLoading &&
-                      handleChangeButton("ТВИП", queriedLogin)
-                    }
-                    disabled={ischangeLoading}
-                  >
-                    {ischangeLoading ? (
-                      <div
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                      >
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    ) : (
-                      "Исправить"
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="row mt-3">
-              <div className="col-md-6">
-                <ServiceTable
-                  title="1С"
-                  services={data.tvip.service1c}
-                  emptyMessage="Нет данных"
-                  highlight={data.tvip.error ? true : false}
-                />
-              </div>
-              <div className="col-md-6">
-                <ServiceTable
-                  title="ТВИП"
-                  services={data.tvip.serviceOp}
-                  emptyMessage="Нет данных"
-                  highlight={data.tvip.error ? true : false}
-                />
-              </div>
-            </div>
-          </>
-        )}
-
-        {data?.tv24?.phone && (
-          <>
-            <h2
-              className={
-                data.tv24.error ? "title-red text-danger mt-5" : "title mt-5"
-              }
-            >
-              24ТВ
-            </h2>
-            <div className="d-flex align-items-center justify-content-between">
-              <div className="me-3">
-                <p className="text-start fs-4">
-                  <strong>Номер:</strong> {data.tv24.phone || "Не указан"}
-                </p>
-              </div>
-              {data.tv24.error && (
-                <div className="ms-auto">
-                  <button
-                    className={`btn ${
-                      ischangeLoading ? "btn-secondary" : "btn-danger"
-                    } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
-                    onClick={() =>
-                      data.tv24.isKRD
-                        ? handleChangeButton("24ТВ КРД", queriedLogin)
-                        : handleChangeButton("24ТВ", queriedLogin)
-                    }
-                    disabled={ischangeLoading}
-                  >
-                    {ischangeLoading ? (
-                      <div
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                      >
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    ) : (
-                      "Исправить"
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="row mt-3">
-              <div className="col-md-6">
-                <ServiceTable
-                  title="1С"
-                  services={data.tv24.service1c}
-                  emptyMessage="Нет данных"
-                  highlight={data.tv24.error ? true : false}
-                />
-              </div>
-              <div className="col-md-6">
-                <ServiceTable
-                  title="24ТВ"
-                  services={data.tv24.serviceOp}
-                  emptyMessage="Нет данных"
-                  highlight={data.tv24.error ? true : false}
-                />
-              </div>
-              <div>
-                <Checkbox
-                  id="banOnAppCheckbox-tvip"
-                  label="Запретить включать пакеты из приложения"
-                  checked={tv24Checkbox.banOnApp}
-                  disabled={data.tv24.ban_on_app === undefined}
-                  onChange={(e) => handleTv24CheckboxChange(e.target.checked)}
-                />
-              </div>
-            </div>
-            <div className="phone-list">
-              {data?.tv24?.additional_phones?.map((phone) => (
-                <div key={phone} className="phone-card">
-                  <div className="phone-info">
-                    <span className="phone-number">{phone}</span>
-                  </div>
-                  <div className="button-container">
+                {data.smotreshka.error && (
+                  <div className="ms-auto">
                     <button
-                      onClick={() => handleMakePrimary(phone, queriedLogin)}
-                      className="btn btn-primary make-primary-btn"
+                      className={`btn ${
+                        ischangeLoading ? "btn-secondary" : "btn-danger"
+                      } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                      onClick={() =>
+                        !ischangeLoading &&
+                        handleChangeButton("Смотрешка", queriedLogin)
+                      }
+                      disabled={ischangeLoading}
                     >
-                      Сделать основным
+                      {ischangeLoading ? (
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      ) : (
+                        "Исправить"
+                      )}
                     </button>
                   </div>
+                )}
+              </div>
+              <div className="row mt-3">
+                <div className="col-md-6">
+                  <ServiceTable
+                    title="1С"
+                    services={data.smotreshka.service1c}
+                    emptyMessage="Нет данных"
+                    highlight={data.smotreshka.error ? true : false}
+                  />
                 </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+                <div className="col-md-6">
+                  <ServiceTable
+                    title="Смотрешка"
+                    services={data.smotreshka.serviceOp}
+                    emptyMessage="Нет данных"
+                    highlight={data.smotreshka.error ? true : false}
+                  />
+                </div>
+                <div className="d-flex flex-column">
+                  <div className="d-flex align-items-start justify-content-between">
+                    <div className="d-flex flex-column align-items-start">
+                      <Checkbox
+                        id="NotTurnOffIfNotUsed-smotreshka"
+                        label="Не отключать при неиспользовании"
+                        checked={smotreshkaCheckboxes.notTurnOffIfNotUsed}
+                        disabled={
+                          data.smotreshka.not_turnoff_if_not_used === undefined
+                        }
+                        className="checkbox-item"
+                        onChange={(e) =>
+                          handleSmotreshkaCheckboxChange(
+                            "notTurnOffIfNotUsed",
+                            e.target.checked
+                          )
+                        }
+                      />
+                      <Checkbox
+                        id="BanOnApp-smotreshka"
+                        label="Запретить включать пакеты из приложения"
+                        checked={smotreshkaCheckboxes.banOnApp}
+                        disabled={data.smotreshka.ban_on_app === undefined}
+                        className="checkbox-item"
+                        onChange={(e) =>
+                          handleSmotreshkaCheckboxChange(
+                            "banOnApp",
+                            e.target.checked
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {data?.tvip?.login && (
+            <>
+              <h2
+                className={
+                  data.tvip.error ? "title-red text-danger mt-5" : "title mt-5"
+                }
+              >
+                ТВИП
+              </h2>
+              <div className="d-flex align-items-center justify-content-between">
+                <div className="me-3">
+                  <UserInfo
+                    login={data.tvip.login}
+                    password={data.tvip.password}
+                  />
+                </div>
+                {data.tvip.error && (
+                  <div className="ms-auto">
+                    <button
+                      className={`btn ${
+                        ischangeLoading ? "btn-secondary" : "btn-danger"
+                      } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                      onClick={() =>
+                        !ischangeLoading &&
+                        handleChangeButton("ТВИП", queriedLogin)
+                      }
+                      disabled={ischangeLoading}
+                    >
+                      {ischangeLoading ? (
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      ) : (
+                        "Исправить"
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="row mt-3">
+                <div className="col-md-6">
+                  <ServiceTable
+                    title="1С"
+                    services={data.tvip.service1c}
+                    emptyMessage="Нет данных"
+                    highlight={data.tvip.error ? true : false}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <ServiceTable
+                    title="ТВИП"
+                    services={data.tvip.serviceOp}
+                    emptyMessage="Нет данных"
+                    highlight={data.tvip.error ? true : false}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {data?.tv24?.phone && (
+            <>
+              <h2
+                className={
+                  data.tv24.error ? "title-red text-danger mt-5" : "title mt-5"
+                }
+              >
+                24ТВ
+              </h2>
+              <div className="d-flex align-items-center justify-content-between">
+                <div className="me-3">
+                  <p className="text-start fs-4">
+                    <strong>Номер:</strong> {data.tv24.phone || "Не указан"}
+                  </p>
+                </div>
+                {data.tv24.error && (
+                  <div className="ms-auto">
+                    <button
+                      className={`btn ${
+                        ischangeLoading ? "btn-secondary" : "btn-danger"
+                      } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                      onClick={() =>
+                        data.tv24.isKRD
+                          ? handleChangeButton("24ТВ КРД", queriedLogin)
+                          : handleChangeButton("24ТВ", queriedLogin)
+                      }
+                      disabled={ischangeLoading}
+                    >
+                      {ischangeLoading ? (
+                        <div
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      ) : (
+                        "Исправить"
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="row mt-3">
+                <div className="col-md-6">
+                  <ServiceTable
+                    title="1С"
+                    services={data.tv24.service1c}
+                    emptyMessage="Нет данных"
+                    highlight={data.tv24.error ? true : false}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <ServiceTable
+                    title="24ТВ"
+                    services={data.tv24.serviceOp}
+                    emptyMessage="Нет данных"
+                    highlight={data.tv24.error ? true : false}
+                  />
+                </div>
+                <div>
+                  <Checkbox
+                    id="banOnAppCheckbox-tvip"
+                    label="Запретить включать пакеты из приложения"
+                    checked={tv24Checkbox.banOnApp}
+                    disabled={data.tv24.ban_on_app === undefined}
+                    onChange={(e) => handleTv24CheckboxChange(e.target.checked)}
+                  />
+                </div>
+              </div>
+              <div className="phone-list">
+                {data?.tv24?.additional_phones?.map((phone) => (
+                  <div key={phone} className="phone-card">
+                    <div className="phone-info">
+                      <span className="phone-number">{phone}</span>
+                    </div>
+                    <div className="button-container">
+                      <button
+                        onClick={() => handleMakePrimary(phone, queriedLogin)}
+                        className="btn btn-primary make-primary-btn"
+                      >
+                        Сделать основным
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </InfoList>
     </div>
   );
 };

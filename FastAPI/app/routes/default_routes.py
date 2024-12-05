@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from typing import Optional
+from fastapi import APIRouter, HTTPException, Depends, Query
 
 from app import crud
-from app.depencies import SessionDependency, TokenDependency
-from app.schemas import ItemId, CreateRole
+from app.depencies import SessionDependency, TokenDependency, RedisDependency
+from app.schemas import ItemId, CreateRole, SearchLogins
 from app.models import User, Role
 
 router = APIRouter()
@@ -21,3 +22,12 @@ async def create_role(role_data: CreateRole, session: SessionDependency, token: 
         role = Role(**role_data.dict())
         role = await crud.add_item(session, role)
         return {'id': role.id}
+
+
+
+@router.get('/v1/search_logins', response_model=SearchLogins)
+async def get_search_logins(redis: RedisDependency,
+                            token: TokenDependency, 
+                            login: Optional[str] = Query(None)):
+    result = await crud.search_logins(login, redis)
+    return {'logins': result}

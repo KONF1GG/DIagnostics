@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { GetNetwork } from "../../API/network";
 import InfoList from "./InfoList";
 import "../CSS/Network.css";
@@ -7,14 +7,8 @@ import "../CSS/Loading.css";
 import { useDataContext } from "../../DataContext/NetworkContext";
 import { getQueryParams } from "./Default/getData";
 
-interface Differences {
-  radius: Record<string, unknown>;
-  redis: Record<string, unknown>;
-}
-
 const Network = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const {
     data: networkData,
@@ -57,7 +51,6 @@ const Network = () => {
     }
   };
 
-  console.log(networkData)
   const combinedData = networkData
     ? [
         {
@@ -98,13 +91,8 @@ const Network = () => {
       ]
     : [];
 
-  const differences = networkData?.differences
-    ? (networkData.differences as unknown as Differences)
-    : { radius: {}, redis: {} };
-
   return (
-    <div>
-      <InfoList />
+    <InfoList>
       {!queriedLogin && !login ? (
         <p className="no-services-message fade-in">Логин не указан</p>
       ) : loading ? (
@@ -137,38 +125,9 @@ const Network = () => {
           ) : (
             <div>Нет данных для отображения</div>
           )}
-
-          {(Object.keys(differences.radius).length > 0 ||
-            Object.keys(differences.redis).length > 0) && (
-            <div>
-              <h2 className="title-red text-danger fade-in">Различия:</h2>
-              <table className="table table-bordered table-striped">
-                <thead className="table-danger">
-                  <tr>
-                    <th>Параметр</th>
-                    <th>Radius</th>
-                    <th>Redis</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(differences.radius).map((key) => {
-                    const radiusValue = differences.radius[key] ?? "-";
-                    const redisValue = differences.redis[key] ?? "-";
-                    return (
-                      <tr key={key} className="user-row">
-                        <td>{key}</td>
-                        <td>{String(radiusValue)}</td>
-                        <td>{String(redisValue)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       )}
-    </div>
+    </InfoList>
   );
 };
 

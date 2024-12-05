@@ -1,41 +1,105 @@
-/* Стили для табов */
-.nav-tabs {
-    position: relative;
-  }
-  
-  /* Псевдоэлемент для динамической линии */
-  .nav-tabs::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    height: 3px; /* Толщина линии */
-    width: 0;
-    background-color: #0d6efd; /* Цвет линии */
-    transition: transform 0.3s ease, width 0.3s ease; /* Анимация перемещения */
-    pointer-events: none;
-  }
-  
-  /* Стили для каждой вкладки */
-  .nav-item .nav-link {
-    position: relative;
-    font-weight: normal;  /* Убирает жирность у всех ссылок, включая активные */
-    text-decoration: none; /* Убирает подчеркивание */
-  }
-  
-  /* Активная вкладка */
-  .nav-item .nav-link.active {
-    font-weight: normal; /* Убирает жирность на активной вкладке */
-  }
-  
-  /* Линия под активной вкладкой */
-  .nav-item .nav-link.active::after {
-    content: "";
-    position: absolute;
-    bottom: -3px; /* Расстояние от текста до линии */
-    left: 0;
-    height: 3px; /* Толщина линии */
-    width: 100%;
-    background-color: #0d6efd; /* Цвет линии для активной ссылки */
-    transform-origin: left center;
-  }
-  
+/* infoList.css */
+.info-list-layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+#loginInput {
+  padding: 12px 16px;
+  font-size: 16px;
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Все углы закруглены */
+  box-sizing: border-box;
+}
+
+
+.btn-outline-primary {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  height: 50px;
+  padding: 0;
+  font-size: 20px;
+  background-color: #007bff;
+  border-radius: 0 8px 8px 0;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-outline-primary:disabled {
+  background-color: #ddd;
+}
+
+.dropdown-container {
+  position: absolute;
+  top: 100%; /* Позиционируем сразу под полем ввода */
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  opacity: 0; /* Начальное состояние невидимо */
+  pointer-events: none; /* Блокирует события мыши */
+  transition: opacity 0.3s ease;
+}
+
+.dropdown-container.show {
+  opacity: 1; /* Видимость */
+  pointer-events: auto; /* Включает обработку событий мыши */
+}
+
+.dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+.alert {
+  margin-top: 1rem;
+  color: #842029;
+  background-color: #f8d7da;
+  padding: 0.75rem;
+  border-radius: 4px;
+}

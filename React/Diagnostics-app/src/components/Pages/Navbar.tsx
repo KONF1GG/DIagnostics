@@ -25,24 +25,6 @@ const Logout = () => {
 const Navbar = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isBottomNavbarVisible, setIsBottomNavbarVisible] = useState(false);
-
-  // Функция для проверки прокрутки страницы
-  const checkScrollPosition = () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-      setIsBottomNavbarVisible(true);
-    } else {
-      setIsBottomNavbarVisible(false);
-    }
-  };
-
-  // Отслеживаем прокрутку
-  useEffect(() => {
-    window.addEventListener("scroll", checkScrollPosition);
-    return () => {
-      window.removeEventListener("scroll", checkScrollPosition);
-    };
-  }, []);
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);

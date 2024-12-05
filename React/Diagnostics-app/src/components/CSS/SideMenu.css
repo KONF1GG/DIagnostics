@@ -1,0 +1,29 @@
+.side-menu-wrapper {
+    flex: 0 0 250px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+    height: 100%;
+  }
+  
+  .side-menu {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .nav-link:hover,
+  .nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
