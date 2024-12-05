@@ -11,6 +11,7 @@ export interface RBTPhone {
   phone: number; // id
   name: string;
   patronymic: string;
+  role: number;
   contracts: RedisLogin[];
 }
 

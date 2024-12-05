@@ -98,8 +98,8 @@ const App_page = () => {
     <div>
       <InfoList />
       <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
-        <div className="bg-gradient bg-secondary text-center p-3 rounded mb-4">
-          <h2>{data.address_in_app}</h2>
+        <div className="border border-primary text-center p-3 rounded mb-4">
+          <h2 className="text-primary">{data.address_in_app}</h2>
         </div>
 
         {/* Contracts */}
@@ -134,18 +134,19 @@ const App_page = () => {
                 <div key={index} className="col-md-6 col-lg-4 mb-4">
                   <div className="card h-100">
                     <div className="card-header bg-primary text-white">
-                      <h5 className="mb-0">
-                        {phone.name || "Неизвестное имя"}
+                      <h5 className="mb-2">
+                        {phone.phone}{" "}
+                        {phone.name ? `${phone.name}` : "Неизвестное имя"}
+                        {phone.role === 0 ? " (Владелец)" : ""}
                       </h5>
                     </div>
                     <div className="card-body">
-                      <p>
-                        <strong>Телефон:</strong> {phone.phone}
-                      </p>
-                      <h6>Договоры:</h6>
-                      <ul className="list-group list-group-flush">
+                      <ul className="list-group list-group-flush p-0">
                         {phone.contracts.map((contract, idx) => (
-                          <li key={idx} className="list-group-item">
+                          <li
+                            key={idx}
+                            className="list-group-item list-group-item-action"
+                          >
                             <strong>Логин:</strong> {contract.login} <br />
                             <strong>Адрес:</strong> {contract.address} <br />
                             <strong>Договор:</strong> {contract.contract}

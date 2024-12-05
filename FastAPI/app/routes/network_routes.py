@@ -57,7 +57,6 @@ async def get_connection_data(
         else:
             response_data['errors'].append("Радиус недоступен")
 
-        print(radius_data_dict.get('json_data', '2222222'))
         # Проверка данных из Redis
         redis_data_dict = None
         if redis:
