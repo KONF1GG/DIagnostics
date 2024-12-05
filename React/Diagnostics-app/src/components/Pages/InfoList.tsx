@@ -49,12 +49,21 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
 
   const handleLoginSearchChoice = () => {
     if (login) {
+      if (location.pathname == '/'){
+        const redirectUrl = `network?login=${encodeURIComponent(
+          login
+        )}`;
+        navigate(redirectUrl);
+        setLoginsList([]);
+      }
+      else{
       const redirectUrl = `${location.pathname}?login=${encodeURIComponent(
         login
       )}`;
       navigate(redirectUrl);
       setLoginsList([]);
     }
+  }
   };
 
   const handleMouseEnter = () => setIsHovered(true);
