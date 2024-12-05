@@ -54,16 +54,18 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
     }
   }, [login]);
 
-  const handleLoginSearchChoice = () => {
+  const handleLoginSearchChoice = (chosenLogin?: string) => {
     if (login) {
-      if (location.pathname == "/") {
-        const redirectUrl = `network?login=${encodeURIComponent(login)}`;
+      if (location.pathname === "/") {
+        const redirectUrl = chosenLogin
+          ? `network?login=${chosenLogin}`
+          : `network?login=${encodeURIComponent(login)}`;
         navigate(redirectUrl);
         setLoginsList([]);
       } else {
-        const redirectUrl = `${location.pathname}?login=${encodeURIComponent(
-          login
-        )}`;
+        const redirectUrl = chosenLogin
+          ? `${location.pathname}?login=${chosenLogin}`
+          : `${location.pathname}?login=${encodeURIComponent(login)}`;
         navigate(redirectUrl);
         setLoginsList([]);
       }
@@ -104,7 +106,7 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
               ref={inputRef}
             />
             <button
-              onClick={handleLoginSearchChoice}
+              onClick={() => handleLoginSearchChoice()}
               className="btn-outline-primary"
               disabled={!login}
             >
@@ -128,7 +130,7 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
                     onClick={() => {
                       setLogin(loginItem.login);
                       setLoginsList([]);
-                      handleLoginSearchChoice();
+                      handleLoginSearchChoice(loginItem.login);
                     }}
                   >
                     <div className="dropdown-item-details">
