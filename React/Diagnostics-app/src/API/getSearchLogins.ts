@@ -5,7 +5,7 @@ interface ApiError {
     detail: string;
 }
 
-interface LoginData {
+export interface LoginData {
     login: string;
     contract: string;
     name: string;

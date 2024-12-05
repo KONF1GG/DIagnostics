@@ -103,3 +103,86 @@
   padding: 0.75rem;
   border-radius: 4px;
 }
+
+/* Общий стиль для выпадающего списка */
+.dropdown-container {
+  position: absolute;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Показываем контейнер */
+.dropdown-container.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Стили для элементов списка */
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-start;  /* Прижимаем элементы к левому краю */
+  align-items: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none; /* Убираем нижнюю границу для последнего элемента */
+}
+
+.dropdown-item-details {
+  display: flex;
+  justify-content: flex-start;  /* Прижимаем к левому краю */
+  width: 100%;
+}
+
+.dropdown-item-field {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  margin-right: 15px;  /* Добавляем отступ между элементами */
+}
+
+.login {
+  font-weight: bold;
+  color: #007bff; /* Цвет для логина */
+}
+
+.name {
+  flex: 0;
+  text-align: left;
+  color: #333;
+}
+
+.contract {
+  flex: 0;
+  color: #666;
+}
+
+.address {
+  flex: 0;
+  color: #666;
+}
+
+/* Стили при наведении */
+.dropdown-item:hover {
+  background-color: #f8f8f8;
+  transform: translateY(2px);
+  cursor: pointer;
+}

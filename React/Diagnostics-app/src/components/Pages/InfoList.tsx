@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { GetSearchLogins } from "../../API/getSearchLogins";
+import { GetSearchLogins, LoginData } from "../../API/getSearchLogins";
 import { AxiosError } from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import SideMenu from "./SideMenu";
@@ -14,7 +14,7 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [login, setLogin] = useState<string>("");
-  const [loginsList, setLoginsList] = useState<string[]>([]);
+  const [loginsList, setLoginsList] = useState<LoginData[]>([]);
   const [error, setError] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -29,7 +29,14 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
         try {
           const result = await GetSearchLogins(login);
           if ("logins" in result) {
-            setLoginsList(result.logins.map((item) => item.login));
+            setLoginsList(
+              result.logins.map((item) => ({
+                login: item.login,
+                name: item.name,
+                contract: item.contract,
+                address: item.address,
+              }))
+            );
             setError("");
           } else {
             setLoginsList([]);
@@ -49,21 +56,18 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
 
   const handleLoginSearchChoice = () => {
     if (login) {
-      if (location.pathname == '/'){
-        const redirectUrl = `network?login=${encodeURIComponent(
+      if (location.pathname == "/") {
+        const redirectUrl = `network?login=${encodeURIComponent(login)}`;
+        navigate(redirectUrl);
+        setLoginsList([]);
+      } else {
+        const redirectUrl = `${location.pathname}?login=${encodeURIComponent(
           login
         )}`;
         navigate(redirectUrl);
         setLoginsList([]);
       }
-      else{
-      const redirectUrl = `${location.pathname}?login=${encodeURIComponent(
-        login
-      )}`;
-      navigate(redirectUrl);
-      setLoginsList([]);
     }
-  }
   };
 
   const handleMouseEnter = () => setIsHovered(true);
@@ -122,11 +126,25 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
                     key={index}
                     className="dropdown-item"
                     onClick={() => {
-                      setLogin(loginItem);
+                      setLogin(loginItem.login);
                       setLoginsList([]);
+                      handleLoginSearchChoice();
                     }}
                   >
-                    {loginItem}
+                    <div className="dropdown-item-details">
+                      <span className="dropdown-item-field login">
+                        Логин: {loginItem.login}
+                      </span>
+                      <span className="dropdown-item-field name">
+                        Имя: {loginItem.name}
+                      </span>
+                      <span className="dropdown-item-field contract">
+                        Договор: {loginItem.contract}
+                      </span>
+                      <span className="dropdown-item-field address">
+                        Адрес: {loginItem.address}
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
