@@ -8,7 +8,7 @@
 .title-red::after {
   content: ''; /* Создаем псевдоэлемент */
   display: block;
-  width: 50%;
+  width: 70%;
   height: 5px; /* Высота линии под заголовком */
   background: linear-gradient(90deg, #ff0000, #eca3a3); /* Градиент */
   margin: 10px auto; /* Центрируем линию */

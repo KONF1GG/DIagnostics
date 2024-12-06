@@ -28,6 +28,7 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
       const fetchLogins = async () => {
         try {
           const result = await GetSearchLogins(login);
+          // console.log(result)
           if ("logins" in result) {
             setLoginsList(
               result.logins.map((item) => ({
@@ -37,6 +38,7 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
                 address: item.address,
               }))
             );
+            console.log(result)
             setError("");
           } else {
             setLoginsList([]);

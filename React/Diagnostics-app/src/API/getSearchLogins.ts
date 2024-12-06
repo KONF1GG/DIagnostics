@@ -31,7 +31,7 @@ const GetSearchLogins = async (login: string): Promise<ResponseData | ErrorRespo
             }
         });
 
-        console.log(response.data)
+        // console.log(response.data)
 
         if (response.status === 401) {
             window.location.href = '/login';

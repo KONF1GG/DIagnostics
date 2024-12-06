@@ -17,6 +17,10 @@ const Network = () => {
     setLogin,
   } = useDataContext();
 
+  interface Differences {
+    radius: Record<string, unknown>;
+    redis: Record<string, unknown>;
+  }
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -91,6 +95,10 @@ const Network = () => {
       ]
     : [];
 
+  const differences = networkData?.differences
+    ? (networkData.differences as unknown as Differences)
+    : { radius: {}, redis: {} };
+
   return (
     <InfoList>
       {!queriedLogin && !login ? (
@@ -124,6 +132,34 @@ const Network = () => {
             </table>
           ) : (
             <div>Нет данных для отображения</div>
+          )}
+          {(Object.keys(differences.radius).length > 0 ||
+            Object.keys(differences.redis).length > 0) && (
+            <div>
+              <h2 className="title-red text-danger fade-in">Различия:</h2>
+              <table className="table table-bordered table-striped">
+                <thead className="table-danger">
+                  <tr>
+                    <th>Параметр</th>
+                    <th>Radius</th>
+                    <th>Redis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(differences.radius).map((key) => {
+                    const radiusValue = differences.radius[key] ?? "-";
+                    const redisValue = differences.redis[key] ?? "-";
+                    return (
+                      <tr key={key} className="user-row">
+                        <td>{key}</td>
+                        <td>{String(radiusValue)}</td>
+                        <td>{String(redisValue)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}

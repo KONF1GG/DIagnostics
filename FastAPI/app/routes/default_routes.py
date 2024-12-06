@@ -1,9 +1,11 @@
-from typing import Optional
+import asyncio
+from os import access
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 
 from app import crud
 from app.depencies import SessionDependency, TokenDependency, RedisDependency
-from app.schemas import ItemId, CreateRole, SearchLogins
+from app.schemas import ItemId, CreateRole, RedisLoginSearch, SearchLogins
 from app.models import User, Role
 
 router = APIRouter()
@@ -26,8 +28,22 @@ async def create_role(role_data: CreateRole, session: SessionDependency, token: 
 
 
 @router.get('/v1/search_logins', response_model=SearchLogins)
-async def get_search_logins(redis: RedisDependency,
-                            token: TokenDependency, 
-                            login: Optional[str] = Query(None)):
-    result = await crud.search_logins(login, redis)
+async def get_search_logins(
+    redis: RedisDependency,
+    token: TokenDependency, 
+    login: Optional[str] = Query(None)
+):
+    results = await asyncio.gather(
+        crud.search_logins(login.lower(), redis),
+        crud.search_logins(login.capitalize(), redis)
+    )
+    
+    result = []
+    unique_logins = []
+
+    for _ in results:
+        for login in _:
+            if login.login not in unique_logins:
+                result.append(login)
+                unique_logins.append(login.login)
     return {'logins': result}
