@@ -629,6 +629,8 @@ async def get_logins_from_redis(flat_ids: List[int], redis):
 
 async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
     result = await redis.ft('idx:searchLogin').search(search_login)
+    # search_query = f"{search_login} | {search_login.capitalize()}"
+    # result = await redis.ft('idx:searchLogin').search(search_query)
     logins_list = []
     for doc in result.docs:
         data = json.loads(doc.json)
