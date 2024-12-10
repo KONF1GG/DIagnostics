@@ -51,7 +51,7 @@ class CreateRole(BaseModel):
 
 
 class StatusResponse(BaseModel):
-    status: Literal['success', 'deleted']
+    status: Literal['success', 'deleted', 'error']
 
 
 class FailureDetail(BaseModel):
@@ -289,3 +289,12 @@ class RedisLoginSearch(BaseModel):
 
 class SearchLogins(BaseModel):
     logins: List[RedisLoginSearch]
+
+class LogData(BaseModel):
+    login: str
+    page: str
+    action: str
+    success: bool
+    message: str
+    url: str
+    payload: Dict[str, Any]

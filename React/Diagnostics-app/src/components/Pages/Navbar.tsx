@@ -15,7 +15,7 @@ const Logout = () => {
     <button
       onClick={handleLogout}
       className="btn btn-danger"
-      style={{ padding: "10px 20px", borderRadius: "5px" }}
+      style={{ padding: "10px 20px", borderRadius: "5px"}}
     >
       Выйти
     </button>
@@ -69,7 +69,7 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   style={{
                     backgroundColor:
-                      location.pathname === "/" ? "#007bff" : "#e9ecef",
+                      location.pathname === "/" ? "#02458d" : "#e9ecef",
                     padding: "10px 20px",
                     borderRadius: "5px",
                     transition: "background-color 0.3s",
@@ -89,7 +89,7 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   style={{
                     backgroundColor:
-                      location.pathname === "/users" ? "#007bff" : "#e9ecef",
+                      location.pathname === "/users" ? "#02458d" : "#e9ecef",
                     padding: "10px 20px",
                     borderRadius: "5px",
                     transition: "background-color 0.3s",

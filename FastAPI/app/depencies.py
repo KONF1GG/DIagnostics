@@ -1,6 +1,6 @@
 import uuid
 import datetime
-
+import clickhouse_connect
 import asyncpg
 from redis.asyncio import Redis, from_url
 from app.models import Session, Token, SessionRedius
@@ -67,3 +67,22 @@ async def get_rbt_connection() -> asyncpg.connect:
         await connection.close()
 
 RBTDependency = Annotated[psycopg2.connect, Depends(get_rbt_connection)]
+
+
+async def get_clickhouse_connections():
+
+    clickhouse_client = clickhouse_connect.get_client(
+        host=config.CLICKHOUSE_HOST,
+        username=config.CLICKHOUSE_USER,
+        password=config.CLICKHOUSE_PASSWORD
+    )
+
+    try:
+        yield clickhouse_client
+    finally:
+        clickhouse_client.close()
+
+
+
+
+ClickhouseDepency = Annotated[clickhouse_connect, Depends(get_clickhouse_connections)]

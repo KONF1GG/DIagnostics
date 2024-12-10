@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import re
+import pytz
 from tkinter import E
 from typing import Optional, Dict, List
 import aiohttp
@@ -628,9 +629,9 @@ async def get_logins_from_redis(flat_ids: List[int], redis):
 
 
 async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
-    result = await redis.ft('idx:searchLogin').search(search_login)
-    # search_query = f"{search_login} | {search_login.capitalize()}"
-    # result = await redis.ft('idx:searchLogin').search(search_query)
+    # result = await redis.ft('idx:searchLogin').search(search_login)
+    search_query = f"{search_login.lower()} | {search_login.capitalize()}"
+    result = await redis.ft('idx:searchLogin').search(search_query)
     logins_list = []
     for doc in result.docs:
         data = json.loads(doc.json)
@@ -638,3 +639,30 @@ async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
             logins_list.append(RedisLoginSearch(login=data.get('login', ''), name=data.get('name', ''), contract=data.get('contract', ''), address=data.get('address', '')))
 
     return logins_list
+
+
+def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str, success: bool, message: str, url: str, payload: Dict):
+    timezone = pytz.timezone('Etc/GMT-5')
+    timestamp = datetime.datetime.now(timezone).strftime('%Y-%m-%d %H:%M:%S')  # Текущее время
+
+    payload_json = json.dumps(payload)
+
+    # Экранируем строки для безопасности
+    user_name = user_name.replace("'", "''")
+    login = login.replace("'", "''")
+    page = page.replace("'", "''")
+    action = action.replace("'", "''")
+    message = message.replace("'", "''")
+    url = url.replace("'", "''")
+    payload_json = payload_json.replace("'", "''")
+
+    # Формируем SQL-запрос для вставки данных
+    query = f"""
+    INSERT INTO Diagnostic_APP.actions_logs (user_name, login, page, action, status, message, date, url, payload)
+    VALUES ('{user_name}', '{login}', '{page}', '{action}', {1 if success else 0}, '{message}', '{timestamp}', '{url}', '{payload_json}')
+    """
+
+    try:
+        client.command(query)
+    except Exception as e:
+        print(f"Ошибка при записи в ClickHouse: {e}")

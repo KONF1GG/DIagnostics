@@ -14,9 +14,8 @@
 
 .search-container {
   display: flex;
-  flex-direction: column;
   position: relative;
-  width: 100%;
+  justify-content: center;
   margin-bottom: 2rem;
 }
 
@@ -24,7 +23,7 @@
   display: flex;
   align-items: center;
   position: relative;
-  width: 100%;
+  width: 70%;
 }
 
 #loginInput {
@@ -46,7 +45,7 @@
   height: 50px;
   padding: 0;
   font-size: 20px;
-  background-color: #007bff;
+  background-color: #02458d;
   border-radius: 0 8px 8px 0;
   color: white;
   display: flex;
@@ -74,6 +73,7 @@
 .dropdown-container.show {
   opacity: 1; /* Видимость */
   pointer-events: auto; /* Включает обработку событий мыши */
+  width: 70%;
 }
 
 .dropdown-list {
@@ -124,6 +124,7 @@
 .dropdown-container.show {
   opacity: 1;
   visibility: visible;
+  justify-self: center;
 }
 
 /* Стили для элементов списка */
@@ -161,7 +162,7 @@
 
 .login {
   font-weight: bold;
-  color: #007bff; /* Цвет для логина */
+  color: #02458d; /* Цвет для логина */
 }
 
 .name {
