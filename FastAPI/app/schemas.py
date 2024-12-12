@@ -272,6 +272,8 @@ class LoginsData(BaseModel):
     name: str
     address: str
     contract: str
+    active: bool
+    UUID2: str
 
 class Phone(RBT_phone):
     contracts: List[RedisLogin]

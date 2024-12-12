@@ -20,6 +20,8 @@ export interface LoginsData {
   name: string;
   address: string;
   contract: string;
+  active: boolean;
+  UUID2: string;
 }
 
 export interface ResponseData {
@@ -28,7 +30,7 @@ export interface ResponseData {
   phones: RBTPhone[];
 }
 
-interface ApiError {
+export interface ApiError {
   detail: string;
 }
 

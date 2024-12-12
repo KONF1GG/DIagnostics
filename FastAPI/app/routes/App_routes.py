@@ -1,6 +1,8 @@
 import asyncio
 import json
+import time
 from operator import add
+from xml.dom.expatbuilder import theDOMImplementation
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, List, Optional
 
@@ -21,6 +23,12 @@ async def get_connection_data(
 ):
     """Эндпоинт для получения информации приложения"""
 
+
+    # Текущая временная метка
+    current_datetime = time.time()
+
+    # Количество секунд в 3 месяцах (30.44 дня в среднем)
+    three_months_in_seconds = 30.44 * 24 * 60 * 60 * 3
     redis_data = await crud.get_redis_key_data(login, redis)
     flat_id = redis_data.get("flatId", 0)
 
@@ -33,6 +41,7 @@ async def get_connection_data(
     # Получение адреса из данных Redis
     address_in_the_app = redis_data.get("address", "Неизвестно")
 
+
     # Получение списка логинов
     logins_list = await crud.get_logins_by_flatId_redis(flat_id, redis)
     contracts = []
@@ -42,7 +51,11 @@ async def get_connection_data(
             login=data.get('login', ''),
             name=data.get('name', 'Неизвестно'),
             address=data.get('address', 'Неизвестно'),
-            contract=data.get('contract', 'Неизвестно')
+            contract=data.get('contract', 'Неизвестно'),
+            active=True if 0 > max(data.get('servicecats', {}).get('internet', {}).get('timeto', 0), 
+                               data.get('servicecats', {}).get('intercomhandset', {}).get('timeto', 0), 
+                               data.get('servicecats', {}).get('intercom', {}). get('timeto', 0)) - current_datetime < three_months_in_seconds else False, 
+            UUID2=data.get('UUID2', '')
         ))
 
     # Получение данных о номерах RBT

@@ -25,8 +25,6 @@ const LogData = async (data: Data): Promise<string> => {
       },
     });
 
-    console.log("Ответ от сервера:", response);
-
     // Проверяем статус ответа
     if (response.status === 201 || response.status === 200) {
       return "Данные успешно залогированы.";
@@ -40,7 +38,6 @@ const LogData = async (data: Data): Promise<string> => {
     const error = err as AxiosError<ApiError>;
 
     if (error.response && error.response.data) {
-      // Если сервер вернул ошибку
       const errorDetail = error.response.data.detail || "Произошла ошибка записи лога.";
       console.error("Ошибка от сервера:", errorDetail);
       return errorDetail;

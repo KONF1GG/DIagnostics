@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import SideMenu from "./SideMenu";
 import "../CSS/infoList.css";
+import { Logout } from "./Navbar";
 
 interface InfoListProps {
   children: React.ReactNode;
@@ -156,7 +157,6 @@ const InfoList: React.FC<InfoListProps> = ({ children }) => {
           )}
         </div>
         {error && <div className="alert alert-danger">{error}</div>}
-
         {children}
       </div>
     </div>

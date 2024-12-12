@@ -22,9 +22,7 @@ const App = () => {
         <Navbar />
       )}
 
-      <div style={{ paddingBottom: "60px" }}>
-        {" "}
-        {/* Отступ снизу для контента */}
+      <div>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Reg />} />

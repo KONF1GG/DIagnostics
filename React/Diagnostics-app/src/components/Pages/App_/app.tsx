@@ -4,12 +4,18 @@ import { GetApp } from "../../../API/App";
 import { getQueryParams } from "../Default/getData";
 import InfoList from "../InfoList";
 import "../../CSS/App.css";
+import PhoneModal from "./phonesModal";
+import { handleContractDeleteButton } from "./requests";
 
 const App_page = () => {
   const { data, setData, login, setLogin } = useDataContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  // Модальное окно
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedContract, setSelectedContract] = useState<any>(null);
 
   const queriedLogin = getQueryParams();
 
@@ -37,6 +43,17 @@ const App_page = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRelocate = (contract: any) => {
+    setSelectedContract(contract);
+    setShowModal(true);
+  };
+
+  const confirmRelocation = () => {
+    console.log("Переселён контракт:", selectedContract);
+    // Логика переселения через API или обновление данных
+    setShowModal(false);
   };
 
   useEffect(() => {
@@ -115,6 +132,10 @@ const App_page = () => {
                 <th>Имя</th>
                 <th>Адрес</th>
                 <th>Контракт</th>
+                {data.contracts.some((contract) => !contract.active) && (
+                  <th></th>
+                )}
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -124,6 +145,30 @@ const App_page = () => {
                   <td>{contract.name}</td>
                   <td>{contract.address}</td>
                   <td>{contract.contract}</td>
+                  {!contract.active && (
+                    <td className="text-center">
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() =>
+                          handleContractDeleteButton(
+                            contract.UUID2,
+                            contract.login, 
+                            setData
+                          )
+                        }
+                      >
+                        Отвязать
+                      </button>
+                    </td>
+                  )}
+                  <td>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleRelocate(contract)}
+                    >
+                      Переселить
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -166,6 +211,15 @@ const App_page = () => {
           </div>
         </div>
       </InfoList>
+
+      {/* Подключение PhoneModal */}
+      <PhoneModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={confirmRelocation}
+        contract={selectedContract}
+        phoneNumbers={data.phones}
+      />
     </div>
   );
 };

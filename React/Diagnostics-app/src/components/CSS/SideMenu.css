@@ -1,29 +1,87 @@
+/* Основные стили для меню */
 .side-menu-wrapper {
-    flex: 0 0 250px;
-    background-color: #f8f9fa;
-    border-right: 1px solid #ddd;
-    height: 100%;
+  position: fixed;
+  top: 68px;
+  left: 0;
+  bottom: 0;
+  width: 250px; /* Ширина бокового меню */
+  background-color: #f8f9fa;
+  border-right: 1px solid #ddd;
+  transition: transform 0.3s ease-in-out; /* Плавный эффект выдвижения */
+  transform: translateX(-100%); /* Меню изначально скрыто */
+  z-index: 1050; /* Чтобы меню было поверх контента */
+}
+
+/* Когда меню открыто, оно выдвигается */
+.side-menu-wrapper.open {
+  transform: translateX(0); /* Меню выдвигается */
+}
+
+/* Стиль для контента */
+.main-content {
+  transition: margin-left 0.3s ease; /* Плавный сдвиг основного контента */
+  margin-left: 0; /* Изначально без сдвига */
+}
+
+.main-content.shifted {
+  margin-left: 250px; /* Сдвиг контента при открытом меню */
+}
+
+/* Стили для навигации в меню */
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #333;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background-color: #02458d;
+  color: #fff;
+}
+
+/* Стили для кнопки показа меню */
+.toggle-menu-btn {
+  position: fixed;
+  left: -35px; /* Торчит слева на 35px */
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1060; /* Чтобы кнопка была поверх контента */
+  background-color: #02458d;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: left 0.3s ease; /* Плавное движение кнопки */
+}
+
+.side-menu-wrapper.open + .toggle-menu-btn {
+  left: 250px; /* Когда меню открыто, кнопка перемещается */
+}
+
+/* Стили для нижней части меню (например, для Logout) */
+.side-menu .mt-auto {
+  margin-top: auto; /* Размещение кнопки Logout внизу */
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .side-menu-wrapper {
+    width: 200px; /* Меньше ширина на мобильных */
   }
-  
   .side-menu {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 1rem;
+    padding: 0.5rem;
   }
-  
-  .nav-link {
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    color: #333;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .nav-link:hover,
-  .nav-link.active {
-    background-color: #02458d;
-    color: #fff;
-  }
-  
+}
