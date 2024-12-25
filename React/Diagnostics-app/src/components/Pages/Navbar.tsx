@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "/logo.svg";
 import "../CSS/Navbar.css"; // Импортируем файл стилей
+import { LoginData } from "../../API/getSearchLogins";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -26,6 +27,11 @@ export const Logout = () => {
 const Navbar = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [login, setLogin] = useState<string>("");
+  const [loginsList, setLoginsList] = useState<LoginData[]>([]);
+  const navigate = useNavigate();
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -33,6 +39,20 @@ const Navbar = () => {
 
   const handleLinkClick = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLogin(e.target.value);
+  };
+
+  const handleLoginSearchChoice = (chosenLogin?: string) => {
+    if (login) {
+      const redirectUrl = chosenLogin
+        ? `network?login=${chosenLogin}`
+        : `network?login=${encodeURIComponent(login)}`;
+      navigate(redirectUrl);
+      setLoginsList([]);
+    }
   };
 
   return (
@@ -100,6 +120,33 @@ const Navbar = () => {
                 </Link>
               </li>
             </ul>
+
+            <div className="search-container-nav">
+              <div className="input-wrapper-nav">
+                <input
+                  type="text"
+                  placeholder="Поиск..."
+                  value={login}
+                  onChange={handleInputChange}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && handleLoginSearchChoice()
+                  }
+                />
+                <button
+                  onClick={() => handleLoginSearchChoice()}
+                  className="search-btn"
+                  disabled={!login}
+                >
+                  <i className="fas fa-search" />
+                </button>
+              </div>
+              {/* Выпадающий список */}
+              {loginsList.length > 0 && (isFocused || isHovered) && (
+                <div className="navbar-dropdown">
+                  {/* ... содержимое выпадающего списка ... */}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
