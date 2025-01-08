@@ -117,6 +117,5 @@ async def get_connection_data(
 
     else:
         response_data['errors'].append("Логин не указан")
-
-    # print(response_data)
+        
     return response_data

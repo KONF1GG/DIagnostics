@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "/logo.svg";
 import "../CSS/Navbar.css"; // Импортируем файл стилей
 import { LoginData } from "../../API/getSearchLogins";
+import { GetSearchLogins } from "../../API/getSearchLogins";
+import userIcon from "../../assets/users.svg";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -55,6 +57,33 @@ const Navbar = () => {
     }
   };
 
+  useEffect(() => {
+    if (login.length > 2) {
+      const fetchLogins = async () => {
+        try {
+          const result = await GetSearchLogins(login);
+          if ("logins" in result) {
+            setLoginsList(
+              result.logins.map((item) => ({
+                login: item.login,
+                name: item.name,
+                contract: item.contract,
+                address: item.address,
+              }))
+            );
+          } else {
+            setLoginsList([]);
+          }
+        } catch (err) {
+          setLoginsList([]);
+        }
+      };
+      fetchLogins();
+    } else {
+      setLoginsList([]);
+    }
+  }, [login]);
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
@@ -62,91 +91,68 @@ const Navbar = () => {
           <Link className="navbar-brand" to="/">
             <img src={logo} alt="Логотип" style={{ height: "40px" }} />
           </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            onClick={handleMenuToggle}
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded={isMenuOpen}
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div
-            className={`collapse navbar-collapse ${isMenuOpen ? "show" : ""}`}
-            id="navbarNav"
-          >
-            <ul className="navbar-nav me-auto">
-              <li className="nav-item me-3 item">
-                <Link
-                  className={`nav-link ${
-                    location.pathname === "/"
-                      ? "fw-bold text-white"
-                      : "text-dark"
-                  }`}
-                  to="/"
-                  onClick={handleLinkClick}
-                  style={{
-                    backgroundColor:
-                      location.pathname === "/" ? "#02458d" : "#e9ecef",
-                    padding: "10px 20px",
-                    borderRadius: "5px",
-                    transition: "background-color 0.3s",
-                  }}
-                >
-                  Главная
-                </Link>
-              </li>
-              <li className="nav-item item">
-                <Link
-                  className={`nav-link ${
-                    location.pathname === "/users"
-                      ? "fw-bold text-white"
-                      : "text-dark"
-                  }`}
-                  to="/users"
-                  onClick={handleLinkClick}
-                  style={{
-                    backgroundColor:
-                      location.pathname === "/users" ? "#02458d" : "#e9ecef",
-                    padding: "10px 20px",
-                    borderRadius: "5px",
-                    transition: "background-color 0.3s",
-                  }}
-                >
-                  Пользователи
-                </Link>
-              </li>
-            </ul>
-
-            <div className="search-container-nav">
-              <div className="input-wrapper-nav">
-                <input
-                  type="text"
-                  placeholder="Поиск..."
-                  value={login}
-                  onChange={handleInputChange}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && handleLoginSearchChoice()
-                  }
-                />
-                <button
-                  onClick={() => handleLoginSearchChoice()}
-                  className="search-btn"
-                  disabled={!login}
-                >
-                  <i className="fas fa-search" />
-                </button>
-              </div>
-              {/* Выпадающий список */}
-              {loginsList.length > 0 && (isFocused || isHovered) && (
-                <div className="navbar-dropdown">
-                  {/* ... содержимое выпадающего списка ... */}
-                </div>
-              )}
+          <div className="search-container-nav mx-auto">
+            <div className="input-wrapper-nav">
+              <input
+                type="text"
+                placeholder="Поиск..."
+                value={login}
+                onChange={handleInputChange}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && handleLoginSearchChoice()
+                }
+              />
+              <button
+                onClick={() => handleLoginSearchChoice()}
+                className="search-btn"
+                disabled={!login}
+              >
+                <i className="fas fa-search" />
+              </button>
             </div>
+            {loginsList.length > 0 && (isFocused || isHovered) && (
+              <div
+                className={`dropdown-container ${
+                  isFocused || isHovered ? "show" : ""
+                }`}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <ul className="dropdown-list">
+                  {loginsList.map((loginItem, index) => (
+                    <li
+                      key={index}
+                      className="dropdown-item"
+                      onClick={() => {
+                        setLogin(loginItem.login);
+                        setLoginsList([]);
+                        handleLoginSearchChoice(loginItem.login);
+                      }}
+                    >
+                      <div className="dropdown-item-details">
+                        <span className="dropdown-item-field login">
+                          Логин: {loginItem.login}
+                        </span>
+                        <span className="dropdown-item-field name">
+                          Имя: {loginItem.name}
+                        </span>
+                        <span className="dropdown-item-field contract">
+                          Договор: {loginItem.contract}
+                        </span>
+                        <span className="dropdown-item-field address">
+                          Адрес: {loginItem.address}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <div className="profile-icon" onClick={() => navigate("/users")}>
+            <img src={userIcon} style={{ height: "40px", cursor: "pointer" }} />
           </div>
         </div>
       </nav>

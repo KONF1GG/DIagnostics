@@ -98,6 +98,15 @@ const Network = () => {
   const differences = networkData?.differences
     ? (networkData.differences as unknown as Differences)
     : { radius: {}, redis: {} };
+    
+  if (!networkData?.radius && !networkData?.redis) {
+    return (
+      <InfoList>
+        <p className="no-services-message fade-in">Данные по логину "{queriedLogin}" не найдены</p>
+      </InfoList>
+    );
+  }
+
 
   return (
     <InfoList>

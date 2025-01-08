@@ -1,30 +1,35 @@
 /* Основные стили для меню */
 .side-menu-wrapper {
   position: fixed;
-  top: 68px;
+  top: 0;
   left: 0;
-  bottom: 0;
-  width: 250px; /* Ширина бокового меню */
-  background-color: #f8f9fa;
-  border-right: 1px solid #ddd;
-  transition: transform 0.3s ease-in-out; /* Плавный эффект выдвижения */
-  transform: translateX(-100%); /* Меню изначально скрыто */
-  z-index: 1050; /* Чтобы меню было поверх контента */
+  width: 250px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
-/* Когда меню открыто, оно выдвигается */
 .side-menu-wrapper.open {
-  transform: translateX(0); /* Меню выдвигается */
+  transform: translateX(0);
+}
+
+.side-menu-wrapper:not(.open) {
+  transform: translateX(-250px);
 }
 
 /* Стиль для контента */
 .main-content {
-  transition: margin-left 0.3s ease; /* Плавный сдвиг основного контента */
-  margin-left: 0; /* Изначально без сдвига */
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+  padding-top: 60px;
 }
 
 .main-content.shifted {
-  margin-left: 250px; /* Сдвиг контента при открытом меню */
+  margin-left: 250px;
 }
 
 /* Стили для навигации в меню */
@@ -33,38 +38,31 @@
   flex-direction: column;
   height: 100%;
   padding: 1rem;
+  padding-top: 68px;
 }
 
 .nav-link {
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: #333;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-  transition: background-color 0.3s ease;
+  margin: 5px 0;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover,
 .nav-link.active {
-  background-color: #02458d;
-  color: #fff;
+  background-color: #e8f0fe;
+  color: #02458d;
+  border-radius: 8px;
 }
 
-/* Стили для кнопки показа меню */
-.toggle-menu-btn {
-  position: fixed;
-  left: -35px; /* Торчит слева на 35px */
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1060; /* Чтобы кнопка была поверх контента */
+.nav-link:hover {
+  background-color: #e8f0fe;
+  color: #02458d;
+}
+
+.nav-link.active {
   background-color: #02458d;
   color: white;
-  padding: 10px 15px;
-  border-radius: 50%;
-  border: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: left 0.3s ease; /* Плавное движение кнопки */
 }
 
 .side-menu-wrapper.open + .toggle-menu-btn {
@@ -84,4 +82,60 @@
   .side-menu {
     padding: 0.5rem;
   }
+}
+
+/* Добавим стили для поиска в навбаре */
+.navbar-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.navbar-dropdown .dropdown-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.navbar-dropdown .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.toggle-sidebar-btn {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  width: 20px;
+  height: 80px;
+  background-color: #02458d;
+  color: white;
+  border: none;
+  border-radius: 0 20px 20px 0;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%);
+}
+
+.side-menu-wrapper.open .toggle-sidebar-btn {
+  right: -30px;
+  width: 30px;
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: #023b7a;
 }
