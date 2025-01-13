@@ -24,6 +24,7 @@ export interface LoginsData {
   name: string;
   address: string;
   contract: string;
+  relocate: boolean;
   active: boolean;
   UUID2: string;
 }

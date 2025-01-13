@@ -216,13 +216,15 @@ const App_page = () => {
                   <td>{contract.contract}</td>
 
                   <td className="d-flex" style={{ border: "none" }}>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => handleRelocate(contract)}
-                      title="Переселить"
-                    >
-                      <EditLocationIcon />
-                    </button>
+                    {contract.relocate && (
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => handleRelocate(contract)}
+                        title="Переселить"
+                      >
+                        <EditLocationIcon />
+                      </button>
+                    )}
                     {contract.active && (
                       <button
                         className="btn btn-danger btn-sm"

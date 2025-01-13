@@ -46,13 +46,14 @@ async def get_connection_data(
     for doc in logins_list:
         data = json.loads(doc.json)
         flat = data.get('flat')
+        if flat == None or flat == 0:
+            flat = '1'
         flatId = data.get('flatId')
         flat_from_RBT = await crud.get_flat_from_RBT_by_flatId(flatId, rbt)
-        flat_value = bool(flat) 
-        flat_from_RBT_value = bool(flat_from_RBT[0]['flat']) if flat_from_RBT[0]['flat'] is not None else False
+        flat_from_RBT_value = flat_from_RBT[0]['flat'] if flat_from_RBT[0]['flat'] is not None else False
 
         house_flat_subscribers = await crud.get_houses_flats_subscribers_by_flat_id(flatId, rbt)
-        is_relocatable = (flat_value != flat_from_RBT_value) or house_flat_subscribers == 0
+        is_relocatable = (flat != flat_from_RBT_value) or house_flat_subscribers == 0
 
         contracts.append(LoginsData(
             phone=data.get('primePhone', ''),
