@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 from redis import ResponseError
 from app import crud
 from app.depencies import RedisDependency, SessionRediusDependency, TokenDependency, RBTDependency
-from app.schemas import TV24, TVIP, AppResponse, LoginsData, Phone, RBT_phone, RedisLogin, Service1C, Service1c, ServiceOp, Smotreshka, StatusResponse, TVResponse
+from app.schemas import TV24, TVIP, AppResponse, ChangeRoleRequest, LoginsData, Phone, RBT_phone, RedisLogin, Service1C, Service1c, ServiceOp, Smotreshka, StatusResponse, TVResponse
 from app import config
 
 router = APIRouter()
@@ -90,6 +90,45 @@ async def get_connection_data(
         phones=phones
     )
 
+@router.patch('/v1/app/change_role', response_model=StatusResponse)
+async def change_role_in_RBT(
+    request: ChangeRoleRequest,  # Получаем все параметры из тела запроса
+    rbt: Any  # Замените тип на конкретный тип зависимости, если требуется
+):
+    print(f"Changing role: house_id={request.house_id}, flat_id={request.flat_id}, role={request.role}")
+
+    # Используем транзакцию для работы с базой данных
+    # async with rbt.transaction():
+    #     try:
+    #         # Выполняем SQL-запрос для обновления роли
+    #         result = await rbt.execute("""
+    #             UPDATE houses_flats_subscribers
+    #             SET role = :role
+    #             WHERE house_id = :house_id AND flat_id = :flat_id
+    #         """, {
+    #             "role": request.role,
+    #             "house_id": request.house_id,
+    #             "flat_id": request.flat_id
+    #         })
+
+    #         if result.rowcount == 0:
+    #             # Если обновление не затронуло ни одной строки, возвращаем ошибку
+    #             raise HTTPException(
+    #                 status_code=404,
+    #                 detail="Запись с указанными house_id и flat_id не найдена"
+    #             )
+
+    #         # Успешный результат
+    #         return StatusResponse(
+    #             status="success",
+    #         )
+
+    #     except Exception as e:
+    #         # Логирование и обработка ошибки
+    #         raise HTTPException(
+    #             status_code=500,
+    #             detail=f"Ошибка изменения роли: {str(e)}"
+    #         )
 
 @router.delete('/v1/app/houses_flats_subscribers/{house_id}', response_model=StatusResponse)
 async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, rbt: RBTDependency):

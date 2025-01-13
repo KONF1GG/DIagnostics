@@ -249,10 +249,7 @@ class CameraDataToChange(BaseModel):
     name: Optional[str] = None
     ip: Optional[str] = None
 
-class RBT(BaseModel):
-    house_id: int
-    flat_id: int
-    role: int
+
 
 # class RBT_flat(BaseModel):
 #     flat_id: int
@@ -262,6 +259,10 @@ class RedisLogin(BaseModel):
     address: str
     contract: str
 
+class RBT(BaseModel):
+    house_id: int
+    flat_id: int
+    role: int
 
 class RBT_phone(RBT):
     phone: int # id
@@ -303,3 +304,8 @@ class LogData(BaseModel):
     message: str
     url: str
     payload: Dict[str, Any]
+
+class ChangeRoleRequest(BaseModel):
+    house_id: int
+    flat_id: int
+    role: int

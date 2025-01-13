@@ -193,27 +193,111 @@ export const handleUserDelete = async (
 };
 
 // relocation.ts
-export const relocatePhones = async (selectedNumbers: number[], login: string) => {
+export const relocatePhones = async (
+  selectedNumbers: number[],
+  login: string
+) => {
   try {
-    const response = await fetch('/api/relocate', {
-      method: 'POST',
+    const response = await fetch("/api/relocate", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         login,
-        selectedNumbers
+        selectedNumbers,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Ошибка при переселении');
+      throw new Error("Ошибка при переселении");
     }
 
     const data = await response.json();
     return data; // Возвращаем данные с сервера
   } catch (error) {
-    console.error('Ошибка переселения:', error);
+    console.error("Ошибка переселения:", error);
     throw error; // Пробрасываем ошибку дальше
+  }
+};
+
+export const ChangeRole = async (
+  house_id: number,
+  flat_id: number,
+  role: number,
+  login: string,
+  setData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  const url = `/v1/app/change_role`;
+
+  try {
+    // Передаем параметры в запрос
+    const response = await api.patch(url, {
+      house_id,
+      flat_id,
+      role,
+    });
+
+    if (response.status !== 200) {
+      // Логирование ошибки
+      await LogData({
+        login,
+        page: `Приложение`,
+        action: "Изменение роли",
+        success: false,
+        url: url,
+        payload: { house_id, flat_id, role },
+        message: `Ошибка: ${response.statusText || "Не удалось изменить роль"}`,
+      });
+
+      toast.error(
+        `Ошибка: ${response.statusText || "Не удалось изменить роль"}`,
+        { position: "bottom-right" }
+      );
+      return;
+    }
+
+    // Логирование успешного выполнения
+    await LogData({
+      login,
+      page: `Приложение`,
+      action: "Изменение роли",
+      success: true,
+      url: url,
+      payload: { house_id, flat_id, role },
+      message: "Роль успешно изменена",
+    });
+
+    toast.success("Роль успешно изменена", {
+      position: "bottom-right",
+    });
+
+    // Обновляем данные приложения
+    const result = await GetApp(login);
+
+    if (result && "detail" in result) {
+      console.log(result);
+      setData(null);
+    } else if (result) {
+      setData(result);
+    } else {
+      setData(null);
+    }
+  } catch (error) {
+    // Логирование исключения
+    console.log(error);
+    await LogData({
+      login,
+      page: `Приложение`,
+      action: "Изменение роли",
+      success: false,
+      url: url,
+      payload: { house_id, flat_id, role },
+      message: `Ошибка: ${String(error)}`,
+    });
+
+    toast.error(`Ошибка: ${error || "Не удалось изменить роль"}`, {
+      position: "bottom-right",
+    });
   }
 };
