@@ -93,7 +93,7 @@ async def get_connection_data(
 @router.patch('/v1/app/change_role', response_model=StatusResponse)
 async def change_role_in_RBT(
     request: ChangeRoleRequest,  # Получаем все параметры из тела запроса
-    rbt: Any  # Замените тип на конкретный тип зависимости, если требуется
+    rbt: RBTDependency  # Замените тип на конкретный тип зависимости, если требуется
 ):
     print(f"Changing role: house_id={request.house_id}, flat_id={request.flat_id}, role={request.role}")
 
