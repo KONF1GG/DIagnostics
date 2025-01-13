@@ -31,6 +31,7 @@ export interface LoginsData {
 
 export interface ResponseData {
   address_in_app: string;
+  flat_id: number;
   contracts: LoginsData[];
   phones: RBTPhone[];
 }

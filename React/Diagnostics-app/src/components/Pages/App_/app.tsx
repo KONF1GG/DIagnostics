@@ -244,116 +244,122 @@ const App_page = () => {
           {/* Phones */}
           <div className="app-container">
             <h2 className="title">Телефоны, привязанные к адресу</h2>
-            <div className="container my-4">
-              <div className="row">
-                {data.phones
-                  .sort((a, b) => a.role - b.role) // Сортировка: владельцы (role === 0) первыми
-                  .map((phone, index) => (
-                    <div key={index} className="col-md-6 col-lg-4 mb-4 ">
-                      <div className={`card h-100 bg-light`}>
-                        <div
-                          className={`card-header d-flex justify-content-between align-items-center ${
-                            phone.role === 0 ? "highlight-owner" : ""
-                          }`}
-                        >
-                          <h5
-                            className={`card-title ${
-                              phone.role === 0 ? "owner fw-bold" : ""
-                            }`}
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              handleRoleChange(
-                                phone.house_id,
-                                phone.flat_id,
-                                phone.role
-                              )
-                            }
-                            title="Нажмите, чтобы изменить роль"
-                          >
-                            {phone.role === 0 ? "Владелец" : "Пользователь"}
-                          </h5>
-                          <div className="d-flex align-items-center">
-                            {phone.role !== 0 && (
-                              <button
-                                className="btn btn-danger btn-sm"
-                                onClick={() => {
-                                  handleDeleteNumber(
-                                    phone.house_id,
-                                    queriedLogin
-                                  );
-                                }}
-                                title="Отвязать"
-                              >
-                                <PersonRemoveIcon fontSize="small" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                        <h5 className="fw-bold mb-0 text-center mt-3">
-                          {phone.name ? phone.name : "Неизвестное имя"}{" "}
-                          {phone.phone}
-                        </h5>
-                        <div className="card-body">
+            {data.phones && data.phones.length > 0 ? (
+              <div className="container my-4">
+                <div className="row">
+                  {data.phones
+                    .sort((a, b) => a.role - b.role) // Сортировка: владельцы (role === 0) первыми
+                    .map((phone, index) => (
+                      <div key={index} className="col-md-6 col-lg-4 mb-4 ">
+                        <div className={`card h-100 bg-light`}>
                           <div
-                            className="contract-grid"
-                            style={{
-                              display: "grid",
-                              gridTemplateColumns:
-                                "repeat(auto-fit, minmax(250px, 1fr))",
-                              gap: "1rem",
-                            }}
+                            className={`card-header d-flex justify-content-between align-items-center ${
+                              phone.role === 0 ? "highlight-owner" : ""
+                            }`}
                           >
-                            {phone.contracts.map((contract, idx) => (
-                              <div
-                                key={idx}
-                                className="contract-card border rounded p-3"
-                                style={{
-                                  position: "relative",
-                                  backgroundColor: "#DCDCDC",
-                                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                                }}
-                              >
-                                <div>
-                                  <div>
-                                    <strong>Логин:</strong> {contract.login}
-                                  </div>
-                                  <div>
-                                    <strong>Адрес:</strong> {contract.address}
-                                  </div>
-                                  <div>
-                                    <strong>Договор:</strong>{" "}
-                                    {contract.contract}
-                                  </div>
-                                </div>
+                            <h5
+                              className={`card-title ${
+                                phone.role === 0 ? "owner fw-bold" : ""
+                              }`}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handleRoleChange(
+                                  phone.house_id,
+                                  phone.flat_id,
+                                  phone.role
+                                )
+                              }
+                              title="Нажмите, чтобы изменить роль"
+                            >
+                              {phone.role === 0 ? "Владелец" : "Пользователь"}
+                            </h5>
+                            <div className="d-flex align-items-center">
+                              {phone.role !== 0 && (
                                 <button
-                                  className="btn"
+                                  className="btn btn-danger btn-sm"
                                   onClick={() => {
-                                    handleDeleteAddress(
-                                      contract.house_id,
+                                    handleDeleteNumber(
+                                      phone.house_id,
                                       queriedLogin
                                     );
                                   }}
                                   title="Отвязать"
+                                >
+                                  <PersonRemoveIcon fontSize="small" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          <h5 className="fw-bold mb-0 text-center mt-3">
+                            {phone.name ? phone.name : "Неизвестное имя"}{" "}
+                            {phone.phone}
+                          </h5>
+                          <div className="card-body">
+                            <div
+                              className="contract-grid"
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns:
+                                  "repeat(auto-fit, minmax(250px, 1fr))",
+                                gap: "1rem",
+                              }}
+                            >
+                              {phone.contracts.map((contract, idx) => (
+                                <div
+                                  key={idx}
+                                  className="contract-card border rounded p-3"
                                   style={{
-                                    position: "absolute",
-                                    top: "0.5rem",
-                                    right: "0.5rem",
-                                    padding: "0.25rem",
-                                    fontSize: "1rem",
-                                    width: "auto",
+                                    position: "relative",
+                                    backgroundColor: "#DCDCDC",
+                                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                                   }}
                                 >
-                                  <ClearIcon fontSize="small" />
-                                </button>
-                              </div>
-                            ))}
+                                  <div>
+                                    <div>
+                                      <strong>Логин:</strong> {contract.login}
+                                    </div>
+                                    <div>
+                                      <strong>Адрес:</strong> {contract.address}
+                                    </div>
+                                    <div>
+                                      <strong>Договор:</strong>{" "}
+                                      {contract.contract}
+                                    </div>
+                                  </div>
+                                  {phone.flat_id !== data.flat_id && (
+                                    <button
+                                      className="btn"
+                                      onClick={() => {
+                                        handleDeleteAddress(
+                                          contract.house_id,
+                                          queriedLogin
+                                        );
+                                      }}
+                                      title="Отвязать"
+                                      style={{
+                                        position: "absolute",
+                                        top: "0.5rem",
+                                        right: "0.5rem",
+                                        padding: "0.25rem",
+                                        fontSize: "1rem",
+                                        width: "auto",
+                                      }}
+                                    >
+                                      <ClearIcon fontSize="small" />
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <strong>Данных нет</strong>
+            )}
           </div>
         </div>
       </InfoList>

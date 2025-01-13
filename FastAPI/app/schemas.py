@@ -284,6 +284,7 @@ class Phone(RBT_phone):
 
 class AppResponse(BaseModel):
     address_in_app: str
+    flat_id: int
     contracts: List[LoginsData]
     phones: List[Phone]
 

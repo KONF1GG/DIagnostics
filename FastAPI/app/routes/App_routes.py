@@ -45,7 +45,7 @@ async def get_connection_data(
     contracts = []
     for doc in logins_list:
         data = json.loads(doc.json)
-        flat = data.get('flat')
+        flat = str(data.get('flat'))
         if flat == None or flat == 0:
             flat = '1'
         flatId = data.get('flatId')
@@ -88,6 +88,7 @@ async def get_connection_data(
 
     return AppResponse(
         address_in_app=address_in_the_app,
+        flat_id=flat_id,
         contracts=contracts,
         phones=phones
     )
