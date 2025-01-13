@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { RBTPhone } from "../../../API/App";
+import { RBTPhone, LoginsData } from "../../../API/App";
 
 interface PhoneModalProps {
   show: boolean;
   onClose: () => void;
-  onConfirm: (selectedNumbers: number[]) => void; // Передаем выбранные номера при подтверждении
-  contract: any | null;
-  phoneNumbers: RBTPhone[]; 
+  onConfirm: (selectedNumbers: number[], selectedNames: string[]) => void;
+  contract: LoginsData | null;
+  phoneNumbers: RBTPhone[];
 }
 
 const PhoneModal: React.FC<PhoneModalProps> = ({
@@ -18,42 +18,57 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
   phoneNumbers,
 }) => {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
+  const [selectedNames, setSelectedNames] = useState<string[]>([]); // Состояние для имен
 
-  const handleCheckboxChange = (phone: number) => {
-    setSelectedNumbers(
-      (prev) =>
-        prev.includes(phone)
-          ? prev.filter((num) => num !== phone) // Убираем номер, если уже выбран
-          : [...prev, phone] // Добавляем номер, если не выбран
+  const handleCheckboxChange = (phone: number, name: string) => {
+    setSelectedNumbers((prev) =>
+      prev.includes(phone)
+        ? prev.filter((num) => num !== phone)
+        : [...prev, phone]
+    );
+    setSelectedNames((prev) =>
+      prev.includes(name)
+        ? prev.filter((nameItem) => nameItem !== name)
+        : [...prev, name]
     );
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedNumbers); // Передаем выбранные номера
-    setSelectedNumbers([]); // Сбрасываем состояние после подтверждения
+    onConfirm(selectedNumbers, selectedNames); // Передаем номера и имена
+    setSelectedNumbers([]); 
+    setSelectedNames([]); 
   };
 
   return (
     <Modal show={show} onHide={onClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Подтверждение</Modal.Title>
+        <Modal.Title>Переселение</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>
-          Кого Вы хотите переселить вместе с логином{" "}
-          <strong>{contract?.login}</strong>?
+          Кого Вы хотите переселить вместе с <strong>{contract?.name}</strong>
+          <strong>
+            {" ("}
+            {contract?.login}
+            {") ?"}
+          </strong>
         </p>
         <Form>
-          {phoneNumbers.map((phone, index) => (
-            <Form.Check
-              key={index}
-              type="checkbox"
-              label={phone.phone}
-              value={phone.phone}
-              checked={selectedNumbers.includes(phone.phone)}
-              onChange={() => handleCheckboxChange(phone.phone)}
-            />
-          ))}
+          {phoneNumbers
+            .filter(
+              (phone) =>
+                String(phone.phone).slice(-9) !== contract?.phone.slice(-9)
+            )
+            .map((phone, index) => (
+              <Form.Check
+                key={index}
+                type="checkbox"
+                label={`${phone.name} - ${phone.phone}`}
+                value={phone.phone}
+                checked={selectedNumbers.includes(phone.phone)}
+                onChange={() => handleCheckboxChange(phone.phone, phone.name)}
+              />
+            ))}
         </Form>
       </Modal.Body>
       <Modal.Footer>

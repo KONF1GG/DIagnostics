@@ -5,25 +5,32 @@ import { getQueryParams } from "../Default/getData";
 import InfoList from "../InfoList";
 import "../../CSS/App.css";
 import PhoneModal from "./phonesModal";
-import { handleContractDeleteButton } from "./requests";
+import { handleContractDeleteButton, handleUserDelete } from "./requests";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
+import EditLocationIcon from "@mui/icons-material/EditLocation";
+import ConfirmationModal from "./../../Modals/ConfirmationModal";
 
 const App_page = () => {
   const { data, setData, login, setLogin } = useDataContext();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Модальное окно
+  // Модальное окно для переселения
   const [showModal, setShowModal] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
+
+  // Модальное окно для подтверждения
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {});
 
   const queriedLogin = getQueryParams();
 
   // Функция загрузки данных
-  const fetchData = async (login) => {
+  const fetchData = async (login: string) => {
     setLoading(true);
     setError(null);
 
@@ -48,15 +55,68 @@ const App_page = () => {
     }
   };
 
-  const handleRelocate = (contract) => {
+  const handleRelocate = (contract: any) => {
     setSelectedContract(contract);
-    setShowModal(true);
+    setShowModal(true); // Открытие модалки для переселения
   };
 
-  const confirmRelocation = () => {
-    console.log("Переселён контракт:", selectedContract);
+  const confirmRelocation = (
+    selectedNumbers: number[],
+    selectedNames: string[]
+  ) => {
+    console.log(selectedNumbers);
     // Логика переселения через API или обновление данных
-    setShowModal(false);
+    setShowModal(false); // Закрытие модалки переселения
+  };
+
+  const handleDeleteContract = (UUID2: string, login: string) => {
+    setModalTitle("Удаление договора");
+    setModalMessage("Вы уверены, что хотите отвязать этот договор?");
+    setOnConfirmAction(() => {
+      return () => {
+        console.log("Функция удаления активирована");
+        console.log("Удалён контракт:", UUID2);
+        // handleContractDeleteButton(UUID2, login, setData); // Логика удаления
+        setShowConfirmModal(false); // Закрытие модалки
+      };
+    });
+    setShowConfirmModal(true); // Открытие модалки подтверждения
+  };
+
+  const handleRoleChange = async (houseId: number, currentRole: number) => {
+    const newRole = currentRole === 0 ? 1 : 0;
+    try {
+      // Здесь вызывается API для смены роли (пример)
+      console.log(
+        `Роль изменена на ${newRole === 0 ? "Владелец" : "Пользователь"}`
+      );
+    } catch (error) {
+      console.error("Ошибка при смене роли:", error);
+    }
+  };
+
+  const handleDeleteNumber = (houseId: number, login: string) => {
+    setModalTitle("Удаление номера");
+    setModalMessage("Вы уверены, что хотите отвязать этот номер?");
+    setOnConfirmAction(() => {
+      return () => {
+        handleUserDelete(houseId, login, "номер", setData);
+        setShowConfirmModal(false); // Закрытие модалки
+      };
+    });
+    setShowConfirmModal(true); // Открытие модалки подтверждения
+  };
+
+  const handleDeleteAddress = (houseId: number, login: string) => {
+    setModalTitle("Удаление адреса");
+    setModalMessage("Вы уверены, что хотите отвязать этот адрес?");
+    setOnConfirmAction(() => {
+      return () => {
+        handleUserDelete(houseId, login, "адрес", setData);
+        setShowConfirmModal(false); // Закрытие модалки
+      };
+    });
+    setShowConfirmModal(true); // Открытие модалки подтверждения
   };
 
   useEffect(() => {
@@ -135,9 +195,6 @@ const App_page = () => {
                 <th>Имя</th>
                 <th>Адрес</th>
                 <th>Контракт</th>
-                {data.contracts.some((contract) => !contract.active) && (
-                  <th></th>
-                )}
                 <th></th>
               </tr>
             </thead>
@@ -148,35 +205,31 @@ const App_page = () => {
                   <td>{contract.name}</td>
                   <td>{contract.address}</td>
                   <td>{contract.contract}</td>
-                  {!contract.active && (
-                    <td className="text-center">
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() =>
-                          handleContractDeleteButton(
-                            contract.UUID2,
-                            contract.login,
-                            setData
-                          )
-                        }
-                      >
-                        Отвязать
-                      </button>
-                    </td>
-                  )}
-                  <td>
+
+                  <td className="d-flex" style={{ border: "none" }}>
                     <button
                       className="btn btn-primary btn-sm"
                       onClick={() => handleRelocate(contract)}
+                      title="Переселить"
                     >
-                      Переселить
+                      <EditLocationIcon />
                     </button>
+                    {!contract.active && (
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() =>
+                          handleDeleteContract(contract.UUID2, contract.login)
+                        }
+                        title="Отвязать"
+                      >
+                        <PersonRemoveIcon />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
           {/* Phones */}
           <div className="app-container">
             <h2 className="title">Телефоны, привязанные к адресу</h2>
@@ -185,69 +238,101 @@ const App_page = () => {
                 {data.phones
                   .sort((a, b) => a.role - b.role) // Сортировка: владельцы (role === 0) первыми
                   .map((phone, index) => (
-                    <div key={index} className="col-md-6 col-lg-4 mb-4">
+                    <div key={index} className="col-md-6 col-lg-4 mb-4 ">
                       <div className={`card h-100 bg-light`}>
                         <div
-                          className={`card-header d-flex justify-content-between align-items-center`}
+                          className={`card-header d-flex justify-content-between align-items-center ${
+                            phone.role === 0 ? "highlight-owner" : ""
+                          }`}
                         >
                           <h5
                             className={`card-title ${
-                              phone.role === 0 ? "owner" : ""
+                              phone.role === 0 ? "owner fw-bold" : ""
                             }`}
+                            style={{ cursor: "pointer" }}
+                            onClick={() =>
+                              handleRoleChange(phone.house_id, phone.role)
+                            }
+                            title="Нажмите, чтобы изменить роль"
                           >
                             {phone.role === 0 ? "Владелец" : "Пользователь"}
                           </h5>
-                          <div>
-                            <button
-                              className="btn btn-link"
-                              onClick={() => setShowModal(true)}
-                              title="Изменить роль"
-                            >
-                              <EditIcon />
-                            </button>
+                          <div className="d-flex align-items-center">
                             {phone.role !== 0 && (
                               <button
                                 className="btn btn-danger btn-sm"
                                 onClick={() => {
-                                  // Логика для отвязывания телефона
+                                  handleDeleteNumber(
+                                    phone.house_id,
+                                    queriedLogin
+                                  );
                                 }}
                                 title="Отвязать"
                               >
-                                <PersonRemoveIcon fontSize="small"/>
+                                <PersonRemoveIcon fontSize="small" />
                               </button>
                             )}
                           </div>
                         </div>
-                        <h5 className="mb-0 text-center">
-                          {phone.phone}{" "}
-                          {phone.name ? phone.name : "Неизвестное имя"}
+                        <h5 className="fw-bold mb-0 text-center mt-3">
+                          {phone.name ? phone.name : "Неизвестное имя"}{" "}
+                          {phone.phone}
                         </h5>
                         <div className="card-body">
-                          <ul className="list-group list-group-flush p-0">
+                          <div
+                            className="contract-grid"
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns:
+                                "repeat(auto-fit, minmax(250px, 1fr))",
+                              gap: "1rem",
+                            }}
+                          >
                             {phone.contracts.map((contract, idx) => (
-                              <li
+                              <div
                                 key={idx}
-                                className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                className="contract-card border rounded p-3"
+                                style={{
+                                  position: "relative",
+                                  backgroundColor: "#DCDCDC",
+                                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                }}
                               >
                                 <div>
-                                  <strong>Логин:</strong> {contract.login}{" "}
-                                  <br />
-                                  <strong>Адрес:</strong> {contract.address}{" "}
-                                  <br />
-                                  <strong>Договор:</strong> {contract.contract}
+                                  <div>
+                                    <strong>Логин:</strong> {contract.login}
+                                  </div>
+                                  <div>
+                                    <strong>Адрес:</strong> {contract.address}
+                                  </div>
+                                  <div>
+                                    <strong>Договор:</strong>{" "}
+                                    {contract.contract}
+                                  </div>
                                 </div>
                                 <button
-                                  className="btn btn-secondary btn-sm"
+                                  className="btn"
                                   onClick={() => {
-                                    /* Логика для отвязывания адреса */
+                                    handleDeleteAddress(
+                                      contract.house_id,
+                                      queriedLogin
+                                    );
                                   }}
                                   title="Отвязать"
+                                  style={{
+                                    position: "absolute",
+                                    top: "0.5rem",
+                                    right: "0.5rem",
+                                    padding: "0.25rem",
+                                    fontSize: "1rem",
+                                    width: "auto",
+                                  }}
                                 >
-                                  <ClearIcon />
+                                  <ClearIcon fontSize="small" />
                                 </button>
-                              </li>
+                              </div>
                             ))}
-                          </ul>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -265,6 +350,15 @@ const App_page = () => {
         onConfirm={confirmRelocation}
         contract={selectedContract}
         phoneNumbers={data.phones}
+      />
+
+      {/* Подключение ConfirmationModal */}
+      <ConfirmationModal
+        show={showConfirmModal}
+        onCancel={() => setShowConfirmModal(false)}
+        title={modalTitle}
+        message={modalMessage}
+        onConfirm={onConfirmAction}
       />
     </div>
   );

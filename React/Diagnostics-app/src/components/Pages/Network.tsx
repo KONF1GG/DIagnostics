@@ -28,7 +28,7 @@ const Network = () => {
   const queriedLogin = getQueryParams();
 
   useEffect(() => {
-    if (queriedLogin !== login) {
+    if (queriedLogin !== login || !networkData) {
       setLogin(queriedLogin);
       fetchNetworkData(queriedLogin);
     } else if (networkData) {
@@ -44,6 +44,7 @@ const Network = () => {
       const result = await GetNetwork(login);
       if (typeof result === "string") {
         setError(result);
+        setNetworkData(null);
       } else {
         setNetworkData(result);
       }
@@ -98,15 +99,21 @@ const Network = () => {
   const differences = networkData?.differences
     ? (networkData.differences as unknown as Differences)
     : { radius: {}, redis: {} };
-    
-  if (!networkData?.radius && !networkData?.redis) {
+
+  if (!queriedLogin) {
     return (
       <InfoList>
-        <p className="no-services-message fade-in">Данные по логину "{queriedLogin}" не найдены</p>
+        <p className="no-services-message fade-in">Логин не указан</p>
       </InfoList>
     );
   }
-
+  if (error) {
+    return (
+      <InfoList>
+        <p className="no-services-message fade-in">{error}</p>
+      </InfoList>
+    );
+  }
 
   return (
     <InfoList>

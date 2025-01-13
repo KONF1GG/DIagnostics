@@ -1,13 +1,13 @@
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
 import { GetApp } from "../../../API/App";
+import api from "./../../../API/api";
 
 export const handleContractDeleteButton = async (
   uuid2: string,
   login: string,
   setData: React.Dispatch<React.SetStateAction<any>>
 ) => {
-  console.log(`Кнопка отвязать нажата!`);
   const requestData = {
     UUID2: uuid2,
     flatId: 0,
@@ -71,7 +71,7 @@ export const handleContractDeleteButton = async (
     }
   } catch (error) {
     // Логирование исключения
-    console.log(error)
+    console.log(error);
     await LogData({
       login,
       page: `Приложение`,
@@ -85,5 +85,135 @@ export const handleContractDeleteButton = async (
     toast.error(`Ошибка: ${error || "Не удалось отвязать договор"}`, {
       position: "bottom-right",
     });
+  }
+};
+
+export const handleUserDelete = async (
+  house_id: number,
+  login: string,
+  deleteObject: string,
+  setData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  const url = `/v1/app/houses_flats_subscribers/${house_id}`;
+  const isPhoneDelete = deleteObject.includes("номер");
+  try {
+    const response = await api.delete(url);
+
+    if (response.status !== 200) {
+      // Логирование ошибки
+      await LogData({
+        login,
+        page: `Приложение`,
+        action: isPhoneDelete
+          ? "Кнопка отвязать (Телефон на адресе)"
+          : "Кнопка отвязать (Договор на адресе)",
+        success: false,
+        url: url,
+        payload: { house_id },
+        message: `Ошибка: ${
+          response.statusText ||
+          (isPhoneDelete
+            ? "Не удалось отвязать номер"
+            : "Не удалось отвязать договор")
+        }`,
+      });
+
+      toast.error(
+        `Ошибка: ${
+          response.statusText ||
+          (isPhoneDelete
+            ? "Не удалось отвязать номер"
+            : "Не удалось отвязать договор")
+        }`,
+        { position: "bottom-right" }
+      );
+      return;
+    }
+
+    // Логирование успешного выполнения
+    await LogData({
+      login,
+      page: `Приложение`,
+      action: isPhoneDelete
+        ? "Кнопка отвязать (Телефон на адресе)"
+        : "Кнопка отвязать (Договор на адресе)",
+      success: true,
+      url: url,
+      payload: { house_id },
+      message: isPhoneDelete
+        ? "Телефон успешно отвязан"
+        : "Договор успешно отвязан",
+    });
+
+    toast.success(
+      isPhoneDelete ? "Телефон успешно отвязан" : "Договор успешно отвязан",
+      {
+        position: "bottom-right",
+      }
+    );
+
+    // Обновляем данные приложения
+    const result = await GetApp(login);
+
+    if (result && "detail" in result) {
+      console.log(result);
+      setData(null);
+    } else if (result) {
+      setData(result);
+    } else {
+      setData(null);
+    }
+  } catch (error) {
+    // Логирование исключения
+    console.log(error);
+    await LogData({
+      login,
+      page: `Приложение`,
+      action: isPhoneDelete
+        ? "Кнопка отвязать (Телефон на адресе)"
+        : "Кнопка отвязать (Договор на адресе)",
+      success: false,
+      url: url,
+      payload: { house_id },
+      message: `Ошибка: ${String(error)}`,
+    });
+
+    toast.error(
+      `Ошибка: ${
+        error ||
+        (isPhoneDelete
+          ? "Не удалось отвязать номер"
+          : "Не удалось отвязать договор")
+      }`,
+      {
+        position: "bottom-right",
+      }
+    );
+  }
+};
+
+// relocation.ts
+export const relocatePhones = async (selectedNumbers: number[], login: string) => {
+  try {
+    const response = await fetch('/api/relocate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        login,
+        selectedNumbers
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Ошибка при переселении');
+    }
+
+    const data = await response.json();
+    return data; // Возвращаем данные с сервера
+  } catch (error) {
+    console.error('Ошибка переселения:', error);
+    throw error; // Пробрасываем ошибку дальше
   }
 };

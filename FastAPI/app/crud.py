@@ -13,6 +13,7 @@ from fastapi import HTTPException
 from jinja2 import DictLoader
 import psycopg2
 from redis.commands.search.result import Result
+from yarl import Query
 from app.depencies import RedisDependency
 from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
 from app.models import Session, ORM_OBJECT, ORM_CLS
@@ -62,16 +63,12 @@ async def find_failure_by_login(redis: RedisDependency, login_data: LoginFailure
 
     return None
 
-
-# Получение данных по логину из редиса
-from fastapi import HTTPException
-
 async def get_login_data(login: str, redis: RedisDependency) -> Dict:
     login_data = await redis.json().get(f"login:{login}")
     if login_data:
         return login_data
     else:
-        raise HTTPException(status_code=404, detail=f'Данные по логину "{login}" не найдены')
+        raise HTTPException(status_code=404, detail=f'Данные по логину {login} не найдены')
 
 async def get_cameras(login: str, retries: int = 2, timeout: int = 3) -> CamerasData | None:
     query_string = f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=cameras&login={login}'
@@ -590,6 +587,7 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
         subs_list = [
             RBT_phone(
                 house_id=row['house_subscriber_id'],
+                flat_id=flat_id,
                 role=row['role'],
                 name=row['subscriber_name'],
                 phone=row['id'],
@@ -614,6 +612,18 @@ async def get_flats(house_id: int, rbt):
         flats_list = [row['house_flat_id'] for row in result]
 
     return flats_list
+
+async def get_flat_from_RBT_by_flatId(flatId: int, rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT flat
+        FROM "houses_flats"
+        WHERE "house_flat_id" = $1
+        """
+        result = await rbt.fetch(query, flatId)
+
+    return result
+
 
 
 async def get_logins_from_redis(flat_ids: List[int], redis):
@@ -668,3 +678,5 @@ def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str
         client.command(query)
     except Exception as e:
         print(f"Ошибка при записи в ClickHouse: {e}")
+
+

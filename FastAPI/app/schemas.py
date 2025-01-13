@@ -251,6 +251,7 @@ class CameraDataToChange(BaseModel):
 
 class RBT(BaseModel):
     house_id: int
+    flat_id: int
     role: int
 
 # class RBT_flat(BaseModel):
@@ -268,11 +269,13 @@ class RBT_phone(RBT):
     patronymic: str
 
 class LoginsData(BaseModel):
+    phone: str
     login: str
     name: str
     address: str
     contract: str
     active: bool
+    relocate: bool
     UUID2: str
 
 class Phone(RBT_phone):

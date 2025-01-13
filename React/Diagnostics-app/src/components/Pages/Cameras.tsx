@@ -60,17 +60,11 @@ const Cameras = () => {
   ) => {
     setSelectedCamera({ cameraData1C, cameraDataRedis, cameraDataFlusic });
     setIsModalOpen(true);
-    document.body.style.overflow = "hidden"; // Отключаем прокрутку
-    document.body.style.position = "fixed"; // Фиксируем позицию
-    document.body.style.width = "100%"; // Чтобы не было сдвига
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedCamera(null);
-    document.body.style.overflow = ""; // Включаем прокрутку обратно
-    document.body.style.position = ""; // Возвращаем оригинальную позицию
-    document.body.style.width = ""; // Убираем фиксированную ширину
   };
 
   const handleResize = () => {

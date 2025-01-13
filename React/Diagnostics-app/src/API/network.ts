@@ -41,7 +41,6 @@ const GetNetwork = async (login: string): Promise<NetworkData | string> => {
                 'x-token': token 
             }
         });
-        
 
         console.log(response)
         if (response.status === 401) {

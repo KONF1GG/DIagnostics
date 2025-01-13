@@ -2,12 +2,14 @@ import { AxiosError } from "axios";
 import api from "./api";
 
 export interface RedisLogin {
+  house_id: number;
   login: string;
   address: string;
   contract: string;
 }
 
 export interface RBTPhone {
+  house_id: number;
   phone: number; // id
   name: string;
   patronymic: string;
@@ -16,6 +18,7 @@ export interface RBTPhone {
 }
 
 export interface LoginsData {
+  phone: string;
   login: string;
   name: string;
   address: string;

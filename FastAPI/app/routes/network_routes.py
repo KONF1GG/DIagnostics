@@ -63,7 +63,7 @@ async def get_connection_data(
             try:
                 redis_data_dict = await get_login_data(login, redis)
             except Exception:
-                response_data['errors'].append("Ошибка запроса к Редису")
+                redis_data_dict = None
         else:
             response_data['errors'].append("Редис недоступен")
 
@@ -113,7 +113,10 @@ async def get_connection_data(
 
         # Если данных нет ни откуда
         else:
-            response_data['errors'].append(f"Ошибка получения данных по логину - {login}")
+            raise HTTPException(
+            status_code=404,
+            detail=f'Данные по логину {login} dcxsssssssssssssssssssssssssне найдены',
+        )
 
     else:
         response_data['errors'].append("Логин не указан")
