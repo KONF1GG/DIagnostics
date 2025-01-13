@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "/logo.svg";
 import "../CSS/Navbar.css"; // Импортируем файл стилей
 import { LoginData } from "../../API/getSearchLogins";
 import { GetSearchLogins } from "../../API/getSearchLogins";
 import userIcon from "../../assets/users.svg";
+import debounce from "lodash/debounce"; // Подключаем lodash для дебаунса
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -31,8 +32,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [login, setLogin] = useState<string>("");
-  const [loginsList, setLoginsList] = useState<LoginData[]>([]);
+  const [login, setLogin] = useState<string>(""); // Текущее значение инпута
+  const [loginsList, setLoginsList] = useState<LoginData[]>([]); // Список найденных логинов
   const navigate = useNavigate();
 
   const handleMenuToggle = () => {
@@ -41,10 +42,6 @@ const Navbar = () => {
 
   const handleLinkClick = () => {
     setIsMenuOpen(false);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLogin(e.target.value);
   };
 
   const handleLoginSearchChoice = (chosenLogin?: string) => {
@@ -57,32 +54,37 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => {
-    if (login.length > 2) {
-      const fetchLogins = async () => {
-        try {
-          const result = await GetSearchLogins(login);
-          if ("logins" in result) {
-            setLoginsList(
-              result.logins.map((item) => ({
-                login: item.login,
-                name: item.name,
-                contract: item.contract,
-                address: item.address,
-              }))
-            );
-          } else {
-            setLoginsList([]);
-          }
-        } catch (err) {
+  // Функция поиска логинов с дебаунсом
+  const fetchLogins = useCallback(
+    debounce(async (query: string) => {
+      try {
+        const result = await GetSearchLogins(query);
+        if ("logins" in result) {
+          setLoginsList(
+            result.logins.map((item) => ({
+              login: item.login,
+              name: item.name,
+              contract: item.contract,
+              address: item.address,
+            }))
+          );
+        } else {
           setLoginsList([]);
         }
-      };
-      fetchLogins();
+      } catch (err) {
+        setLoginsList([]);
+      }
+    }, 500), // 500 мс задержка
+    []
+  );
+
+  useEffect(() => {
+    if (login.length > 2) {
+      fetchLogins(login); // Вызываем функцию с дебаунсом
     } else {
-      setLoginsList([]);
+      setLoginsList([]); // Очищаем список, если введено меньше 3 символов
     }
-  }, [login]);
+  }, [login, fetchLogins]);
 
   return (
     <>
@@ -97,7 +99,7 @@ const Navbar = () => {
                 type="text"
                 placeholder="Поиск..."
                 value={login}
-                onChange={handleInputChange}
+                onChange={(e) => setLogin(e.target.value)} // Обновляем состояние
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onKeyDown={(e) =>
