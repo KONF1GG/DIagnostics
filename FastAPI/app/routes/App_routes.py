@@ -23,7 +23,6 @@ async def get_connection_data(
 ):
     """Эндпоинт для получения информации приложения"""
 
-
     # Текущая временная метка
     current_datetime = time.time()
 
@@ -41,7 +40,6 @@ async def get_connection_data(
     # Получение адреса из данных Redis
     address_in_the_app = redis_data.get("address", "Неизвестно")
 
-
     # Получение списка логинов
     logins_list = await crud.get_logins_by_flatId_redis(flat_id, redis)
     contracts = []
@@ -50,8 +48,11 @@ async def get_connection_data(
         flat = data.get('flat')
         flatId = data.get('flatId')
         flat_from_RBT = await crud.get_flat_from_RBT_by_flatId(flatId, rbt)
-        if str(flat) == flat_from_RBT[0]['flat']:
-            print('yes')
+        flat_value = bool(flat) 
+        flat_from_RBT_value = bool(flat_from_RBT[0]['flat']) if flat_from_RBT[0]['flat'] is not None else False
+
+        house_flat_subscribers = await crud.get_houses_flats_subscribers_by_flat_id(flatId, rbt)
+        is_relocatable = (flat_value != flat_from_RBT_value) or house_flat_subscribers == 0
 
         contracts.append(LoginsData(
             phone=data.get('primePhone', ''),
@@ -62,7 +63,7 @@ async def get_connection_data(
             active=True if 0 > max(data.get('servicecats', {}).get('internet', {}).get('timeto', 0), 
                                data.get('servicecats', {}).get('intercomhandset', {}).get('timeto', 0), 
                                data.get('servicecats', {}).get('intercom', {}). get('timeto', 0)) - current_datetime < three_months_in_seconds else False, 
-            relocate=True if str(flat) != flat_from_RBT[0]['flat'] else False,
+            relocate=is_relocatable,  # Добавляем логику для кнопки "Переселить"
             UUID2=data.get('UUID2', '')
         ))
 

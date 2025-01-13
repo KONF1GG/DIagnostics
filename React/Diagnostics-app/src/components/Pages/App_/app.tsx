@@ -5,7 +5,11 @@ import { getQueryParams } from "../Default/getData";
 import InfoList from "../InfoList";
 import "../../CSS/App.css";
 import PhoneModal from "./phonesModal";
-import { handleContractDeleteButton, handleUserDelete, ChangeRole } from "./requests";
+import {
+  handleContractDeleteButton,
+  handleUserDelete,
+  ChangeRole,
+} from "./requests";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import ClearIcon from "@mui/icons-material/Clear";
 import EditLocationIcon from "@mui/icons-material/EditLocation";
@@ -76,22 +80,25 @@ const App_page = () => {
       return () => {
         console.log("Функция удаления активирована");
         console.log("Удалён контракт:", UUID2);
-        // handleContractDeleteButton(UUID2, login, setData); // Логика удаления
-        setShowConfirmModal(false); // Закрытие модалки
+        handleContractDeleteButton(UUID2, login, setData); // Логика удаления
+        setShowConfirmModal(false);
       };
     });
-    setShowConfirmModal(true); // Открытие модалки подтверждения
+    setShowConfirmModal(true);
   };
 
-  const handleRoleChange = async (houseId: number, flatId: number, currentRole: number) => {
+  const handleRoleChange = async (
+    houseId: number,
+    flatId: number,
+    currentRole: number
+  ) => {
     const newRole = currentRole === 0 ? 1 : 0;
     try {
       // Здесь вызывается API для смены роли (пример)
-      await ChangeRole(houseId, flatId, newRole, queriedLogin, setData)
+      await ChangeRole(houseId, flatId, newRole, queriedLogin, setData);
       console.log(
         `Роль изменена на ${newRole === 0 ? "Владелец" : "Пользователь"}`
       );
-      
     } catch (error) {
       console.error("Ошибка при смене роли:", error);
     }
@@ -216,7 +223,7 @@ const App_page = () => {
                     >
                       <EditLocationIcon />
                     </button>
-                    {!contract.active && (
+                    {contract.active && (
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() =>
@@ -253,7 +260,11 @@ const App_page = () => {
                             }`}
                             style={{ cursor: "pointer" }}
                             onClick={() =>
-                              handleRoleChange(phone.house_id, phone.flat_id, phone.role)
+                              handleRoleChange(
+                                phone.house_id,
+                                phone.flat_id,
+                                phone.role
+                              )
                             }
                             title="Нажмите, чтобы изменить роль"
                           >

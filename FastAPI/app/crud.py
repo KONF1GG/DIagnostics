@@ -625,6 +625,17 @@ async def get_flat_from_RBT_by_flatId(flatId: int, rbt):
     return result
 
 
+async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT COUNT(*)
+        FROM "houses_flats"
+        WHERE "house_flat_id" = $1
+        """
+        result = await rbt.fetchval(query, flat_id)
+    return result 
+
+
 
 async def get_logins_from_redis(flat_ids: List[int], redis):
     search_query = " | ".join([f"@flatId:[{flat_id} {flat_id}]" for flat_id in flat_ids])
