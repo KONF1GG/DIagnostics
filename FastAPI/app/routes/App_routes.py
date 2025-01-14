@@ -64,7 +64,7 @@ async def get_connection_data(
             active=True if 0 > max(data.get('servicecats', {}).get('internet', {}).get('timeto', 0), 
                                data.get('servicecats', {}).get('intercomhandset', {}).get('timeto', 0), 
                                data.get('servicecats', {}).get('intercom', {}). get('timeto', 0)) - current_datetime < three_months_in_seconds else False, 
-            relocate=is_relocatable,  # Добавляем логику для кнопки "Переселить"
+            relocate=is_relocatable,  
             UUID2=data.get('UUID2', '')
         ))
 
@@ -72,11 +72,13 @@ async def get_connection_data(
     rbt_phones = await crud.get_numbers_rbt(flat_id, rbt)
     phones = []
     for rbt_phone in rbt_phones:
-        flats = await crud.get_flats(rbt_phone.house_id, rbt)
-        redis_logins = await crud.get_logins_from_redis(flats, redis)
+        flats_house_ids = await crud.get_flats(rbt_phone.house_id, rbt)
+        redis_logins = await crud.get_logins_from_redis(flats_house_ids, redis)
         redis_contracts = [
             RedisLogin(
                 login=data.get('login', ''),
+                flat_id=data.get('flatId', ''),
+                phone=data.get('primePhone', ''),
                 address=data.get('address', 'Неизвестно'),
                 contract=data.get('contract', 'Неизвестно')
             )
@@ -95,8 +97,8 @@ async def get_connection_data(
 
 @router.patch('/v1/app/change_role', response_model=StatusResponse)
 async def change_role_in_RBT(
-    request: ChangeRoleRequest,  # Получаем все параметры из тела запроса
-    rbt: RBTDependency  # Замените тип на конкретный тип зависимости, если требуется
+    request: ChangeRoleRequest, 
+    rbt: RBTDependency  
 ):
     print(f"Changing role: house_id={request.house_id}, flat_id={request.flat_id}, role={request.role}")
 

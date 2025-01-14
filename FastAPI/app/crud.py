@@ -603,14 +603,14 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
 async def get_flats(house_id: int, rbt):
     async with rbt.transaction():
         query = """
-        SELECT house_flat_id
+        SELECT house_flat_id, house_subscriber_id
         FROM "houses_flats_subscribers"
         WHERE "house_subscriber_id" = $1
         """
         result = await rbt.fetch(query, house_id)
         
-        flats_list = [row['house_flat_id'] for row in result]
-
+        flats_list = [{'flat_id': row['house_flat_id'], 'house_id': row['house_subscriber_id']} for row in result]
+    
     return flats_list
 
 async def get_flat_from_RBT_by_flatId(flatId: int, rbt):
@@ -637,9 +637,9 @@ async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
 
 
 
-async def get_logins_from_redis(flat_ids: List[int], redis):
-    search_query = " | ".join([f"@flatId:[{flat_id} {flat_id}]" for flat_id in flat_ids])
-    
+async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
+    search_query = " | ".join([f"@flatId:[{flat_house_id['flat_id']} {flat_house_id['flat_id']}]" for flat_house_id in flat_house_ids])
+
     result = await redis.ft('idx:client').search(search_query)
     
     logins = []

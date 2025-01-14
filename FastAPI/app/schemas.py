@@ -256,6 +256,8 @@ class CameraDataToChange(BaseModel):
 
 class RedisLogin(BaseModel):
     login: str
+    flat_id: int
+    phone: str
     address: str
     contract: str
 

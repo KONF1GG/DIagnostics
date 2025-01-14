@@ -326,7 +326,7 @@ const App_page = () => {
                                       {contract.contract}
                                     </div>
                                   </div>
-                                  {phone.flat_id !== data.flat_id && (
+                                  {contract.flat_id !== data.flat_id && (
                                     <button
                                       className="btn"
                                       onClick={() => {
