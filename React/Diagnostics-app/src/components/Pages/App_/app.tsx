@@ -261,7 +261,16 @@ const App_page = () => {
                               className={`card-title ${
                                 phone.role === 0 ? "owner fw-bold" : ""
                               }`}
-                              style={{ cursor: "pointer" }}
+                              style={{
+                                cursor: "pointer",
+                                transition: "color 0.3s ease",
+                              }}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.color = "#02458d")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.color = "")
+                              }
                               onClick={() =>
                                 handleRoleChange(
                                   phone.house_id,
@@ -326,7 +335,7 @@ const App_page = () => {
                                       {contract.contract}
                                     </div>
                                   </div>
-                                  {contract.flat_id !== data.flat_id && (
+                                  {(contract.flat_id !== data.flat_id || phone.role === 1) && (
                                     <button
                                       className="btn"
                                       onClick={() => {

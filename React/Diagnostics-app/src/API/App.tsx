@@ -4,6 +4,8 @@ import api from "./api";
 export interface RedisLogin {
   login: string;
   flat_id: number;
+  house_id: number;
+  role: number;
   phone: string;
   address: string;
   contract: string;
