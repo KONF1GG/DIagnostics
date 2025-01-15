@@ -31,6 +31,7 @@ async def get_connection_data(
     three_months_in_seconds = 30.44 * 24 * 60 * 60 * 3
     redis_data = await crud.get_redis_key_data(login, redis)
     flat_id = redis_data.get("flatId", 0)
+    main_contract = redis_data.get('contract', '')
 
     if flat_id == 0:
         raise HTTPException(
@@ -54,18 +55,21 @@ async def get_connection_data(
         flat_from_RBT_value = flat_from_RBT[0]['flat'] if flat_from_RBT[0]['flat'] is not None else False
 
         house_flat_subscribers = await crud.get_houses_flats_subscribers_by_flat_id(flatId, rbt)
-        is_relocatable = (flat != flat_from_RBT_value) or house_flat_subscribers == 0
+        flat_to_relocate = flat if (flat != flat_from_RBT_value) or house_flat_subscribers == 0 else None
+        print(flat)
+        print(flat_from_RBT_value)
 
         contracts.append(LoginsData(
             phone=data.get('primePhone', ''),
             login=data.get('login', ''),
+            house_id=data.get('houseId', ''),
             name=data.get('name', 'Неизвестно'),
             address=data.get('address', 'Неизвестно'),
             contract=data.get('contract', 'Неизвестно'),
             active=True if 0 > max(data.get('servicecats', {}).get('internet', {}).get('timeto', 0), 
                                data.get('servicecats', {}).get('intercomhandset', {}).get('timeto', 0), 
                                data.get('servicecats', {}).get('intercom', {}). get('timeto', 0)) - current_datetime < three_months_in_seconds else False, 
-            relocate=is_relocatable,  
+            relocate=flat_to_relocate,  
             UUID2=data.get('UUID2', '')
         ))
 
@@ -97,6 +101,7 @@ async def get_connection_data(
     return AppResponse(
         address_in_app=address_in_the_app,
         flat_id=flat_id,
+        main_contract=main_contract,
         contracts=contracts,
         phones=phones
     )

@@ -276,11 +276,12 @@ class RBT_phone(RBT):
 class LoginsData(BaseModel):
     phone: str
     login: str
+    house_id: int
     name: str
     address: str
     contract: str
     active: bool
-    relocate: bool
+    relocate: str | None
     UUID2: str
 
 class Phone(RBT_phone):
@@ -290,6 +291,7 @@ class AppResponse(BaseModel):
     address_in_app: str
     flat_id: int
     contracts: List[LoginsData]
+    main_contract: str
     phones: List[Phone]
 
 class RedisLoginSearch(BaseModel):

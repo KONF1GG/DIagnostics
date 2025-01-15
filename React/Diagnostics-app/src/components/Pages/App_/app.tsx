@@ -66,7 +66,8 @@ const App_page = () => {
 
   const confirmRelocation = (
     selectedNumbers: number[],
-    selectedNames: string[]
+    flatId: number,
+    houseId: number
   ) => {
     console.log(selectedNumbers);
     // Логика переселения через API или обновление данных
@@ -224,7 +225,7 @@ const App_page = () => {
                   <td>{contract.contract}</td>
 
                   <td className="d-flex" style={{ border: "none" }}>
-                    {contract.relocate && (
+                    {contract.flatToRelocate && contract.flatToRelocate !== 'None' && (
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() => handleRelocate(contract)}
@@ -326,53 +327,77 @@ const App_page = () => {
                                 gap: "1rem",
                               }}
                             >
-                              {phone.contracts.map((contract, idx) => (
+                              {data.main_contract && phone.contracts.some(contract => contract.contract === data.main_contract) && (
                                 <div
-                                  key={idx}
                                   className="contract-card border rounded p-3"
                                   style={{
                                     position: "relative",
-                                    backgroundColor: "#DCDCDC",
+                                    backgroundColor: "rgb(175, 186, 194)", // Выделение контракта
                                     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                                   }}
                                 >
                                   <div>
                                     <div>
-                                      <strong>Логин:</strong> {contract.login}
+                                      <strong>Логин:</strong> {phone.contracts.find(contract => contract.contract === data.main_contract)?.login}
                                     </div>
                                     <div>
-                                      <strong>Адрес:</strong> {contract.address}
+                                      <strong>Адрес:</strong> {phone.contracts.find(contract => contract.contract === data.main_contract)?.address}
                                     </div>
                                     <div>
-                                      <strong>Договор:</strong>{" "}
-                                      {contract.contract}
+                                      <strong>Договор:</strong> {data.main_contract}
                                     </div>
                                   </div>
-                                  {(contract.flat_id !== data.flat_id ||
-                                    phone.role === 1) && (
-                                    <button
-                                      className="btn"
-                                      onClick={() => {
-                                        handleDeleteAddress(
-                                          contract.house_id,
-                                          contract.flat_id,
-                                          queriedLogin
-                                        );
-                                      }}
-                                      title="Отвязать"
-                                      style={{
-                                        position: "absolute",
-                                        top: "0.5rem",
-                                        right: "0.5rem",
-                                        padding: "0.25rem",
-                                        fontSize: "1rem",
-                                        width: "auto",
-                                      }}
-                                    >
-                                      <ClearIcon fontSize="small" />
-                                    </button>
-                                  )}
                                 </div>
+                              )}
+                              {phone.contracts.map((contract, idx) => (
+                                contract.contract !== data.main_contract && (
+                                  <div
+                                    key={idx}
+                                    className="contract-card border rounded p-3"
+                                    style={{
+                                      position: "relative",
+                                      backgroundColor: "#DCDCDC",
+                                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                    }}
+                                  >
+                                    <div>
+                                      <div>
+                                        <strong>Логин:</strong> {contract.login}
+                                      </div>
+                                      <div>
+                                        <strong>Адрес:</strong> {contract.address}
+                                      </div>
+                                      <div>
+                                        <strong>Договор:</strong>{" "}
+                                        {contract.contract}
+                                      </div>
+                                    </div>
+                                    {(contract.flat_id !== data.flat_id ||
+                                      phone.role === 1) && (
+                                      <button
+                                        className="btn"
+                                        onClick={() => {
+                                          handleDeleteAddress(
+                                            contract.house_id,
+                                            contract.flat_id,
+                                            queriedLogin
+                                          );
+                                        }}
+                                        title="Отвязать"
+                                        style={{
+                                          position: "absolute",
+                                          top: "0.5rem",
+                                          right: "0.5rem",
+                                          padding: "0.25rem",
+                                          fontSize: "1rem",
+                                          width: "auto",
+                                        }}
+                                      >
+                                        <ClearIcon fontSize="small" />
+                                      </button>
+                                    )}
+                                  </div>
+                                )
                               ))}
                             </div>
                           </div>

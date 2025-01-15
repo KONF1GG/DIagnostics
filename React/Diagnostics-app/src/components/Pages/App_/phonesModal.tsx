@@ -34,7 +34,8 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedNumbers, selectedNames); // Передаем номера и имена
+    console.log(contract)
+    // onConfirm(selectedNumbers, contract?.UUID2,); // Передаем номера и имена
     setSelectedNumbers([]); 
     setSelectedNames([]); 
   };

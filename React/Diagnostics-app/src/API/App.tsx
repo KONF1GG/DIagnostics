@@ -25,9 +25,10 @@ export interface LoginsData {
   phone: string;
   login: string;
   name: string;
+  house_id: number;
   address: string;
   contract: string;
-  relocate: boolean;
+  flatToRelocate: string | null;
   active: boolean;
   UUID2: string;
 }
@@ -36,6 +37,7 @@ export interface ResponseData {
   address_in_app: string;
   flat_id: number;
   contracts: LoginsData[];
+  main_contract: string;
   phones: RBTPhone[];
 }
 
