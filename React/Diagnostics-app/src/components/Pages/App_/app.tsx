@@ -104,19 +104,27 @@ const App_page = () => {
     }
   };
 
-  const handleDeleteNumber = (houseId: number, login: string) => {
+  const handleDeleteNumber = (
+    houseId: number,
+    flatId: number,
+    login: string
+  ) => {
     setModalTitle("Удаление номера");
     setModalMessage("Вы уверены, что хотите отвязать этот номер?");
     setOnConfirmAction(() => {
       return () => {
-        handleUserDelete(houseId, login, "номер", setData);
+        handleUserDelete(houseId, flatId, login, "номер", setData);
         setShowConfirmModal(false); // Закрытие модалки
       };
     });
     setShowConfirmModal(true); // Открытие модалки подтверждения
   };
 
-  const handleDeleteAddress = (houseId: number, flatId:number, login: string) => {
+  const handleDeleteAddress = (
+    houseId: number,
+    flatId: number,
+    login: string
+  ) => {
     setModalTitle("Удаление адреса");
     setModalMessage("Вы уверены, что хотите отвязать этот адрес?");
     setOnConfirmAction(() => {
@@ -192,7 +200,7 @@ const App_page = () => {
       <InfoList>
         <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
           <div className="border border-primary text-center p-3 rounded mb-4">
-            <h2 style={{ color: '#02458d' }}>{data.address_in_app}</h2>
+            <h2 style={{ color: "#02458d" }}>{data.address_in_app}</h2>
           </div>
 
           {/* Contracts */}
@@ -278,7 +286,11 @@ const App_page = () => {
                                   phone.role
                                 )
                               }
-                              title={`Сделать ${phone.role === 0 ? "Пользователем" : "владельцем"}`}
+                              title={`Сделать ${
+                                phone.role === 0
+                                  ? "Пользователем"
+                                  : "владельцем"
+                              }`}
                             >
                               {phone.role === 0 ? "Владелец" : "Пользователь"}
                             </h5>
@@ -289,6 +301,7 @@ const App_page = () => {
                                   onClick={() => {
                                     handleDeleteNumber(
                                       phone.house_id,
+                                      phone.flat_id,
                                       queriedLogin
                                     );
                                   }}
@@ -335,7 +348,8 @@ const App_page = () => {
                                       {contract.contract}
                                     </div>
                                   </div>
-                                  {(contract.flat_id !== data.flat_id || phone.role === 1) && (
+                                  {(contract.flat_id !== data.flat_id ||
+                                    phone.role === 1) && (
                                     <button
                                       className="btn"
                                       onClick={() => {

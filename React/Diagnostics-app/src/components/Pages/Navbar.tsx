@@ -36,13 +36,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLoginSearchChoice = (chosenLogin?: string) => {
-    if (login) {
+    if (chosenLogin) {
       const previousUrl = location.pathname;
       const redirectUrl = previousUrl === '/' 
-        ? '/network' 
-        : (chosenLogin 
-          ? `${previousUrl}?login=${chosenLogin}` 
-          : `${previousUrl}?login=${encodeURIComponent(login)}`); 
+        ? `/network?login=${encodeURIComponent(chosenLogin)}` 
+        : `${previousUrl}?login=${encodeURIComponent(chosenLogin)}`; 
       navigate(redirectUrl);
       setLoginsList([]);
     }
