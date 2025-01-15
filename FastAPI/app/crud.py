@@ -15,7 +15,7 @@ import psycopg2
 from redis.commands.search.result import Result
 from yarl import Query
 from app.depencies import RedisDependency
-from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, TV24Operator, TVIPOperator
+from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
 from app.models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 from app import crud
@@ -624,6 +624,59 @@ async def get_flat_from_RBT_by_flatId(flatId: int, rbt):
 
     return result
 
+async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> StatusResponse:
+    query = """
+        UPDATE houses_flats_subscribers
+        SET role = $1
+        WHERE house_subscriber_id = $2 AND house_flat_id = $3
+        RETURNING house_subscriber_id
+    """
+    
+    async with rbt.transaction():
+        try:
+            result = await rbt.fetchval(query, role, house_id, flat_id)
+            
+            if result is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Запись не найдена"
+                )
+
+            return StatusResponse(
+                status="success",
+            )
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Ошибка при изменении роли: {str(e)}"
+            )
+        
+async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt) -> StatusResponse:
+    query = """
+        DELETE FROM houses_flats_subscribers
+        WHERE house_subscriber_id = $1 AND house_flat_id = $2
+    """
+    
+    async with rbt.transaction():
+        try:
+            result = await rbt.fetchval(query, house_id, flat_id)
+            
+            if result is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Запись не найдена"
+                )
+
+            return StatusResponse(
+                status="succsess",
+            )
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Ошибка при удалении записи: {str(e)}"
+            )
 
 async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
     async with rbt.transaction():

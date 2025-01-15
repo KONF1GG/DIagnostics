@@ -143,7 +143,9 @@ const Cameras = () => {
                 )}
               </div>
             ) : (
-              <p className="no-services-message">Услуги отсутствуют</p>
+              <p className="no-services-message" style={{ marginTop: "-20px" }}>
+                Услуги отсутствуют
+              </p>
             )}
 
             {/* Камеры из 1C */}

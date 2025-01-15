@@ -33,10 +33,12 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
             ].map(({ path, label }, index) => (
               <Link
                 key={index}
-                to={`/${path}?login=${encodeURIComponent(login)}`}
+                to={login ? `/${path}?login=${encodeURIComponent(login)}` : "#"}
                 className={`nav-link ${
                   location.pathname.includes(path) ? "active" : ""
                 }`}
+                onClick={login ? undefined : (e) => e.preventDefault()} 
+                style={{ pointerEvents: login ? "auto" : "none", color: login ? "inherit" : "gray" }} // Добавлено для отключения клика
               >
                 {label}
               </Link>

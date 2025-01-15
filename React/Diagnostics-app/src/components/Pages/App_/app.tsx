@@ -192,7 +192,7 @@ const App_page = () => {
       <InfoList>
         <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
           <div className="border border-primary text-center p-3 rounded mb-4">
-            <h2 className="text-primary">{data.address_in_app}</h2>
+            <h2 style={{ color: '#02458d' }}>{data.address_in_app}</h2>
           </div>
 
           {/* Contracts */}
@@ -278,7 +278,7 @@ const App_page = () => {
                                   phone.role
                                 )
                               }
-                              title="Нажмите, чтобы изменить роль"
+                              title={`Сделать ${phone.role === 0 ? "Пользователем" : "владельцем"}`}
                             >
                               {phone.role === 0 ? "Владелец" : "Пользователь"}
                             </h5>

@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 import time
 from operator import add
 from xml.dom.expatbuilder import theDOMImplementation
@@ -107,70 +108,11 @@ async def change_role_in_RBT(
     request: ChangeRoleRequest, 
     rbt: RBTDependency  
 ):
-    print(f"Changing role: house_id={request.house_id}, flat_id={request.flat_id}, role={request.role}")
+    return await crud.change_RBT_role(request.house_id, request.flat_id, request.role, rbt)
 
-    # Используем транзакцию для работы с базой данных
-    # async with rbt.transaction():
-    #     try:
-    #         # Выполняем SQL-запрос для обновления роли
-    #         result = await rbt.execute("""
-    #             UPDATE houses_flats_subscribers
-    #             SET role = :role
-    #             WHERE house_id = :house_id AND flat_id = :flat_id
-    #         """, {
-    #             "role": request.role,
-    #             "house_id": request.house_id,
-    #             "flat_id": request.flat_id
-    #         })
 
-    #         if result.rowcount == 0:
-    #             # Если обновление не затронуло ни одной строки, возвращаем ошибку
-    #             raise HTTPException(
-    #                 status_code=404,
-    #                 detail="Запись с указанными house_id и flat_id не найдена"
-    #             )
-
-    #         # Успешный результат
-    #         return StatusResponse(
-    #             status="success",
-    #         )
-
-    #     except Exception as e:
-    #         # Логирование и обработка ошибки
-    #         raise HTTPException(
-    #             status_code=500,
-    #             detail=f"Ошибка изменения роли: {str(e)}"
-    #         )
-
-@router.delete('/v1/app/houses_flats_subscribers/{house_id}', response_model=StatusResponse)
-async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, rbt: RBTDependency):
-    return StatusResponse(
-                status="success",
-            )
-    # async with rbt.transaction():
-    #     try:
-    #         # Удаляем запись из основной таблицы
-    #         result = await rbt.execute("""
-    #             DELETE FROM houses_flats_subscribers
-    #             WHERE house_subscriber_id = :house_id
-    #         """, {"house_id": house_id})
-
-    #         # Проверяем, что запись была найдена и удалена
-    #         if result.rowcount == 0:
-    #             raise HTTPException(
-    #                 status_code=404,
-    #                 detail=f"Запись с ID {house_id} не найдена"
-    #             )
-
-    #         # Успешный результат
-    #         return StatusResponse(
-    #             status="success",
-    #             message=f"Запись с ID {house_id} удалена"
-    #         )
-
-    #     except Exception as e:
-    #         # Логирование ошибки (рекомендуется добавить, если есть логирование в проекте)
-    #         raise HTTPException(
-    #             status_code=500,
-    #             detail=f"Ошибка удаления записи с ID {house_id}: {str(e)}"
-    #         )
+@router.delete('/v1/app/houses_flats_subscribers/{house_id}/{flat_id}', response_model=StatusResponse)
+async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: int, rbt: RBTDependency):
+    
+    return StatusResponse(status='success')
+    # return await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)

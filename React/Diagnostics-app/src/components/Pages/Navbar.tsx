@@ -29,26 +29,20 @@ export const Logout = () => {
 
 const Navbar = () => {
   const location = useLocation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [login, setLogin] = useState<string>(""); // Текущее значение инпута
   const [loginsList, setLoginsList] = useState<LoginData[]>([]); // Список найденных логинов
   const navigate = useNavigate();
 
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLinkClick = () => {
-    setIsMenuOpen(false);
-  };
-
   const handleLoginSearchChoice = (chosenLogin?: string) => {
     if (login) {
-      const redirectUrl = chosenLogin
-        ? `network?login=${chosenLogin}`
-        : `network?login=${encodeURIComponent(login)}`;
+      const previousUrl = location.pathname;
+      const redirectUrl = previousUrl === '/' 
+        ? '/network' 
+        : (chosenLogin 
+          ? `${previousUrl}?login=${chosenLogin}` 
+          : `${previousUrl}?login=${encodeURIComponent(login)}`); 
       navigate(redirectUrl);
       setLoginsList([]);
     }
@@ -85,6 +79,15 @@ const Navbar = () => {
       setLoginsList([]); // Очищаем список, если введено меньше 3 символов
     }
   }, [login, fetchLogins]);
+
+  // Отслеживаем изменения в URL и обновляем значение login
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const loginParam = params.get("login");
+    if (loginParam) {
+      setLogin(loginParam);
+    }
+  }, [location.search]);
 
   return (
     <>

@@ -64,8 +64,6 @@ async def get_connection_data(
                 redis_data_dict = await get_login_data(login, redis)
             except Exception:
                 redis_data_dict = None
-        else:
-            response_data['errors'].append("Редис недоступен")
 
         # Если данные доступны из обеих баз
         if redis_data_dict and radius_data_dict:
@@ -115,7 +113,7 @@ async def get_connection_data(
         else:
             raise HTTPException(
             status_code=404,
-            detail=f'Данные по логину {login} dcxsssssssssssssssssssssssssне найдены',
+            detail=f'Данные по логину {login} не найдены',
         )
 
     else:

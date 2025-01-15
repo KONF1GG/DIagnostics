@@ -18,8 +18,6 @@
 /* Анимация появления */
 .fade-in {
   animation: fadeIn 0.5s ease-in-out forwards;
-  -webkit-animation: example 0.5s ease-in-out;
-  -moz-animation: example 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {

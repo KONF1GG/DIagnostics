@@ -107,6 +107,7 @@ const Network = () => {
       </InfoList>
     );
   }
+
   if (error) {
     return (
       <InfoList>
