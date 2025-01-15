@@ -3,6 +3,7 @@ import json
 import re
 import time
 from operator import add
+from urllib import response
 from xml.dom.expatbuilder import theDOMImplementation
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, List, Optional
@@ -10,7 +11,7 @@ from typing import Dict, List, Optional
 from redis import ResponseError
 from app import crud
 from app.depencies import RedisDependency, SessionRediusDependency, TokenDependency, RBTDependency
-from app.schemas import TV24, TVIP, AppResponse, ChangeRoleRequest, LoginsData, Phone, RBT_phone, RedisLogin, Service1C, Service1c, ServiceOp, Smotreshka, StatusResponse, TVResponse
+from app.schemas import TV24, TVIP, AppResponse, ChangeRoleRequest, LoginsData, Phone, RBT_phone, RedisLogin, RelocateRequest, Service1C, Service1c, ServiceOp, Smotreshka, StatusResponse, TVResponse
 from app import config
 
 router = APIRouter()
@@ -56,13 +57,11 @@ async def get_connection_data(
 
         house_flat_subscribers = await crud.get_houses_flats_subscribers_by_flat_id(flatId, rbt)
         flat_to_relocate = flat if (flat != flat_from_RBT_value) or house_flat_subscribers == 0 else None
-        print(flat)
-        print(flat_from_RBT_value)
-
         contracts.append(LoginsData(
             phone=data.get('primePhone', ''),
             login=data.get('login', ''),
             house_id=data.get('houseId', ''),
+            flat=flat,
             name=data.get('name', 'Неизвестно'),
             address=data.get('address', 'Неизвестно'),
             contract=data.get('contract', 'Неизвестно'),
@@ -129,3 +128,34 @@ async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: 
     return StatusResponse(
         status="success",
     )
+
+
+@router.patch(('/v1/app/relocate'), response_model=StatusResponse)
+async def relocate_users(
+    request: RelocateRequest, 
+    rbt: RBTDependency  
+):
+    # flat_id = await crud.get_flat_from_RBT_by_house_id_and_flat(request.flat, request.house_id, rbt)
+
+    # if flat_id is None:
+    #     # Создание новой квартиры
+    #     try:
+    #         flat_id = await crud.create_new_flat(request.flat, request.house_id)
+
+    #     except Exception as e:
+    #         raise HTTPException(status_code=400, detail=f"Не удалось создать квартиру: {e}")
+
+    # Переселение
+    # response = await crud.change_flat_in_1C(request.flat, request.UUID2)
+    response = 1
+    if response:
+        try:
+            phones_list = [str(phone) for phone in request.phones]
+            house_subscriber_ids_to_relocate = await crud.get_house_subscriber_ids_to_relocate_by_phones(phones_list, rbt)
+            print(house_subscriber_ids_to_relocate)
+            return StatusResponse(status='success')
+            # relocate_response = await crud.change_flat_id_in_RBT(house_subscriber_ids_to_relocate, request.flat)    
+        except Exception as e:
+            raise HTTPException(status_code=400, detail="Не удалось переселить")
+    else:
+        raise HTTPException(status_code=400, detail=f'Не удалось изменить кваритру в 1С')

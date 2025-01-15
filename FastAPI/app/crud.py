@@ -672,6 +672,68 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
                 detail=f"Произошла ошибка при удалении записи: {str(e)}" 
             )
 
+async def get_flat_from_RBT_by_house_id_and_flat(flat: str, house_id: int, rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT house_flat_id
+        FROM "houses_flats"
+        WHERE "flat" = $1 AND "address_house_id" = $2
+        LIMIT 1
+        """
+        result = await rbt.fetchval(query, flat, house_id)
+
+    return result 
+
+async def create_new_flat(flat: str, house_id: int, rbt):
+    async with rbt.transaction():
+        query = """
+        INSERT INTO "houses_flats" (address_house_id, flat)
+        VALUES ($1, $2)
+        RETURNING house_flat_id
+        """
+        result = await rbt.fetchval(query, flat, house_id)
+
+    return result 
+
+async def change_flat_in_1C(new_flat: str, uuid2: str):
+    url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/RBT/setFlatId"
+    payload = {"UUID2": uuid2, "flatId": new_flat}
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=payload) as response:
+                response.raise_for_status() 
+                return await response.json() 
+
+    except aiohttp.ClientError as e:
+        print(f"Ошибка клиента Aiohttp: {e}")
+        return None
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+        return None
+
+
+async def get_house_subscriber_ids_to_relocate_by_phones(phones: List[str], rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT house_subscriber_id
+        FROM houses_subscribers_mobile
+        WHERE id = ANY($1);
+        """
+        result = await rbt.fetch(query, phones)
+    return result
+
+
+async def change_flat_id_in_RBT(house_ids: List[int], new_flat_id: int, rbt):
+    async with rbt.transaction():
+        query = """
+        UPDATE "houses_flats_subscribers"
+        SET house_flat_id = $1
+        WHERE house_subscriber_id = ANY($2)
+        """
+        await rbt.execute(query, new_flat_id, house_ids)
+    return {"status": "success"}
+
 async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
     async with rbt.transaction():
         query = """
@@ -690,7 +752,6 @@ async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
         flat_id = flat_house_id['flat_id']
         if flat_id not in unique_list:
             unique_list.append(flat_id)
-    print(unique_list)
     search_query = " | ".join([f"@flatId:[{flat_id} {flat_id}]" for flat_id in unique_list])
     result = await redis.ft('idx:client').search(search_query)
 

@@ -27,13 +27,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={() => { 
-          console.log("Подтвердить нажато"); 
           onConfirm(); 
         }}>
           Подтвердить
         </Button>
         <Button variant="secondary" onClick={() => { 
-          console.log("Отмена нажата"); 
           onCancel(); 
         }}>
           Отмена

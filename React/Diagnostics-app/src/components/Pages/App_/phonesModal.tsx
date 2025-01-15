@@ -5,7 +5,13 @@ import { RBTPhone, LoginsData } from "../../../API/App";
 interface PhoneModalProps {
   show: boolean;
   onClose: () => void;
-  onConfirm: (selectedNumbers: number[], selectedNames: string[]) => void;
+  onConfirm: (
+    login: string,
+    selectedNumbers: number[],
+    UUID2: string,
+    flat: string,
+    house_id: number
+  ) => void;
   contract: LoginsData | null;
   phoneNumbers: RBTPhone[];
 }
@@ -17,27 +23,21 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
   contract,
   phoneNumbers,
 }) => {
-  const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
-  const [selectedNames, setSelectedNames] = useState<string[]>([]); // Состояние для имен
+  const [phones, setPhones] = useState<number[]>([]);
 
-  const handleCheckboxChange = (phone: number, name: string) => {
-    setSelectedNumbers((prev) =>
+  const handleCheckboxChange = (phone: number) => {
+    setPhones((prev) =>
       prev.includes(phone)
         ? prev.filter((num) => num !== phone)
         : [...prev, phone]
     );
-    setSelectedNames((prev) =>
-      prev.includes(name)
-        ? prev.filter((nameItem) => nameItem !== name)
-        : [...prev, name]
-    );
   };
 
   const handleConfirm = () => {
-    console.log(contract)
-    // onConfirm(selectedNumbers, contract?.UUID2,); // Передаем номера и имена
-    setSelectedNumbers([]); 
-    setSelectedNames([]); 
+    if (contract?.UUID2 && contract?.house_id) {
+      onConfirm(contract.login, phones, contract.UUID2, contract.flat, contract.house_id);
+      setPhones([]);
+    }
   };
 
   return (
@@ -66,8 +66,8 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
                 type="checkbox"
                 label={`${phone.name} - ${phone.phone}`}
                 value={phone.phone}
-                checked={selectedNumbers.includes(phone.phone)}
-                onChange={() => handleCheckboxChange(phone.phone, phone.name)}
+                checked={phones.includes(phone.phone)}
+                onChange={() => handleCheckboxChange(phone.phone)}
               />
             ))}
         </Form>

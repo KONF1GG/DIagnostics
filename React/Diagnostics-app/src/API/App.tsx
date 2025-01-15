@@ -26,9 +26,10 @@ export interface LoginsData {
   login: string;
   name: string;
   house_id: number;
+  flat: string;
   address: string;
   contract: string;
-  flatToRelocate: string | null;
+  relocate: string | null;
   active: boolean;
   UUID2: string;
 }

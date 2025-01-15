@@ -278,6 +278,7 @@ class LoginsData(BaseModel):
     login: str
     house_id: int
     name: str
+    flat: str
     address: str
     contract: str
     active: bool
@@ -316,3 +317,9 @@ class ChangeRoleRequest(BaseModel):
     house_id: int
     flat_id: int
     role: int
+
+class RelocateRequest(BaseModel):
+    phones: List[int]
+    UUID2: str
+    flat: str
+    house_id: int

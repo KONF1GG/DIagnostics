@@ -193,35 +193,6 @@ export const handleUserDelete = async (
   }
 };
 
-// relocation.ts
-export const relocatePhones = async (
-  selectedNumbers: number[],
-  login: string
-) => {
-  try {
-    const response = await fetch("/api/relocate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        login,
-        selectedNumbers,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Ошибка при переселении");
-    }
-
-    const data = await response.json();
-    return data; // Возвращаем данные с сервера
-  } catch (error) {
-    console.error("Ошибка переселения:", error);
-    throw error; // Пробрасываем ошибку дальше
-  }
-};
-
 export const ChangeRole = async (
   house_id: number,
   flat_id: number,
@@ -232,7 +203,6 @@ export const ChangeRole = async (
   const url = `/v1/app/change_role`;
 
   try {
-    // Передаем параметры в запрос
     const response = await api.patch(url, {
       house_id,
       flat_id,
@@ -298,6 +268,89 @@ export const ChangeRole = async (
     });
 
     toast.error(`Ошибка: ${error || "Не удалось изменить роль"}`, {
+      position: "bottom-right",
+    });
+  }
+};
+
+export const Relocate = async (
+  phones: number[],
+  UUID2: string,
+  flat: string,
+  house_id: number,
+  login: string,
+  setData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  const url = `/v1/app/relocate`;
+
+  try {
+    const response = await api.patch(url, {
+      phones,
+      UUID2,
+      flat,
+      house_id,
+    });
+
+    if (response.status !== 200) {
+      await LogData({
+        login,
+        page: `Приложение`,
+        action: "Переселение",
+        success: false,
+        url: url,
+        payload: { phones, UUID2, login, flat },
+        message: `Ошибка: ${
+          response.statusText || "Не удалось переселить договор"
+        }`,
+      });
+
+      toast.error(
+        `Ошибка: ${response.statusText || "Не удалось переселить договор"}`,
+        { position: "bottom-right" }
+      );
+      return;
+    }
+
+    // Логирование успешного выполнения
+    await LogData({
+      login,
+      page: `Приложение`,
+      action: "Переселение",
+      success: true,
+      url: url,
+      payload: { phones, UUID2, login, flat },
+      message: "Договор успешно переселен",
+    });
+
+    toast.success("Договор успешно переселен", {
+      position: "bottom-right",
+    });
+
+    // Обновляем данные приложения
+    const result = await GetApp(login);
+
+    if (result && "detail" in result) {
+      console.log(result);
+      setData(null);
+    } else if (result) {
+      setData(result);
+    } else {
+      setData(null);
+    }
+  } catch (error) {
+    // Логирование исключения
+    console.log(error);
+    await LogData({
+      login,
+      page: `Приложение`,
+      action: "Переселение",
+      success: false,
+      url: url,
+      payload: { phones, UUID2, login, flat },
+      message: `Ошибка: ${String(error)}`,
+    });
+
+    toast.error(`Ошибка: ${error || "Не удалось переселить договор"}`, {
       position: "bottom-right",
     });
   }
