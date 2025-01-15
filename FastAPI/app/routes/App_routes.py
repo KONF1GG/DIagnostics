@@ -75,24 +75,22 @@ async def get_connection_data(
     for rbt_phone in rbt_phones:
         flats_house_ids = await crud.get_flats(rbt_phone.house_id, rbt)
         redis_logins = await crud.get_logins_from_redis(flats_house_ids, redis)
-        
         redis_contracts = []
-
-
         for login in redis_logins:
             data = json.loads(login.json)
             rbt_phone_add = await crud.get_numbers_rbt(data.get('flatId'), rbt)
             for phone in rbt_phone_add:
-                redis_contract = RedisLogin(
-                    login=data.get('login', ''),
-                    flat_id=data.get('flatId', ''),
-                    house_id=phone.house_id,
-                    role=phone.role,
-                    phone=data.get('primePhone', ''),
-                    address=data.get('address', 'Неизвестно'),
-                    contract=data.get('contract', 'Неизвестно')
-                )
-                redis_contracts.append(redis_contract)
+                if str(phone.phone)[-10:] in data.get('phones'):
+                    redis_contract = RedisLogin(
+                        login=data.get('login', ''),
+                        flat_id=data.get('flatId', ''),
+                        house_id=phone.house_id,
+                        role=phone.role,
+                        phone=data.get('primePhone', ''),
+                        address=data.get('address', 'Неизвестно'),
+                        contract=data.get('contract', 'Неизвестно')
+                    )
+                    redis_contracts.append(redis_contract)
 
         phones.append(Phone(**rbt_phone.dict(), contracts=redis_contracts))
 
@@ -114,5 +112,5 @@ async def change_role_in_RBT(
 @router.delete('/v1/app/houses_flats_subscribers/{house_id}/{flat_id}', response_model=StatusResponse)
 async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: int, rbt: RBTDependency):
     
-    return StatusResponse(status='success')
-    # return await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)
+    # return StatusResponse(status='success')
+    return await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)

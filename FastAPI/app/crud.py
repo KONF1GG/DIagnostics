@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from enum import unique
 import json
 import re
 import pytz
@@ -691,10 +692,15 @@ async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
 
 
 async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
-    search_query = " | ".join([f"@flatId:[{flat_house_id['flat_id']} {flat_house_id['flat_id']}]" for flat_house_id in flat_house_ids])
-
+    unique_list = []
+    for flat_house_id in flat_house_ids:
+        flat_id = flat_house_id['flat_id']
+        if flat_id not in unique_list:
+            unique_list.append(flat_id)
+    print(unique_list)
+    search_query = " | ".join([f"@flatId:[{flat_id} {flat_id}]" for flat_id in unique_list])
     result = await redis.ft('idx:client').search(search_query)
-    
+
     logins = []
     for doc in result.docs:
         logins.append(doc)
