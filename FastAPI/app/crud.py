@@ -655,6 +655,7 @@ async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> Status
         
 async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt) -> StatusResponse:
     query = """
+        RETURNING house_subscriber_id
         DELETE FROM houses_flats_subscribers
         WHERE house_subscriber_id = $1 AND house_flat_id = $2
     """
@@ -663,20 +664,12 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
         try:
             result = await rbt.fetchval(query, house_id, flat_id)
             
-            if result is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Запись не найдена"
-                )
-
-            return StatusResponse(
-                status="succsess",
-            )
-
+            return result
+        
         except Exception as e:
             raise HTTPException(
                 status_code=500,
-                detail=f"Ошибка при удалении записи: {str(e)}"
+                detail=f"Произошла ошибка при удалении записи: {str(e)}" 
             )
 
 async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):

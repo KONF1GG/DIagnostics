@@ -113,4 +113,14 @@ async def change_role_in_RBT(
 async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: int, rbt: RBTDependency):
     
     # return StatusResponse(status='success')
-    return await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)
+    result = await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)
+
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Запись не найдена"
+        )
+
+    return StatusResponse(
+        status="success",
+    )

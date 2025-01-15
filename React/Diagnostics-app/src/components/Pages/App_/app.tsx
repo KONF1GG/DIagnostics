@@ -116,12 +116,12 @@ const App_page = () => {
     setShowConfirmModal(true); // Открытие модалки подтверждения
   };
 
-  const handleDeleteAddress = (houseId: number, login: string) => {
+  const handleDeleteAddress = (houseId: number, flatId:number, login: string) => {
     setModalTitle("Удаление адреса");
     setModalMessage("Вы уверены, что хотите отвязать этот адрес?");
     setOnConfirmAction(() => {
       return () => {
-        handleUserDelete(houseId, login, "адрес", setData);
+        handleUserDelete(houseId, flatId, login, "адрес", setData);
         setShowConfirmModal(false); // Закрытие модалки
       };
     });
@@ -341,6 +341,7 @@ const App_page = () => {
                                       onClick={() => {
                                         handleDeleteAddress(
                                           contract.house_id,
+                                          contract.flat_id,
                                           queriedLogin
                                         );
                                       }}

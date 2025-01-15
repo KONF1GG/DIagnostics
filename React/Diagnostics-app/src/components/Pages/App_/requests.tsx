@@ -90,11 +90,12 @@ export const handleContractDeleteButton = async (
 
 export const handleUserDelete = async (
   house_id: number,
+  flat_id: number,
   login: string,
   deleteObject: string,
   setData: React.Dispatch<React.SetStateAction<any>>
 ) => {
-  const url = `/v1/app/houses_flats_subscribers/${house_id}`;
+  const url = `/v1/app/houses_flats_subscribers/${house_id}/${flat_id}`;
   const isPhoneDelete = deleteObject.includes("номер");
   try {
     const response = await api.delete(url);
