@@ -68,13 +68,13 @@ const App_page = () => {
 
   const confirmRelocation = (
     login: string,
-    phones: number[],
+    phones: string[],
     UUID2: string,
     flat: string,
     house_id: number
   ) => {
-    Relocate(phones, UUID2, flat, house_id, login, setData);
-    setShowModal(false); // Закрытие модалки переселения
+    Relocate(phones.map(Number), UUID2, flat, house_id, login, setData);
+    setShowModal(false);
   };
 
   const handleDeleteContract = (UUID2: string, login: string) => {
@@ -367,6 +367,38 @@ const App_page = () => {
                                         <strong>Договор:</strong>{" "}
                                         {data.main_contract}
                                       </div>
+                                      <button
+                                        className="btn"
+                                        onClick={() => {
+                                          const foundContract =
+                                            phone.contracts.find(
+                                              (contract) =>
+                                                contract.contract ===
+                                                data.main_contract
+                                            );
+                                          if (
+                                            foundContract?.house_id &&
+                                            foundContract?.flat_id
+                                          ) {
+                                            handleDeleteAddress(
+                                              foundContract.house_id,
+                                              foundContract.flat_id,
+                                              queriedLogin
+                                            );
+                                          }
+                                        }}
+                                        title="Отвязать"
+                                        style={{
+                                          position: "absolute",
+                                          top: "0.5rem",
+                                          right: "0.5rem",
+                                          padding: "0.25rem",
+                                          fontSize: "1rem",
+                                          width: "auto",
+                                        }}
+                                      >
+                                        <ClearIcon fontSize="small" />
+                                      </button>
                                     </div>
                                   </div>
                                 )}

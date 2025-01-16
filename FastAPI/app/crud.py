@@ -598,6 +598,7 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
             for row in result
         ]
 
+    print(subs_list)
     return subs_list
 
 
@@ -671,6 +672,18 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
                 status_code=500,
                 detail=f"Произошла ошибка при удалении записи: {str(e)}" 
             )
+        
+async def get_house_id_by_uuid2(uuid2: str, rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT house_subscriber_id
+        FROM "houses_subscribers_mobile"
+        WHERE "auth_token" = $1 
+        LIMIT 1
+        """
+        result = await rbt.fetchval(query, uuid2)
+
+    return result 
 
 async def get_flat_from_RBT_by_house_id_and_flat(flat: str, house_id: int, rbt):
     async with rbt.transaction():

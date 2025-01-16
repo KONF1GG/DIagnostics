@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { RBTPhone, LoginsData } from "../../../API/App";
 
@@ -7,7 +7,7 @@ interface PhoneModalProps {
   onClose: () => void;
   onConfirm: (
     login: string,
-    selectedNumbers: number[],
+    selectedNumbers: string[],
     UUID2: string,
     flat: string,
     house_id: number
@@ -23,9 +23,11 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
   contract,
   phoneNumbers,
 }) => {
-  const [phones, setPhones] = useState<number[]>([]);
+  const [phones, setPhones] = useState<string[]>(
+    contract?.phone ? [contract.phone] : []
+  );
 
-  const handleCheckboxChange = (phone: number) => {
+  const handleCheckboxChange = (phone: string) => {
     setPhones((prev) =>
       prev.includes(phone)
         ? prev.filter((num) => num !== phone)
@@ -35,8 +37,14 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
 
   const handleConfirm = () => {
     if (contract?.UUID2 && contract?.house_id) {
-      onConfirm(contract.login, phones, contract.UUID2, contract.flat, contract.house_id);
-      setPhones([]);
+      onConfirm(
+        contract.login,
+        phones,
+        contract.UUID2,
+        contract.flat,
+        contract.house_id
+      );
+      setPhones([contract?.phone]); 
     }
   };
 
@@ -65,9 +73,9 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
                 key={index}
                 type="checkbox"
                 label={`${phone.name} - ${phone.phone}`}
-                value={phone.phone}
-                checked={phones.includes(phone.phone)}
-                onChange={() => handleCheckboxChange(phone.phone)}
+                value={String(phone.phone)}
+                checked={phones.includes(String(phone.phone))}
+                onChange={() => handleCheckboxChange(String(phone.phone))}
               />
             ))}
         </Form>

@@ -81,19 +81,19 @@ async def get_connection_data(
         redis_contracts = []
         for login in redis_logins:
             data = json.loads(login.json)
-            rbt_phone_add = await crud.get_numbers_rbt(data.get('flatId'), rbt)
-            for phone in rbt_phone_add:
-                if str(phone.phone)[-10:] in data.get('phones'):
-                    redis_contract = RedisLogin(
-                        login=data.get('login', ''),
-                        flat_id=data.get('flatId', ''),
-                        house_id=phone.house_id,
-                        role=phone.role,
-                        phone=data.get('primePhone', ''),
-                        address=data.get('address', 'Неизвестно'),
-                        contract=data.get('contract', 'Неизвестно')
-                    )
-                    redis_contracts.append(redis_contract)
+            # rbt_phone_add = await crud.get_numbers_rbt(data.get('flatId'), rbt)
+            # for phone in rbt_phone_add:
+            #     if str(phone.phone)[-10:] in data.get('phones'):
+            redis_contract = RedisLogin(
+                login=data.get('login', ''),
+                flat_id=data.get('flatId', ''),
+                # house_id=phone.house_id,
+                # role=phone.role,
+                phone=data.get('primePhone', ''),
+                address=data.get('address', 'Неизвестно'),
+                contract=data.get('contract', 'Неизвестно')
+            )
+            redis_contracts.append(redis_contract)
 
         phones.append(Phone(**rbt_phone.dict(), contracts=redis_contracts))
 
