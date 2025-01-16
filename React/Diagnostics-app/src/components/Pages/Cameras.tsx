@@ -6,6 +6,7 @@ import "../CSS/cameras.css";
 import { useDataContext } from "../../DataContext/CamerasContext";
 import Modal from "../Modals/CameraModal";
 import { getQueryParams } from "./Default/getData";
+import Loader from "../Pages/Default/Loading";
 
 const Cameras = () => {
   const { data, setData, login, setLogin } = useDataContext();
@@ -92,9 +93,8 @@ const Cameras = () => {
         {!queriedLogin && !login ? (
           <p className="no-services-message fade-in">Логин не указан</p>
         ) : !data ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Загрузка...</p>
+          <div>
+            <Loader />
           </div>
         ) : (
           <div className={`container ${isVisible ? "fade-in" : "fade-out"}`}>

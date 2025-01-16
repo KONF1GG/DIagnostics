@@ -10,6 +10,7 @@ import Checkbox from "./CheckBox";
 import { getQueryParams } from "../Default/getData";
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
+import Loader from "../Default/Loading";
 
 interface UpdateSettingsRequest {
   login: string;
@@ -409,9 +410,8 @@ const TV = () => {
     return (
       <div>
         <InfoList>
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Загрузка...</p>
+          <div>
+            <Loader />
           </div>
         </InfoList>
       </div>

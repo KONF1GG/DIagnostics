@@ -5,6 +5,7 @@ import "../CSS/Users.css";
 import "../CSS/Loading.css";
 import "../CSS/Users.css";
 import InfoList from "./InfoList";
+import Loader from "../Pages/Default/Loading";
 
 interface User {
   id: number;
@@ -49,10 +50,7 @@ const Users: React.FC = () => {
         <h1 className="text-center title md-5">Список пользователей</h1>
         {error && <div className="alert alert-danger">{error}</div>}
         {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Загрузка...</p>
-          </div>
+          <Loader />
         ) : (
           <table className="table">
             <thead className="table-primary">

@@ -6,6 +6,7 @@ import "../CSS/Network.css";
 import "../CSS/Loading.css";
 import { useDataContext } from "../../DataContext/NetworkContext";
 import { getQueryParams } from "./Default/getData";
+import Loader from "../Pages/Default/Loading";
 
 const Network = () => {
   const location = useLocation();
@@ -121,9 +122,8 @@ const Network = () => {
       {!queriedLogin && !login ? (
         <p className="no-services-message fade-in">Логин не указан</p>
       ) : loading ? (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Загрузка...</p>
+        <div>
+          <Loader />
         </div>
       ) : (
         <div className={`container ${isVisible ? "fade-in" : "fade-out"}`}>

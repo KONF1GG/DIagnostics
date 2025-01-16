@@ -7,6 +7,7 @@ import "../CSS/Network.css";
 import { useDataContext } from "../../DataContext/FailureContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getQueryParams } from "./Default/getData";
+import Loader from "./Default/Loading";
 
 const Accidents = () => {
   const location = useLocation();
@@ -64,9 +65,8 @@ const Accidents = () => {
     <div>
       <InfoList>
         {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Загрузка данных...</p>
+          <div>
+            <Loader />
           </div>
         ) : error ? (
           <div className="no-services-message fade-in">{error}</div>

@@ -74,16 +74,6 @@
   margin-top: auto; /* Размещение кнопки Logout внизу */
 }
 
-/* Адаптивность для мобильных устройств */
-@media (max-width: 768px) {
-  .side-menu-wrapper {
-    width: 200px; /* Меньше ширина на мобильных */
-  }
-  .side-menu {
-    padding: 0.5rem;
-  }
-}
-
 /* Добавим стили для поиска в навбаре */
 .navbar-dropdown {
   position: absolute;
@@ -131,6 +121,22 @@
   transform: translateY(-50%);
 }
 
+@media (max-width: 768px) {
+  .side-menu-wrapper {
+    width: 200px; /* Уменьшаем ширину для маленьких экранов */
+  }
+
+  .main-content.shifted {
+    margin-left: 200px; /* Соответствующее изменение для контента */
+  }
+
+  .toggle-sidebar-btn {
+    right: -70px; /* Корректируем позицию кнопки */
+    width: 25px; /* Уменьшаем ширину кнопки */
+  }
+}
+
+
 .side-menu-wrapper.open .toggle-sidebar-btn {
   right: -30px;
   width: 30px;
@@ -139,3 +145,4 @@
 .toggle-sidebar-btn:hover {
   background-color: #023b7a;
 }
+

@@ -15,6 +15,7 @@ import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import ClearIcon from "@mui/icons-material/Clear";
 import EditLocationIcon from "@mui/icons-material/EditLocation";
 import ConfirmationModal from "./../../Modals/ConfirmationModal";
+import Loader from "../Default/Loading";
 
 const App_page = () => {
   const { data, setData, login, setLogin } = useDataContext();
@@ -72,8 +73,7 @@ const App_page = () => {
     flat: string,
     house_id: number
   ) => {
-
-    Relocate(phones, UUID2, flat, house_id, login, setData)
+    Relocate(phones, UUID2, flat, house_id, login, setData);
     setShowModal(false); // Закрытие модалки переселения
   };
 
@@ -167,9 +167,8 @@ const App_page = () => {
     return (
       <div>
         <InfoList>
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-            <p>Загрузка...</p>
+          <div>
+            <Loader />
           </div>
         </InfoList>
       </div>

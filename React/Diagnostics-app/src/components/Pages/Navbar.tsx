@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "/logo.svg";
-import "../CSS/Navbar.css"; // Импортируем файл стилей
+import "../CSS/Navbar.css";
 import { LoginData } from "../../API/getSearchLogins";
 import { GetSearchLogins } from "../../API/getSearchLogins";
 import userIcon from "../../assets/users.svg";
 import debounce from "lodash/debounce"; // Подключаем lodash для дебаунса
+import { Combobox } from "@headlessui/react";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -29,24 +30,10 @@ export const Logout = () => {
 
 const Navbar = () => {
   const location = useLocation();
-  const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [login, setLogin] = useState<string>(""); // Текущее значение инпута
-  const [loginsList, setLoginsList] = useState<LoginData[]>([]); // Список найденных логинов
+  const [login, setLogin] = useState<string>("");
+  const [loginsList, setLoginsList] = useState<LoginData[]>([]);
   const navigate = useNavigate();
 
-  const handleLoginSearchChoice = (chosenLogin?: string) => {
-    if (chosenLogin) {
-      const previousUrl = location.pathname;
-      const redirectUrl = previousUrl === '/' 
-        ? `/network?login=${encodeURIComponent(chosenLogin)}` 
-        : `${previousUrl}?login=${encodeURIComponent(chosenLogin)}`; 
-      navigate(redirectUrl);
-      setLoginsList([]);
-    }
-  };
-
-  // Функция поиска логинов с дебаунсом
   const fetchLogins = useCallback(
     debounce(async (query: string) => {
       try {
@@ -66,19 +53,18 @@ const Navbar = () => {
       } catch (err) {
         setLoginsList([]);
       }
-    }, 500), // 500 мс задержка
+    }, 500),
     []
   );
 
   useEffect(() => {
     if (login.length > 2) {
-      fetchLogins(login); // Вызываем функцию с дебаунсом
+      fetchLogins(login);
     } else {
-      setLoginsList([]); // Очищаем список, если введено меньше 3 символов
+      setLoginsList([]);
     }
   }, [login, fetchLogins]);
 
-  // Отслеживаем изменения в URL и обновляем значение login
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const loginParam = params.get("login");
@@ -86,6 +72,23 @@ const Navbar = () => {
       setLogin(loginParam);
     }
   }, [location.search]);
+
+  const handleLoginSearchChoice = (value: string | null) => {
+    if (value) {
+      const previousUrl = location.pathname;
+      const redirectUrl =
+        previousUrl === "/"
+          ? `/network?login=${encodeURIComponent(value)}`
+          : `${previousUrl}?login=${encodeURIComponent(value)}`;
+      navigate(redirectUrl);
+      setLoginsList([]);
+    }
+  };
+
+  const highlightMatch = useCallback((text: string, query: string) => {
+    const regex = new RegExp(`(${query})`, "gi");
+    return text.replace(regex, "<mark>$1</mark>");
+  }, []);
 
   return (
     <>
@@ -95,64 +98,57 @@ const Navbar = () => {
             <img src={logo} alt="Логотип" style={{ height: "40px" }} />
           </Link>
           <div className="search-container-nav mx-auto">
-            <div className="input-wrapper-nav">
-              <input
-                type="text"
-                placeholder="Поиск..."
-                value={login}
-                onChange={(e) => setLogin(e.target.value)} // Обновляем состояние
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && handleLoginSearchChoice()
-                }
-              />
-              <button
-                onClick={() => handleLoginSearchChoice()}
-                className="search-btn"
-                disabled={!login}
-              >
-                <i className="fas fa-search" />
-              </button>
-            </div>
-            {loginsList.length > 0 && (isFocused || isHovered) && (
-              <div
-                className={`dropdown-container ${
-                  isFocused || isHovered ? "show" : ""
-                }`}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              >
-                <ul className="dropdown-list">
+            <Combobox value={login} onChange={handleLoginSearchChoice}>
+              <div className="input-wrapper-nav">
+                <Combobox.Input
+                  placeholder="Поиск..."
+                  onChange={(event) => setLogin(event.target.value)}
+                  className="combobox-input"
+                />
+                <Combobox.Button className="search-btn">
+                  <i className="fas fa-search" />
+                </Combobox.Button>
+              </div>
+              {loginsList.length > 0 && (
+                <Combobox.Options className="dropdown-container show">
                   {loginsList.map((loginItem, index) => (
-                    <li
+                    <Combobox.Option
                       key={index}
+                      value={loginItem.login}
+                      as="li"
                       className="dropdown-item"
-                      onClick={() => {
-                        setLogin(loginItem.login);
-                        setLoginsList([]);
-                        handleLoginSearchChoice(loginItem.login);
-                      }}
                     >
                       <div className="dropdown-item-details">
-                        <span className="dropdown-item-field login">
-                          Логин: {loginItem.login}
-                        </span>
-                        <span className="dropdown-item-field name">
-                          Имя: {loginItem.name}
-                        </span>
-                        <span className="dropdown-item-field contract">
-                          Договор: {loginItem.contract}
-                        </span>
-                        <span className="dropdown-item-field address">
-                          Адрес: {loginItem.address}
-                        </span>
+                        <span
+                          className="dropdown-item-field login"
+                          dangerouslySetInnerHTML={{
+                            __html: highlightMatch(loginItem.login, login),
+                          }}
+                        ></span>
+                        <span
+                          className="dropdown-item-field name"
+                          dangerouslySetInnerHTML={{
+                            __html: highlightMatch(loginItem.name, login),
+                          }}
+                        ></span>
+                        <span
+                          className="dropdown-item-field contract"
+                          dangerouslySetInnerHTML={{
+                            __html: highlightMatch(loginItem.contract, login),
+                          }}
+                        ></span>
+                        <span
+                          className="dropdown-item-field address"
+                          dangerouslySetInnerHTML={{
+                            __html: highlightMatch(loginItem.address, login),
+                          }}
+                        ></span>
                       </div>
-                    </li>
+                    </Combobox.Option>
                   ))}
-                </ul>
-              </div>
-            )}
+                </Combobox.Options>
+              )}
+            </Combobox>
           </div>
           <div className="profile-icon" onClick={() => navigate("/users")}>
             <img src={userIcon} style={{ height: "40px", cursor: "pointer" }} />

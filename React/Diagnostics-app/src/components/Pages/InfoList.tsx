@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SideMenu from "./SideMenu";
 import "../CSS/infoList.css";
 interface InfoListProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const InfoList: React.FC<InfoListProps> = ({ children }) => {

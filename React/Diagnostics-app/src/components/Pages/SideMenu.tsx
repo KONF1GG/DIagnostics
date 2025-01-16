@@ -37,8 +37,11 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                 className={`nav-link ${
                   location.pathname.includes(path) ? "active" : ""
                 }`}
-                onClick={login ? undefined : (e) => e.preventDefault()} 
-                style={{ pointerEvents: login ? "auto" : "none", color: login ? "inherit" : "gray" }} // Добавлено для отключения клика
+                onClick={login ? undefined : (e) => e.preventDefault()}
+                style={{
+                  pointerEvents: login ? "auto" : "none",
+                  color: login ? "inherit" : "gray",
+                }} // Добавлено для отключения клика
               >
                 {label}
               </Link>
@@ -48,11 +51,6 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
             <Logout />
           </div>
         </div>
-      </div>
-
-      {/* Основной контент */}
-      <div className={`main-content ${isSidebarOpen ? "shifted" : ""}`}>
-        {/* Ваш основной контент здесь */}
       </div>
     </div>
   );
