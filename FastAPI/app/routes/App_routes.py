@@ -56,7 +56,7 @@ async def get_connection_data(
         flat_from_RBT_value = flat_from_RBT[0]['flat'] if flat_from_RBT[0]['flat'] is not None else False
 
         house_flat_subscribers = await crud.get_houses_flats_subscribers_by_flat_id(flatId, rbt)
-        is_relocatable = flat if (flat != flat_from_RBT_value) or house_flat_subscribers == 0 else None
+        is_relocatable = str(flat) if (flat != flat_from_RBT_value) or house_flat_subscribers == 0 else None
 
         contracts.append(LoginsData(
             phone=data.get('primePhone', ''),

@@ -1,32 +1,39 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-import { RedisLogin } from "../../API/App";
+import { RBTPhone, RedisLogin } from "../../API/App";
 
 interface ConfirmationModalProps {
+  login: string;
   show: boolean;
-  title: string;
-  message: string;
-  addContracts: RedisLogin[];
+  addContracts?: RedisLogin[];
+  phone?: RBTPhone | null;
+  contract?: RedisLogin | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+  login,
   show,
-  title,
-  message,
   addContracts,
+  phone,
+  contract,
   onConfirm,
   onCancel,
 }) => {
   return (
     <Modal show={show} onHide={onCancel}>
       <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
+        <Modal.Title>Подтверждение</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>{message}</p>
-        {addContracts.length > 0 && (
+        <p>
+          {`Вы уверены, что хотите отвязать `}
+          <strong>{phone ? phone.phone : contract?.login}</strong>
+          {` от `}
+          <strong>{login}</strong>
+        </p>
+        {(addContracts?.length ?? 0) > 0 && (
           <>
             <p>
               <strong className="text-warning">ВНИМАНИЕ</strong> Следующие
@@ -35,7 +42,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <div
               style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
-              {addContracts.map((contract, index) => (
+              {addContracts?.map((contract, index) => (
                 <div
                   key={index}
                   style={{

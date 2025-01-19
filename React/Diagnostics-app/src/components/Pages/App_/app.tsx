@@ -29,9 +29,13 @@ const App_page = () => {
 
   // Модальное окно для подтверждения
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalMessage, setModalMessage] = useState("");
-  const [modalAddAddresses, setModalAddAddresses] = useState<RedisLogin[]>([]);
+  const [modalAddAddresses, setModalAddAddresses] = useState<
+    RedisLogin[] | undefined
+  >([]);
+  const [modalDeletePhone, setDeletePhone] = useState<RBTPhone | null>(null);
+  const [modalDeleteContract, setDeleteContract] = useState<RedisLogin | null>(
+    null
+  );
   const [onConfirmAction, setOnConfirmAction] = useState<() => void>(() => {});
 
   const queriedLogin = getQueryParams();
@@ -79,11 +83,6 @@ const App_page = () => {
   };
 
   const handleDeleteContract = (contract: LoginsData) => {
-    setModalTitle("Удаление договора");
-    setModalMessage(
-      `Вы уверены, что хотите отвязать договор ${contract.contract} ?`
-    );
-
     setOnConfirmAction(() => {
       return () => {
         handleContractDeleteButton(contract.UUID2, contract.login, setData); // Логика удаления
@@ -111,42 +110,20 @@ const App_page = () => {
   };
 
   const handleDeleteAddress = (
-    phone: RBTPhone,
+    contract: RedisLogin | undefined,
+    phone: RBTPhone | undefined,
     houseId: number,
     flatId: number,
     login: string
   ) => {
-    const matchingContracts = phone.contracts.filter(
+    const matchingContracts = phone?.contracts.filter(
       (contract) =>
         contract.contract !== data?.main_contract && contract.flat_id === flatId
     );
 
     setModalAddAddresses(matchingContracts);
-    setModalTitle("Удаление адреса");
-    setModalMessage("Вы уверены, что хотите отвязать этот адрес?");
-    setOnConfirmAction(() => {
-      return () => {
-        handleUserDelete(houseId, flatId, login, "адрес", setData);
-        setShowConfirmModal(false); // Закрытие модалки
-      };
-    });
-    setShowConfirmModal(true); // Открытие модалки подтверждения
-  };
-
-  const handleDeletePhone = (
-    phone: RBTPhone,
-    houseId: number,
-    flatId: number,
-    login: string
-  ) => {
-    const matchingContracts = phone.contracts.filter(
-      (contract) =>
-        contract.contract !== data?.main_contract && contract.flat_id === flatId
-    );
-
-    setModalAddAddresses(matchingContracts);
-    setModalTitle("Удаление адреса");
-    setModalMessage("Вы уверены, что хотите отвязать этот адрес?");
+    setDeletePhone(phone || null);
+    setDeleteContract(contract || null);
     setOnConfirmAction(() => {
       return () => {
         handleUserDelete(houseId, flatId, login, "адрес", setData);
@@ -347,6 +324,7 @@ const App_page = () => {
                                       href="#"
                                       onClick={() => {
                                         handleDeleteAddress(
+                                          undefined,
                                           phone,
                                           phone.house_id,
                                           phone.flat_id,
@@ -441,7 +419,8 @@ const App_page = () => {
                                           className="btn"
                                           onClick={() => {
                                             handleDeleteAddress(
-                                              phone,
+                                              contract,
+                                              undefined,
                                               contract.house_id,
                                               contract.flat_id,
                                               queriedLogin
@@ -488,11 +467,12 @@ const App_page = () => {
 
       {/* Подключение ConfirmationModal */}
       <ConfirmationModal
+        login={queriedLogin}
         show={showConfirmModal}
         onCancel={() => setShowConfirmModal(false)}
-        title={modalTitle}
-        message={modalMessage}
         addContracts={modalAddAddresses}
+        phone={modalDeletePhone}
+        contract={modalDeleteContract}
         onConfirm={onConfirmAction}
       />
     </div>

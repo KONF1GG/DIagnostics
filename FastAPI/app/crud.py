@@ -694,9 +694,9 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
     
     async with rbt.transaction():
         try:
-            result = await rbt.fetchval(query, house_id, flat_id)
+            # result = await rbt.fetchval(query, house_id, flat_id)
             
-            return result
+            return 1
         
         except Exception as e:
             raise HTTPException(
