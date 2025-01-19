@@ -574,6 +574,40 @@ async def get_logins_by_flatId_redis(flat_id: int, redis: RedisDependency):
         raise HTTPException(status_code=404, detail="Логины не найдены по flatId")
     return search_result.docs
 
+async def get_number_from_rbt(house_sub_id, rbt):
+    async with rbt.transaction():
+        query = """
+        SELECT id
+        FROM "houses_subscribers_mobile"
+        WHERE "house_subscriber_id" = $1
+        """
+        result = await rbt.fetch(query, house_sub_id)
+    
+    return result
+
+async def get_number_rbt(flat_and_house_id: dict, rbt) -> List[RBT_phone]:
+    async with rbt.transaction():
+        query = """
+        SELECT fs.role, sm.id, sm.subscriber_name, sm.subscriber_patronymic
+        FROM houses_flats_subscribers fs
+        JOIN houses_subscribers_mobile sm
+        ON fs.house_subscriber_id = sm.house_subscriber_id
+        WHERE fs.house_flat_id = $1 and fs.house_subscriber_id =  $2
+        """
+        result = await rbt.fetch(query, flat_and_house_id['flat_id'], flat_and_house_id['house_id'])
+
+    return [
+        RBT_phone(
+            house_subscriber_id=flat_and_house_id['house_id'],
+            flat_id=flat_and_house_id['flat_id'],
+            role=row['role'],
+            name=row['subscriber_name'],
+            phone=row['id'],
+            patronymic=row['subscriber_patronymic'],
+        ) for row in result
+    ]
+
+
 async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
     async with rbt.transaction():
         query = """
@@ -593,12 +627,9 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
                 name=row['subscriber_name'],
                 phone=row['id'],
                 patronymic=row['subscriber_patronymic'],
-
-            ) 
-            for row in result
+            ) for row in result
         ]
 
-    print(subs_list)
     return subs_list
 
 
@@ -757,8 +788,6 @@ async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
         result = await rbt.fetchval(query, flat_id)
     return result 
 
-
-
 async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
     unique_list = []
     for flat_house_id in flat_house_ids:
@@ -774,12 +803,17 @@ async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
     
     return logins
 
+async def get_login_from_redis_by_flat_id(flat_id: int, redis):
+    search_query = f"@flatId:[{flat_id} {flat_id}]"
+    result = await redis.ft('idx:client').search(search_query)
+
+    return result.docs
+
 
 async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
     # result = await redis.ft('idx:searchLogin').search(search_login)
     # search_query = f"{search_login.lower()} | {search_login.capitalize()} | {search_login}"
     search_query = f"{search_login} | {search_login.lower()} | {search_login.capitalize()}"
-    print(search_query)
     result = await redis.ft('idx:searchLogin').search(search_query)
     logins_list = []
     for doc in result.docs:

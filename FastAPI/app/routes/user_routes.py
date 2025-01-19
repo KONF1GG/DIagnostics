@@ -22,9 +22,6 @@ async def get_users(session: SessionDependency, token: TokenDependency):
     for user in users:
         user_data.append(UserModel(id=user.id, name=user.name, role=user.role.name))
 
-    print(user_data)
-
-
     return user_data  
 
 @router.post('/v1/user', response_model=ItemId)

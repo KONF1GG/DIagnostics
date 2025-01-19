@@ -25,8 +25,8 @@ export interface LoginsData {
   phone: string;
   login: string;
   name: string;
-  house_id: number;
-  flat: string;
+  address_house_id: number;
+  flat_id: number;
   address: string;
   contract: string;
   relocate: string | null;

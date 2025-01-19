@@ -10,7 +10,7 @@ interface PhoneModalProps {
     selectedNumbers: string[],
     UUID2: string,
     flat: string,
-    house_id: number
+    address_house_id: number
   ) => void;
   contract: LoginsData | null;
   phoneNumbers: RBTPhone[];
@@ -36,15 +36,15 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
   };
 
   const handleConfirm = () => {
-    if (contract?.UUID2 && contract?.house_id) {
+    if (contract?.UUID2 && contract?.address_house_id) {
       onConfirm(
         contract.login,
         phones,
         contract.UUID2,
         contract.flat,
-        contract.house_id
+        contract.address_house_id
       );
-      setPhones([contract?.phone]); 
+      setPhones([contract?.phone]);
     }
   };
 

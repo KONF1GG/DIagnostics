@@ -255,11 +255,9 @@ class CameraDataToChange(BaseModel):
 #     flat_id: int
 
 class RedisLogin(BaseModel):
-    login: str
+    house_id: int
     flat_id: int
-    # house_id: int | None
-    # role: int
-    phone: str
+    login: str
     address: str
     contract: str
 
@@ -276,9 +274,9 @@ class RBT_phone(RBT):
 class LoginsData(BaseModel):
     phone: str
     login: str
-    house_id: int
+    address_house_id: int
     name: str
-    flat: str
+    flat_id: int
     address: str
     contract: str
     active: bool
@@ -322,4 +320,4 @@ class RelocateRequest(BaseModel):
     phones: List[int]
     UUID2: str
     flat: str
-    house_id: int
+    address_house_id: int

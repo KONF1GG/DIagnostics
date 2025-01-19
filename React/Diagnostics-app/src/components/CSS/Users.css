@@ -6,7 +6,6 @@ body {
 
 .container {
   padding: 0 0px;
-  margin-top: 40px;
   text-align: center; /* Центрируем содержимое */
 }
 
@@ -94,11 +93,6 @@ thead {
   display: flex;
   justify-content: flex-end;
 }
-
-.btn {
-  margin-left: 5px; /* Отступ между кнопками */
-}
-
 
 @media (max-width: 768px) {
   .table:hover {

@@ -277,7 +277,7 @@ export const Relocate = async (
   phones: number[],
   UUID2: string,
   flat: string,
-  house_id: number,
+  address_house_id: number,
   login: string,
   setData: React.Dispatch<React.SetStateAction<any>>
 ) => {
@@ -288,7 +288,7 @@ export const Relocate = async (
       phones,
       UUID2,
       flat,
-      house_id,
+      address_house_id,
     });
 
     if (response.status !== 200) {
@@ -298,7 +298,7 @@ export const Relocate = async (
         action: "Переселение",
         success: false,
         url: url,
-        payload: { phones, UUID2, login, flat },
+        payload: { phones, UUID2, flat, address_house_id },
         message: `Ошибка: ${
           response.statusText || "Не удалось переселить договор"
         }`,
@@ -318,7 +318,7 @@ export const Relocate = async (
       action: "Переселение",
       success: true,
       url: url,
-      payload: { phones, UUID2, login, flat },
+      payload: { phones, UUID2, address_house_id, flat },
       message: "Договор успешно переселен",
     });
 
@@ -346,7 +346,7 @@ export const Relocate = async (
       action: "Переселение",
       success: false,
       url: url,
-      payload: { phones, UUID2, login, flat },
+      payload: { phones, UUID2, address_house_id, flat },
       message: `Ошибка: ${String(error)}`,
     });
 
