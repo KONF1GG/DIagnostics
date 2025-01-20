@@ -8,21 +8,24 @@ import { DataProviderNet } from "./DataContext/NetworkContext.tsx";
 import { DataProviderTV } from "./DataContext/TVContext.tsx";
 import { DataProviderFailure } from "./DataContext/FailureContext.tsx";
 import { DataProviderApp } from "./DataContext/AppContext.tsx";
+import { SidebarProvider } from "./DataContext/SidebarContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <DataProviderCameras>
-      <DataProviderNet>
-      <DataProviderFailure> 
-      <DataProviderTV> 
-      <DataProviderApp> 
-        <App />
-      </DataProviderApp>
-      </DataProviderTV>
-      </DataProviderFailure>
-      </DataProviderNet>
-      </DataProviderCameras>
-    </BrowserRouter>
+    <SidebarProvider>
+      <BrowserRouter>
+        <DataProviderCameras>
+          <DataProviderNet>
+            <DataProviderFailure>
+              <DataProviderTV>
+                <DataProviderApp>
+                  <App />
+                </DataProviderApp>
+              </DataProviderTV>
+            </DataProviderFailure>
+          </DataProviderNet>
+        </DataProviderCameras>
+      </BrowserRouter>
+    </SidebarProvider>
   </StrictMode>
 );

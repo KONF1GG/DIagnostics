@@ -1,27 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logout } from "./Navbar";
 import "../CSS/SideMenu.css";
+import { useSidebar } from "../../DataContext/SidebarContext";
 
 interface SidebarProps {
   login: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ login }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const location = useLocation();
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const { isSidebarOpen } = useSidebar();
 
   return (
     <div className="d-flex">
       {/* Выдвигающееся меню */}
       <div className={`side-menu-wrapper ${isSidebarOpen ? "open" : ""}`}>
-        <button onClick={toggleSidebar} className="toggle-sidebar-btn">
-          {isSidebarOpen ? "<" : ">"}
-        </button>
         <div className="side-menu">
           <nav>
             {[

@@ -16,7 +16,6 @@ const Login = () => {
       localStorage.setItem("token", result.token);
       window.location.href = "/";
     } else {
-      console.log(result);
       setError(result);
     }
   };

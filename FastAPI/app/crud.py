@@ -664,46 +664,58 @@ async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> Status
         WHERE house_subscriber_id = $2 AND house_flat_id = $3
         RETURNING house_subscriber_id
     """
-    
-    async with rbt.transaction():
-        try:
+    try:
+        async with rbt.transaction():
             result = await rbt.fetchval(query, role, house_id, flat_id)
-            
+
             if result is None:
                 raise HTTPException(
                     status_code=404,
                     detail="Запись не найдена"
                 )
-
             return StatusResponse(
                 status="success",
             )
 
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Ошибка при изменении роли: {str(e)}"
-            )
-        
+    except HTTPException as http_exc:
+        raise http_exc
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Произошла ошибка при изменении роли: {str(e)}"
+        )
+            
 async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt) -> StatusResponse:
+
     query = """
         RETURNING house_subscriber_id
         DELETE FROM houses_flats_subscribers
         WHERE house_subscriber_id = $1 AND house_flat_id = $2
     """
+    try:
+        async with rbt.transaction():
+
+                result = await rbt.fetchval(query, house_id, flat_id)
+                
+                if result is None:
+                    raise HTTPException(
+                        status_code=404,
+                        detail="Запись не найдена"
+                    )
+                return StatusResponse(
+                    status='deleted',
+                )
+        
+    except HTTPException as http_exc:
+        raise http_exc
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Произошла ошибка при удалении записи: {str(e)}" 
+        )
     
-    async with rbt.transaction():
-        try:
-            # result = await rbt.fetchval(query, house_id, flat_id)
-            
-            return 1
-        
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Произошла ошибка при удалении записи: {str(e)}" 
-            )
-        
 async def get_house_id_by_uuid2(uuid2: str, rbt):
     async with rbt.transaction():
         query = """

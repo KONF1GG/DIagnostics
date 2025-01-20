@@ -7,6 +7,9 @@ import { GetSearchLogins } from "../../API/getSearchLogins";
 import userIcon from "../../assets/users.svg";
 import debounce from "lodash/debounce"; // Подключаем lodash для дебаунса
 import { Combobox } from "@headlessui/react";
+import MenuButton from "./Default/MenuOpen";
+import { useSidebar } from "../../DataContext/SidebarContext";
+import toggleSidebar from "../Pages/SideMenu";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -33,6 +36,7 @@ const Navbar = () => {
   const [login, setLogin] = useState<string>("");
   const [loginsList, setLoginsList] = useState<LoginData[]>([]);
   const navigate = useNavigate();
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
 
   const fetchLogins = useCallback(
     debounce(async (query: string) => {
@@ -90,13 +94,18 @@ const Navbar = () => {
     return text.replace(regex, "<mark>$1</mark>");
   }, []);
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => {
+      console.log(prev);
+      return !prev;
+    });
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
         <div className="container-fluid d-flex justify-content-between align-items-center">
-          <Link className="navbar-brand" to="/">
-            <img src={logo} alt="Логотип" style={{ height: "40px" }} />
-          </Link>
+          <MenuButton onClick={toggleSidebar} />
           <div className="search-container-nav mx-auto">
             <Combobox value={login} onChange={handleLoginSearchChoice}>
               <div className="input-wrapper-nav">

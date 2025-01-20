@@ -1,7 +1,8 @@
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
-import { GetApp } from "../../../API/App";
+import { ApiError, GetApp } from "../../../API/App";
 import api from "./../../../API/api";
+import { AxiosError } from "axios";
 
 export const handleContractDeleteButton = async (
   uuid2: string,
@@ -201,32 +202,21 @@ export const ChangeRole = async (
   setData: React.Dispatch<React.SetStateAction<any>>
 ) => {
   const url = `/v1/app/change_role`;
-
+  const token = localStorage.getItem("token");
   try {
-    const response = await api.patch(url, {
-      house_id,
-      flat_id,
-      role,
-    });
-
-    if (response.status !== 200) {
-      // Логирование ошибки
-      await LogData({
-        login,
-        page: `Приложение`,
-        action: "Изменение роли",
-        success: false,
-        url: url,
-        payload: { house_id, flat_id, role },
-        message: `Ошибка: ${response.statusText || "Не удалось изменить роль"}`,
-      });
-
-      toast.error(
-        `Ошибка: ${response.statusText || "Не удалось изменить роль"}`,
-        { position: "bottom-right" }
-      );
-      return;
-    }
+    await api.patch(
+      url,
+      {
+        house_id,
+        flat_id,
+        role,
+      },
+      {
+        headers: {
+          "x-token": token,
+        },
+      }
+    );
 
     // Логирование успешного выполнения
     await LogData({
@@ -247,16 +237,23 @@ export const ChangeRole = async (
     const result = await GetApp(login);
 
     if (result && "detail" in result) {
-      console.log(result);
       setData(null);
     } else if (result) {
       setData(result);
     } else {
       setData(null);
     }
-  } catch (error) {
-    // Логирование исключения
-    console.log(error);
+  } catch (err) {
+    const error = err as AxiosError<ApiError>;
+
+    if (error.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+      return { error: true, message: "Unauthorized" };
+    }
+    const errorDetail =
+      error.response?.data?.detail || "Не удалось изменить роль";
+
     await LogData({
       login,
       page: `Приложение`,
@@ -264,10 +261,10 @@ export const ChangeRole = async (
       success: false,
       url: url,
       payload: { house_id, flat_id, role },
-      message: `Ошибка: ${String(error)}`,
+      message: errorDetail,
     });
 
-    toast.error(`Ошибка: ${error || "Не удалось изменить роль"}`, {
+    toast.error(`${errorDetail || "Не удалось изменить роль"}`, {
       position: "bottom-right",
     });
   }

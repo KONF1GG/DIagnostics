@@ -276,6 +276,7 @@ class LoginsData(BaseModel):
     login: str
     address_house_id: int
     name: str
+    flat: str
     flat_id: int
     address: str
     contract: str
