@@ -96,7 +96,6 @@ const Navbar = () => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => {
-      console.log(prev);
       return !prev;
     });
   };

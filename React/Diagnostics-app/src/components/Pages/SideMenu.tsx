@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logout } from "./Navbar";
 import "../CSS/SideMenu.css";
 import { useSidebar } from "../../DataContext/SidebarContext";
+import jsonData from "./../../components/FileData/diagnosticHelper.json";
 
 interface SidebarProps {
   login: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ login }) => {
+  const [sections, setSections] = useState<any[]>([]);
+
+  useEffect(() => {
+    setSections(jsonData); 
+  }, []);
+
+  console.log(sections)
   const location = useLocation();
   const { isSidebarOpen } = useSidebar();
 
