@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Logout } from "./Navbar";
 import "../CSS/SideMenu.css";
 import { useSidebar } from "../../DataContext/SidebarContext";
+import { useSidebarContext } from "../../DataContext/SideMenuContext";
 import jsonData from "./../../components/FileData/diagnosticHelper.json";
 
 interface SidebarProps {
@@ -10,13 +11,10 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ login }) => {
-  const [sections, setSections] = useState<any[]>([]);
-  const [openSections, setOpenSections] = useState<{ [key: number]: boolean }>(
-    {}
-  );
   const location = useLocation();
+  const navigate = useNavigate();
   const { isSidebarOpen } = useSidebar();
-  const navigate = useNavigate(); // Хук для перехода по ссылкам
+  const { openSections, toggleSection } = useSidebarContext(); // Используем контекст
   const sectionList = [
     { path: "network", label: "Сеть" },
     { path: "accidents", label: "Аварии" },
@@ -26,24 +24,17 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   ];
 
   useEffect(() => {
-    setSections(jsonData);
-    setOpenSections(
-      jsonData.reduce((acc, _, index) => ({ ...acc, [index]: false }), {})
-    ); // По умолчанию все секции закрыты
-  }, []);
-
-  const toggleSection = (index: number) => {
-    setOpenSections((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
-  };
+    // Инициализируем состояние открытых секций при загрузке
+    if (Object.keys(openSections).length === 0) {
+      jsonData.forEach((_, index) => toggleSection(index));
+    }
+  }, [jsonData, toggleSection]);
 
   return (
     <div className="d-flex">
       <div className={`side-menu-wrapper ${isSidebarOpen ? "open" : ""}`}>
         <div className="side-menu">
-          {sections.map((section, index) => (
+          {jsonData.map((section, index) => (
             <div key={index} className="section">
               <h3
                 className="section-title"
