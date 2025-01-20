@@ -10,7 +10,7 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (
     <SidebarContext.Provider value={{ isSidebarOpen, setIsSidebarOpen }}>
       {children}

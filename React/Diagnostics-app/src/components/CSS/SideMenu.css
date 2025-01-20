@@ -11,6 +11,7 @@
   transform: translateX(0);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   z-index: 1;
+  overflow-y: auto; 
 }
 
 .side-menu-wrapper.open {
@@ -31,6 +32,35 @@
 .main-content.shifted {
   margin-left: 250px;
 }
+
+/* Настройка полосы прокрутки */
+.side-menu-wrapper::-webkit-scrollbar {
+  width: 10px; 
+}
+
+/* Ползунок полосы прокрутки */
+.side-menu-wrapper::-webkit-scrollbar-thumb {
+  background-color: #436daf73;
+  border-radius: 10px;
+  border: 2px solid #ffffff; 
+  transition: background-color 0.3s ease, transform 0.3s ease; 
+}
+
+.side-menu-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #79a1e0; 
+  width: 111px;
+}
+
+.side-menu-wrapper::-webkit-scrollbar-track {
+  background-color: #e0e0e0;
+  border-radius: 10px;
+}
+
+.side-menu-wrapper::-webkit-scrollbar-track:hover {
+  background-color: #d0d0d0; 
+}
+
+
 
 /* Стили для навигации в меню */
 .side-menu {
@@ -146,3 +176,126 @@
   background-color: #023b7a;
 }
 
+.side-menu-wrapper {
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.section {
+  margin-bottom: 10px;
+}
+
+.section-title {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 10px 15px;
+  color: #333333;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section-title:hover {
+  background-color: #e8f0fe;
+  color: #02458d;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-title .toggle-icon {
+  font-size: 14px;
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.section-title .toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+
+.toggle-icon {
+  font-size: 12px;
+  margin-left: 5px;
+  transition: transform 0.2s ease;
+}
+
+.toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+.subsections {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+  padding-left: 15px;
+}
+
+.subsections.open {
+  max-height: 500px; /* Достаточно большое значение */
+  opacity: 1;
+}
+
+.subsection {
+  padding: 8px 10px;
+  cursor: pointer;
+  margin: 5px 0;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.subsection:hover {
+  background-color: #f0f4ff; /* Легкий голубой фон при наведении */
+  transform: translateX(5px); /* Легкое смещение вправо */
+}
+
+.subsection a {
+  text-decoration: none;
+  color: #02458d; /* Темно-синий цвет для текста */
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.subsection-content {
+  color: #02458d; /* Темно-синий цвет для текста */
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.subsection a:hover .subsection-content{
+  color: #013974; /* Насыщенный синий цвет при наведении */
+  text-decoration: underline;
+}
+
+/* Для активного подраздела */
+.subsection.active{
+  background-color: #e8f0fe; /* Выделение активного пункта */
+}
+
+.subsection.active .subsection-content{
+  color: #013974;
+  font-weight: bold;
+}
+
+/* Дополнительный стиль для прокручиваемого списка */
+.subsections::-webkit-scrollbar {
+  width: 6px; /* Устанавливаем ширину полосы прокрутки */
+}
+
+.subsections::-webkit-scrollbar-thumb {
+  background-color: #888; /* Цвет полосы прокрутки */
+  border-radius: 3px;
+}
+
+.subsections::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Цвет полосы при наведении */
+}
