@@ -6,7 +6,13 @@ import { LoginData } from "../../API/getSearchLogins";
 import { GetSearchLogins } from "../../API/getSearchLogins";
 import userIcon from "../../assets/users.svg";
 import debounce from "lodash/debounce"; // Подключаем lodash для дебаунса
-import { Combobox } from "@headlessui/react";
+import {
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+} from "@headlessui/react";
 import MenuButton from "./Default/MenuOpen";
 import { useSidebar } from "../../DataContext/SidebarContext";
 import toggleSidebar from "../Pages/SideMenu";
@@ -118,19 +124,19 @@ const Navbar = () => {
           <div className="search-container-nav mx-auto">
             <Combobox value={login} onChange={handleLoginSearchChoice}>
               <div className="input-wrapper-nav">
-                <Combobox.Input
+                <ComboboxInput
                   placeholder="Поиск..."
                   onChange={(event) => setLogin(event.target.value)}
                   className="combobox-input"
                 />
-                <Combobox.Button className="search-btn">
+                <ComboboxButton className="search-btn">
                   <i className="fas fa-search" />
-                </Combobox.Button>
+                </ComboboxButton>
               </div>
               {loginsList.length > 0 && (
-                <Combobox.Options className="dropdown-container show">
+                <ComboboxOptions className="dropdown-container show">
                   {loginsList.map((loginItem, index) => (
-                    <Combobox.Option
+                    <ComboboxOption
                       key={index}
                       value={loginItem.login}
                       as="li"
@@ -162,14 +168,14 @@ const Navbar = () => {
                           }}
                         ></span>
                       </div>
-                    </Combobox.Option>
+                    </ComboboxOption>
                   ))}
-                </Combobox.Options>
+                </ComboboxOptions>
               )}
             </Combobox>
           </div>
           <div className="profile-icon" onClick={() => navigate("/users")}>
-            <img src={userIcon} style={{ height: "40px", cursor: "pointer" }} />
+            <img src={userIcon} style={{ height: "30px", cursor: "pointer" }} />
           </div>
         </div>
       </nav>
