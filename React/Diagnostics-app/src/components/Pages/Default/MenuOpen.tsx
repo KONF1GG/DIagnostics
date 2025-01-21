@@ -24,7 +24,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({ onClick }) => {
           checked={isSidebarOpen}
           readOnly
         />
-        <svg fill="none" viewBox="0 0 50 50" height={50} width={50}>
+        <svg fill="none" viewBox="0 0 50 50" height={50} width={30}>
           <path
             className="lineTop line"
             strokeLinecap="round"
@@ -68,7 +68,7 @@ const StyledWrapper = styled.div`
   }
   .line {
     transition: 0.5s;
-    stroke-width: 6px;
+    stroke-width: 4px;
     stroke: black;
   }
   .lineTop {
@@ -84,9 +84,9 @@ const StyledWrapper = styled.div`
   }
 
   // Изменения при активации чекбокса
-  .hamburger .checkbox:checked + svg .line {
-    stroke: crimson;
-  }
+  // .hamburger .checkbox:checked + svg .line {
+  //   stroke: crimson;
+  // }
   .hamburger .checkbox:checked + svg .lineTop {
     stroke-dashoffset: 0;
     transform-origin: left;

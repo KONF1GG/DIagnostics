@@ -278,12 +278,11 @@
 
 /* Для активного подраздела */
 .subsection.active{
-  background-color: #e8f0fe; /* Выделение активного пункта */
+  background-color: #004691; /* Выделение активного пункта */
 }
 
 .subsection.active .subsection-content{
-  color: #013974;
-  font-weight: bold;
+  color: #ffffff;
 }
 
 .subsection-content.disabled {

@@ -80,13 +80,21 @@ const Navbar = () => {
   const handleLoginSearchChoice = (value: string | null) => {
     if (value) {
       const previousUrl = location.pathname;
-      const redirectUrl =
-        previousUrl === "/"
-          ? `/network?login=${encodeURIComponent(value)}`
-          : previousUrl.includes("/subsection")
-          ? `/network?login=${encodeURIComponent(value)}`
-          : `${previousUrl}?login=${encodeURIComponent(value)}`;
-      navigate(redirectUrl);
+      const searchParams = new URLSearchParams(location.search);
+
+      // Если текущий URL включает "/subsection", заменяем login
+      if (previousUrl.includes("/subsection")) {
+        searchParams.set("login", encodeURIComponent(value));
+        const updatedUrl = `${previousUrl}?${searchParams.toString()}`;
+        navigate(updatedUrl);
+      } else {
+        // Иначе логика перенаправления остается прежней
+        const redirectUrl =
+          previousUrl === "/"
+            ? `/network?login=${encodeURIComponent(value)}`
+            : `${previousUrl}?login=${encodeURIComponent(value)}`;
+        navigate(redirectUrl);
+      }
       setLoginsList([]);
     }
   };

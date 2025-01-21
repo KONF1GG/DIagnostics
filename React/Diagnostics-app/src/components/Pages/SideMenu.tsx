@@ -67,7 +67,18 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                 }`}
               >
                 {sectionList.some((item) => item.label === section.section) && (
-                  <div className="subsection">
+                  <div
+                    className={`subsection ${
+                      login &&
+                      sectionList.some(
+                        (item) =>
+                          item.label === section.section &&
+                          location.pathname.includes(item.path)
+                      )
+                        ? "active"
+                        : ""
+                    }`}
+                  >
                     {sectionList.map((item) =>
                       item.label === section.section ? (
                         <div
@@ -82,11 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                             }
                           }}
                           className={`subsection-content ${
-                            login
-                              ? location.pathname.includes(item.path)
-                                ? "active"
-                                : ""
-                              : "disabled"
+                            !login ? "disabled" : ""
                           }`}
                           title={!login ? "Введите логин" : ""}
                         >

@@ -21,7 +21,9 @@ const SubsectionPage: React.FC = () => {
   if (!selectedSubsection) {
     return (
       <InfoList>
-        <h3>Подраздел не найден</h3>
+        <div className="container">
+          <h3>Подраздел не найден</h3>
+        </div>
       </InfoList>
     );
   }
@@ -62,8 +64,14 @@ const SubsectionPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (queriedLogin && !loginData) {
-      Get(queriedLogin, setLoginData);
+    if (queriedLogin) {
+      if (loginData) {
+        if (loginData.login !== queriedLogin) {
+          Get(queriedLogin, setLoginData);
+        }
+      } else {
+        Get(queriedLogin, setLoginData);
+      }
     }
   }, [queriedLogin, loginData]);
 
