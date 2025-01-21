@@ -83,6 +83,8 @@ const Navbar = () => {
       const redirectUrl =
         previousUrl === "/"
           ? `/network?login=${encodeURIComponent(value)}`
+          : previousUrl.includes("/subsection")
+          ? `/network?login=${encodeURIComponent(value)}`
           : `${previousUrl}?login=${encodeURIComponent(value)}`;
       navigate(redirectUrl);
       setLoginsList([]);

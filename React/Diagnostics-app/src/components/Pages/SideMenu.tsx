@@ -33,9 +33,14 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   // Парсим query-параметры
   const query = new URLSearchParams(location.search);
   const selectedSubsectionName = query.get("subsection");
+  const queriedLogin = query.get("login");
 
   const openSubsection = (subsectionName: string) => {
-    navigate(`/subsection?subsection=${encodeURIComponent(subsectionName)}`);
+    let url = `/subsection?subsection=${encodeURIComponent(subsectionName)}`;
+    if (queriedLogin) {
+      url += `&login=${encodeURIComponent(queriedLogin)}`;
+    }
+    navigate(url);
   };
 
   return (
@@ -81,9 +86,9 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                               ? location.pathname.includes(item.path)
                                 ? "active"
                                 : ""
-                              : "disabled" // Добавляем класс для неактивной кнопки
+                              : "disabled"
                           }`}
-                          title={!login ? "Введите логин" : ""} // Подсказка при отсутствии логина
+                          title={!login ? "Введите логин" : ""}
                         >
                           Основной
                         </div>

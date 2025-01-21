@@ -10,25 +10,28 @@ import { DataProviderFailure } from "./DataContext/FailureContext.tsx";
 import { DataProviderApp } from "./DataContext/AppContext.tsx";
 import { SidebarProvider } from "./DataContext/SidebarContext.tsx";
 import { SideMenuProvider } from "./DataContext/SideMenuContext.tsx";
+import { RedisDataProvider } from "./DataContext/RedisLoginDataContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <SidebarProvider>
-      <SideMenuProvider>
-        <BrowserRouter>
-          <DataProviderCameras>
-            <DataProviderNet>
-              <DataProviderFailure>
-                <DataProviderTV>
-                  <DataProviderApp>
-                    <App />
-                  </DataProviderApp>
-                </DataProviderTV>
-              </DataProviderFailure>
-            </DataProviderNet>
-          </DataProviderCameras>
-        </BrowserRouter>
-      </SideMenuProvider>
-    </SidebarProvider>
+    <RedisDataProvider>
+      <SidebarProvider>
+        <SideMenuProvider>
+          <BrowserRouter>
+            <DataProviderCameras>
+              <DataProviderNet>
+                <DataProviderFailure>
+                  <DataProviderTV>
+                    <DataProviderApp>
+                      <App />
+                    </DataProviderApp>
+                  </DataProviderTV>
+                </DataProviderFailure>
+              </DataProviderNet>
+            </DataProviderCameras>
+          </BrowserRouter>
+        </SideMenuProvider>
+      </SidebarProvider>
+    </RedisDataProvider>
   </StrictMode>
 );

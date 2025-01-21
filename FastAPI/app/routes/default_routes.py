@@ -1,7 +1,8 @@
 import asyncio
 from os import access
-from typing import List, Optional
+from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
+from sqlalchemy import JSON
 
 from app import crud
 from app.depencies import SessionDependency, TokenDependency, RedisDependency, ClickhouseDepency
@@ -88,3 +89,8 @@ async def log(
 
     # Возвращаем успешный статус
     return {"status": "success"}
+
+
+@router.get('/v1/redis_data', response_model=Dict)
+async def get_data_from_redis_by_login(login: str, redis: RedisDependency, token: TokenDependency):
+    return await crud.get_login_data(login, redis)
