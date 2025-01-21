@@ -8,9 +8,10 @@ import Network from "./components/Pages/Network";
 import Accidents from "./components/Pages/Accidents";
 import Cameras from "./components/Pages/Cameras";
 import TV from "./components/Pages/TV/TV";
-import App_page from "./components/Pages/App_/app"
+import App_page from "./components/Pages/App_/app";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SubsectionPage from "./components/Pages/Default/GeneralPage/GeneralSubsection";
 
 const App = () => {
   const location = useLocation();
@@ -33,6 +34,7 @@ const App = () => {
           <Route path="/cameras" element={<Cameras />} />
           <Route path="/TV" element={<TV />} />
           <Route path="/app" element={<App_page />}></Route>
+          <Route path="/subsection" element={<SubsectionPage />} />
         </Routes>
       </div>
     </>

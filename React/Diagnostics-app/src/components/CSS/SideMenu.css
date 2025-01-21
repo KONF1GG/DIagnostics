@@ -286,6 +286,12 @@
   font-weight: bold;
 }
 
+.subsection-content.disabled {
+  cursor: not-allowed; /* Отключаем hover */
+  color: gray;
+}
+
+
 /* Дополнительный стиль для прокручиваемого списка */
 .subsections::-webkit-scrollbar {
   width: 6px; /* Устанавливаем ширину полосы прокрутки */

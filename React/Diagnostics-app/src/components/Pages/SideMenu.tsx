@@ -30,6 +30,14 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
     }
   }, [jsonData, toggleSection]);
 
+  // Парсим query-параметры
+  const query = new URLSearchParams(location.search);
+  const selectedSubsectionName = query.get("subsection");
+
+  const openSubsection = (subsectionName: string) => {
+    navigate(`/subsection?subsection=${encodeURIComponent(subsectionName)}`);
+  };
+
   return (
     <div className="d-flex">
       <div className={`side-menu-wrapper ${isSidebarOpen ? "open" : ""}`}>
@@ -69,10 +77,13 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                             }
                           }}
                           className={`subsection-content ${
-                            location.pathname.includes(item.path)
-                              ? "active"
-                              : ""
+                            login
+                              ? location.pathname.includes(item.path)
+                                ? "active"
+                                : ""
+                              : "disabled" // Добавляем класс для неактивной кнопки
                           }`}
+                          title={!login ? "Введите логин" : ""} // Подсказка при отсутствии логина
                         >
                           Основной
                         </div>
@@ -82,7 +93,15 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                 )}
                 {section.subsections &&
                   section.subsections.map((subsection, subIndex) => (
-                    <div key={subIndex} className="subsection">
+                    <div
+                      key={subIndex}
+                      className={`subsection ${
+                        subsection.subsection === selectedSubsectionName
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() => openSubsection(subsection.subsection)}
+                    >
                       <div className="subsection-content">
                         {subsection.subsection}
                       </div>

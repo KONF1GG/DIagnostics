@@ -1,0 +1,41 @@
+.card-list {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Адаптивная сетка */
+gap: 20px; /* Расстояние между карточками */
+}
+
+.card {
+background: linear-gradient(145deg, #e6edf5, #ffff); /* Светлый градиент */
+border-radius: 16px; /* Закругленные углы */
+box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); /* Глубокая тень */
+padding: 20px;
+overflow: hidden;
+position: relative;
+}
+
+.card-regular {
+grid-column: span 4; /* Обычные карточки занимают одну колонку */
+}
+
+.card-large {
+grid-column: span 4; /* Карточки с большим количеством текста занимают две колонки */
+}
+
+.card-title {
+font-size: 20px;
+font-weight: bold;
+margin-bottom: 12px;
+color: #003166; /* Яркий синий для заголовка */
+}
+
+.card-text {
+text-align: left; /* Выравнивание текста по левому краю */
+white-space: pre-wrap; /* Для обработки переносов строк, если вдруг есть \n */
+line-height: 1.6; /* Для удобочитаемости текста */
+font-size: 16px;
+color: #555;
+}
+
+.card-title, .card-text {
+position: relative;
+}

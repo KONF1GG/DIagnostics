@@ -338,42 +338,14 @@ const App_page = () => {
                                 )}
                               </ul>
                             </div>
-
-                            <div>
-                              <strong>Логин:</strong>{" "}
-                              {
-                                phone.contracts.find(
-                                  (contract) =>
-                                    contract.flat_id === data.flat_id
-                                )?.login
-                              }
-                            </div>
-                            <div>
-                              <strong>Адрес:</strong>{" "}
-                              {
-                                phone.contracts.find(
-                                  (contract) =>
-                                    contract.flat_id === data.flat_id
-                                )?.address
-                              }
-                            </div>
-                            <div>
-                              <strong>Договор:</strong>{" "}
-                              {
-                                phone.contracts.find(
-                                  (contract) =>
-                                    contract.flat_id === data.flat_id
-                                )?.contract
-                              }
-                            </div>
                           </div>
                           <h5 className="fw-bold mb-0 text-center mt-3">
                             {phone.contracts.some(
                               (contract) =>
                                 contract.contract !== data.main_contract
                             )
-                              ? "Адреса, привязанные к телефону:"
-                              : "Привязанных адресов нет"}
+                              ? "Другие адреса, привязанные к этому телефону:"
+                              : "Других привязанных адресов к этому телефону нет"}
                           </h5>
                           <div className="card-body">
                             <div
