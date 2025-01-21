@@ -1,21 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "/logo.svg";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../CSS/Navbar.css";
 import { LoginData } from "../../API/getSearchLogins";
 import { GetSearchLogins } from "../../API/getSearchLogins";
 import userIcon from "../../assets/users.svg";
 import debounce from "lodash/debounce"; // Подключаем lodash для дебаунса
-import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-} from "@headlessui/react";
 import MenuButton from "./Default/MenuOpen";
 import { useSidebar } from "../../DataContext/SidebarContext";
-import toggleSidebar from "../Pages/SideMenu";
+import Loader from "./Default/FormLoader";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -41,8 +33,11 @@ const Navbar = () => {
   const location = useLocation();
   const [login, setLogin] = useState<string>("");
   const [loginsList, setLoginsList] = useState<LoginData[]>([]);
+  const [isDropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const [activeIndex, setActiveIndex] = useState<number>(-1); // Для управления навигацией
   const navigate = useNavigate();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchLogins = useCallback(
     debounce(async (query: string) => {
@@ -62,6 +57,7 @@ const Navbar = () => {
         }
       } catch (err) {
         setLoginsList([]);
+      } finally {
       }
     }, 500),
     []
@@ -70,10 +66,18 @@ const Navbar = () => {
   useEffect(() => {
     if (login.length > 2) {
       fetchLogins(login);
+      setDropdownOpen(true);
     } else {
       setLoginsList([]);
+      setDropdownOpen(false);
     }
   }, [login, fetchLogins]);
+
+  useEffect(() => {
+    if (loginsList.length === 1) {
+      handleLoginSearchChoice(loginsList[0].login);
+    }
+  }, [loginsList]); // Этот useEffect срабатывает только когда изменяется loginsList
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -83,103 +87,146 @@ const Navbar = () => {
     }
   }, [location.search]);
 
-  const handleLoginSearchChoice = (value: string | null) => {
-    if (value) {
-      const previousUrl = location.pathname;
-      const searchParams = new URLSearchParams(location.search);
+  const handleLoginSearchChoice = (value: string) => {
+    const previousUrl = location.pathname;
+    const searchParams = new URLSearchParams(location.search);
 
-      // Если текущий URL включает "/subsection", заменяем login
-      if (previousUrl.includes("/subsection")) {
-        searchParams.set("login", encodeURIComponent(value));
-        const updatedUrl = `${previousUrl}?${searchParams.toString()}`;
-        navigate(updatedUrl);
-      } else {
-        // Иначе логика перенаправления остается прежней
-        const redirectUrl =
-          previousUrl === "/"
-            ? `/network?login=${encodeURIComponent(value)}`
-            : `${previousUrl}?login=${encodeURIComponent(value)}`;
-        navigate(redirectUrl);
-      }
-      setLoginsList([]);
+    if (previousUrl.includes("/subsection")) {
+      searchParams.set("login", encodeURIComponent(value));
+      const updatedUrl = `${previousUrl}?${searchParams.toString()}`;
+      navigate(updatedUrl);
+    } else {
+      const redirectUrl =
+        previousUrl === "/"
+          ? `/network?login=${encodeURIComponent(value)}`
+          : `${previousUrl}?login=${encodeURIComponent(value)}`;
+      navigate(redirectUrl);
+    }
+    setLoginsList([]);
+    setDropdownOpen(false);
+
+    const searchInput = document.querySelector(
+      ".combobox-input"
+    ) as HTMLInputElement;
+    if (searchInput) {
+      searchInput.blur();
     }
   };
 
   const highlightMatch = useCallback((text: string, query: string) => {
     const regex = new RegExp(`(${query})`, "gi");
-    return text.replace(regex, "<mark>$1</mark>");
+    return text.replace(regex, `<mark>$1</mark>`);
   }, []);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => {
-      return !prev;
-    });
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (loginsList.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        setActiveIndex((prev) => (prev + 1) % loginsList.length);
+        break;
+      case "ArrowUp":
+        setActiveIndex(
+          (prev) => (prev - 1 + loginsList.length) % loginsList.length
+        );
+        break;
+      case "Enter":
+        if (activeIndex >= 0 && activeIndex < loginsList.length) {
+          handleLoginSearchChoice(loginsList[activeIndex].login);
+        }
+        break;
+      case "Escape":
+        setDropdownOpen(false);
+        break;
+    }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
-        <div className="container-fluid d-flex justify-content-between align-items-center">
-          <MenuButton onClick={toggleSidebar} />
-          <div className="search-container-nav mx-auto">
-            <Combobox value={login} onChange={handleLoginSearchChoice}>
-              <div className="input-wrapper-nav">
-                <ComboboxInput
-                  placeholder="Поиск..."
-                  onChange={(event) => setLogin(event.target.value)}
-                  className="combobox-input"
-                />
-                <ComboboxButton className="search-btn">
-                  <i className="fas fa-search" />
-                </ComboboxButton>
-              </div>
-              {loginsList.length > 0 && (
-                <ComboboxOptions className="dropdown-container show">
-                  {loginsList.map((loginItem, index) => (
-                    <ComboboxOption
-                      key={index}
-                      value={loginItem.login}
-                      as="li"
-                      className="dropdown-item"
-                    >
-                      <div className="dropdown-item-details">
-                        <span
-                          className="dropdown-item-field login"
-                          dangerouslySetInnerHTML={{
-                            __html: highlightMatch(loginItem.login, login),
-                          }}
-                        ></span>
-                        <span
-                          className="dropdown-item-field name"
-                          dangerouslySetInnerHTML={{
-                            __html: highlightMatch(loginItem.name, login),
-                          }}
-                        ></span>
-                        <span
-                          className="dropdown-item-field contract"
-                          dangerouslySetInnerHTML={{
-                            __html: highlightMatch(loginItem.contract, login),
-                          }}
-                        ></span>
-                        <span
-                          className="dropdown-item-field address"
-                          dangerouslySetInnerHTML={{
-                            __html: highlightMatch(loginItem.address, login),
-                          }}
-                        ></span>
-                      </div>
-                    </ComboboxOption>
-                  ))}
-                </ComboboxOptions>
-              )}
-            </Combobox>
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
+      <div className="container-fluid d-flex justify-content-between align-items-center">
+        <MenuButton onClick={toggleSidebar} />
+        <div className="search-container-nav mx-auto" ref={dropdownRef}>
+          <div
+            className={`input-wrapper-nav ${
+              isDropdownOpen && loginsList.length > 0 ? "dropdown-open" : ""
+            }`}
+          >
+            <input
+              type="text"
+              placeholder="Поиск..."
+              value={login}
+              onChange={(event) => setLogin(event.target.value)}
+              onFocus={() => setDropdownOpen(true)}
+              onKeyDown={handleKeyDown}
+              className="combobox-input"
+            />
+            {/* <button className="search-btn">
+              <i className="fas fa-search" />
+            </button> */}
           </div>
-          <div className="profile-icon" onClick={() => navigate("/users")}>
-            <img src={userIcon} style={{ height: "30px", cursor: "pointer" }} />
-          </div>
+
+          {isDropdownOpen && loginsList.length > 0 && (
+            <ul className="dropdown-container show">
+              {loginsList.map((loginItem, index) => (
+                <li
+                  key={index}
+                  className={`dropdown-item ${
+                    activeIndex === index ? "active" : ""
+                  }`}
+                  onClick={() => handleLoginSearchChoice(loginItem.login)}
+                >
+                  <div className="dropdown-item-details">
+                    <span
+                      className="dropdown-item-field login"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightMatch(loginItem.login, login),
+                      }}
+                    ></span>
+                    <span
+                      className="dropdown-item-field name"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightMatch(loginItem.name, login),
+                      }}
+                    ></span>
+                    <span
+                      className="dropdown-item-field contract"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightMatch(loginItem.contract, login),
+                      }}
+                    ></span>
+                    <span
+                      className="dropdown-item-field address"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightMatch(loginItem.address, login),
+                      }}
+                    ></span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </nav>
-    </>
+        <div className="profile-icon" onClick={() => navigate("/users")}>
+          <img src={userIcon} style={{ height: "50px", cursor: "pointer" }} />
+        </div>
+      </div>
+    </nav>
   );
 };
 

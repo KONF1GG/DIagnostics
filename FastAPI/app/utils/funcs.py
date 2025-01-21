@@ -35,7 +35,7 @@ async def compare_json(radius: Dict, redis: Dict):
             mac1, vlan1 = (
                 (radius_value.get('mac'), radius_value.get('vlan')) if radius_value else (
                 None, None))
-            mac2, vlan2 = (redis.get('mac'), int(redis.get('vlan')))
+            mac2, vlan2 = (redis.get('mac', None), int(redis.get('vlan', 0)))
 
             if mac1 != mac2:
                 differences['radius']['mac'] = mac1

@@ -6,7 +6,6 @@ interface ApiError {
 }
 
 const check_token = async (token: string) => {
-    console.log("Отправляем токен:", token); // Логируем токен
     try {
         const response = await api.post("/v1/token", null, {
             headers: {

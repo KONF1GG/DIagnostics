@@ -59,19 +59,6 @@
   background-color: #ddd;
 }
 
-.dropdown-container {
-  position: absolute;
-  top: 100%; /* Позиционируем сразу под полем ввода */
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  opacity: 0; /* Начальное состояние невидимо */
-  pointer-events: none; /* Блокирует события мыши */
-  transition: opacity 0.3s ease;
-  min-width: 200px; /* Установите минимальную ширину по вашему усмотрению */
-  width: auto; /* Автоматическая подстройка ширины */
-}
-
 .dropdown-container.show {
   opacity: 1; 
   pointer-events: auto; 
@@ -104,64 +91,6 @@
   background-color: #f8d7da;
   padding: 0.75rem;
   border-radius: 4px;
-}
-
-/* Общий стиль для выпадающего списка */
-.dropdown-container {
-  position: absolute;
-  width: 100%;
-  max-height: 300px;
-  overflow-y: auto;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 10px;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  min-width: 200px; /* Установите минимальную ширину по вашему усмотрению */
-  width: auto; /* Автоматическая подстройка ширины */
-}
-
-/* Показываем контейнер */
-.dropdown-container.show {
-  opacity: 1;
-  visibility: visible;
-  justify-self: center;
-}
-
-/* Стили для элементов списка */
-.dropdown-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown-item {
-  padding: 10px 15px;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: flex-start; /* Прижимаем элементы к левому краю */
-  align-items: center;
-  transition: background-color 0.3s ease; /* Убрали transform для предотвращения опускания текста */
-}
-
-.dropdown-item:last-child {
-  border-bottom: none; /* Убираем нижнюю границу для последнего элемента */
-}
-
-.dropdown-item-details {
-  display: flex;
-  justify-content: flex-start; /* Прижимаем к левому краю */
-  width: 100%;
-}
-
-.dropdown-item-field {
-  font-size: 14px;
-  color: #333;
-  white-space: nowrap;
-  margin-right: 15px; /* Добавляем отступ между элементами */
 }
 
 .login {

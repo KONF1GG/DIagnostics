@@ -13,7 +13,6 @@ const Home = () => {
 
     if (token) {
       const validateToken = async () => {
-        console.log(token);
         const result = await check_token(token);
 
         if (typeof result === "string" && result.includes("Invalid token")) {

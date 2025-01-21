@@ -122,21 +122,33 @@
 
 .search-container-nav {
   flex-grow: 1;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
+  position: relative;
 }
-
 .input-wrapper-nav {
   display: flex;
   align-items: center;
+  justify-self: center;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: #fff;
+  overflow: hidden;
+  width: 80%;
+  transition: border-radius 0.3s ease, border-color 0.3s ease;
 }
+
+.input-wrapper-nav input:focus {
+  outline: none;
+}
+
 
 .input-wrapper-nav input {
   width: 100%;
   padding: 12px 50px 12px 20px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
+  border: none;
   font-size: 16px;
+  outline: none;
 }
 
 .search-btn {
@@ -146,8 +158,8 @@
   color: #02458d;
   padding: 5px 10px;
   font-size: 16px;
+  cursor: pointer;
 }
-
 .search-btn:disabled {
   color: #ccc;
 }
@@ -193,4 +205,88 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.dropdown-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  justify-self: center;
+  width: 80%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  transition: all 0.3s ease, max-height 0.3s ease;
+  opacity: 0;
+  transform: translateY(-10px);
+  visibility: hidden;
+  padding: 0 0; /* Отступы сверху и снизу */
+}
+
+/* Объединение поиска и списка */
+.input-wrapper-nav.dropdown-open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.dropdown-container.show {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  max-height: 300px;
+}
+/* Стили для элементов списка */
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-item.active {
+  background-color: #f0f0f0;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-block: inherit;
+  transition: background-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Расстояние между строками */
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+
+.dropdown-item:last-child {
+  border-bottom: none; /* Убираем нижнюю границу для последнего элемента */
+}
+
+.dropdown-item-details {
+  display: flex;
+  flex-wrap: wrap; /* Для упорядочивания содержимого */
+  gap: 10px; /* Пространство между элементами */
+}
+
+.dropdown-item-field {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  margin-right: 15px; /* Добавляем отступ между элементами */
+}
+
+mark {
+  background-color: #ffeb3b;
+  color: black;
+  padding: 0 2px; /* Добавляем немного пространства вокруг выделения */
+  border-radius: 2px;
 }

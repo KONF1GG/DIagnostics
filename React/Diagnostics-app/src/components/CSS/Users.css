@@ -108,9 +108,10 @@ thead {
 
 
 .profile-icon:hover {
-  transform: scale(1.2);
+  transform: scale(1);
 }
 
 .profile-icon {
+  transform: scale(0.7);
   transition: transform 0.3s, box-shadow 0.3s;
 }
