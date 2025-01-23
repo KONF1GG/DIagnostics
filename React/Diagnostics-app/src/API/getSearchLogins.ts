@@ -31,16 +31,14 @@ const GetSearchLogins = async (login: string): Promise<ResponseData | ErrorRespo
             }
         });
 
-        // console.log(response.data)
-
-        if (response.status === 401) {
-            window.location.href = '/login';
-            return { error: true, message: "Unauthorized" };
-        }
-
         return response.data as ResponseData; 
     } catch (err) {
         const error = err as AxiosError<ApiError>;
+
+        if (error.response?.status === 401) {
+            window.location.href = '/login';
+            return { error: true, message: "Unauthorized" };
+        }
 
         if (error.response && error.response.data) {
             const errorDetail = error.response.data.detail || "Произошла ошибка получения списка логинов";

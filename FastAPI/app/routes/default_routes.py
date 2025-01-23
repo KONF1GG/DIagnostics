@@ -34,7 +34,9 @@ async def get_search_logins(
     token: TokenDependency, 
     login: Optional[str] = Query(None)
 ):
+ 
     result = await crud.search_logins(login, redis)
+    print(result)
     # results = await asyncio.gather(
     #     crud.search_logins(login.lower(), redis),
     #     crud.search_logins(login.capitalize(), redis)

@@ -61,16 +61,13 @@ export const GetApp = async (
         },
       }
     );
-
-    console.log(response.status);
-    if (response.status === 401) {
-      window.location.href = "/login";
-      return null;
-    }
-
     return response.data;
   } catch (err) {
     const error = err as AxiosError<ApiError>;
+    if (error.response?.status === 401) {
+      window.location.href = "/login";
+      return null;
+    }
 
     if (
       error.response &&

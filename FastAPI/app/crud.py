@@ -825,7 +825,19 @@ async def get_login_from_redis_by_flat_id(flat_id: int, redis):
 async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
     # result = await redis.ft('idx:searchLogin').search(search_login)
     # search_query = f"{search_login.lower()} | {search_login.capitalize()} | {search_login}"
-    search_query = f"{search_login} | {search_login.lower()} | {search_login.capitalize()}"
+    # search_query = f"{search_login} | {search_login.lower()} | {search_login.capitalize()}"
+    search_query = f''
+    default_search = ''
+    lower_search = ''
+    capitalize_search = ''
+    for login in search_login.split():
+        # search_query += f"{login} | {login.lower()} | {login.capitalize()}"
+        default_search += f'{login} '
+        lower_search += f'{login.lower()} '
+        capitalize_search += f'{login.capitalize()} '
+
+    search_query = f'{default_search} | {lower_search} | {capitalize_search}'
+    print(search_query)
     result = await redis.ft('idx:searchLogin').search(search_query)
     logins_list = []
     for doc in result.docs:
