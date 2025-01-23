@@ -56,7 +56,7 @@ async def get_connection_data(
         flat_from_RBT_value = flat_from_RBT[0]['flat'] if flat_from_RBT[0]['flat'] is not None else False
 
         house_flat_subscribers = await crud.get_houses_flats_subscribers_by_flat_id(flatId, rbt)
-        is_relocatable = str(flat) if (flat != flat_from_RBT_value) or house_flat_subscribers == 0 else None
+        is_relocatable = str(flat) if (str(flat) != flat_from_RBT_value) or house_flat_subscribers == 0 else None
 
         contracts.append(LoginsData(
             phone=data.get('primePhone', ''),
@@ -123,27 +123,28 @@ async def relocate_users(
     request: RelocateRequest, 
     rbt: RBTDependency  
 ):
-    # flat_id = await crud.get_flat_from_RBT_by_house_id_and_flat(request.flat, request.house_id, rbt)
+    flat_id = await crud.get_flat_from_RBT_by_house_id_and_flat(request.flat, request.house_id, rbt)
 
-    # if flat_id is None:
-    #     # Создание новой квартиры
-    #     try:
-    #         flat_id = await crud.create_new_flat(request.flat, request.house_id)
+    if flat_id is None:
+        # Создание новой квартиры
+        try:
+            flat_id = await crud.create_new_flat(request.flat, request.house_id)
 
-    #     except Exception as e:
-    #         raise HTTPException(status_code=400, detail=f"Не удалось создать квартиру: {e}")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Не удалось создать квартиру: {e}")
 
     # Переселение
-    # response = await crud.change_flat_in_1C(request.flat, request.UUID2)
-    response = 1
-    if response:
-        try:
-            phones_list = [str(phone) for phone in request.phones]
-            house_subscriber_ids_to_relocate = await crud.get_house_subscriber_ids_to_relocate_by_phones(phones_list, rbt)
-            print(house_subscriber_ids_to_relocate)
-            return StatusResponse(status='success')
-            # relocate_response = await crud.change_flat_id_in_RBT(house_subscriber_ids_to_relocate, request.flat)    
-        except Exception as e:
-            raise HTTPException(status_code=400, detail="Не удалось переселить")
+    response = await crud.change_flat_in_1C(request.flat, request.UUID2)
+    if request.phones:
+        if response:
+            try:
+                phones_list = [str(phone) for phone in request.phones]
+                house_subscriber_ids_to_relocate = await crud.get_house_subscriber_ids_to_relocate_by_phones(phones_list, rbt)
+                print(house_subscriber_ids_to_relocate)
+                return StatusResponse(status='success')
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Не удалось переселить: {str(e)}")
+        else:
+            raise HTTPException(status_code=400, detail='Не удалось изменить квартиру в 1С')
     else:
-        raise HTTPException(status_code=400, detail=f'Не удалось изменить кваритру в 1С')
+        return StatusResponse(status='success')

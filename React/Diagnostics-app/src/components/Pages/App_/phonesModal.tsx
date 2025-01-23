@@ -23,9 +23,7 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
   contract,
   phoneNumbers,
 }) => {
-  const [phones, setPhones] = useState<string[]>(
-    contract?.phone ? [contract.phone] : []
-  );
+  const [phones, setPhones] = useState<string[]>([]);
 
   const handleCheckboxChange = (phone: string) => {
     setPhones((prev) =>
@@ -44,8 +42,9 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
         contract.flat,
         contract.address_house_id
       );
-      setPhones([contract?.phone]);
     }
+    // Очистка выбранных номеров после подтверждения
+    setPhones([]);
   };
 
   return (
@@ -64,10 +63,7 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
         </p>
         <Form>
           {phoneNumbers
-            .filter(
-              (phone) =>
-                String(phone.phone).slice(-9) !== contract?.phone.slice(-9)
-            )
+            .filter(() => contract?.phone)
             .map((phone, index) => (
               <Form.Check
                 key={index}

@@ -837,7 +837,7 @@ async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
         capitalize_search += f'{login.capitalize()} '
 
     search_query = f'{default_search} | {lower_search} | {capitalize_search}'
-    print(search_query)
+    # print(search_query)
     result = await redis.ft('idx:searchLogin').search(search_query)
     logins_list = []
     for doc in result.docs:

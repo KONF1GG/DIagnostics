@@ -78,7 +78,7 @@ export const handleContractDeleteButton = async (
       page: `Приложение`,
       action: "Кнопка отвзяать (Договор на адресе)",
       success: false,
-      url: "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/correctTV",
+      url: "http://server1c.freedom1.ru/UNF_CRM_WS/hs/RBT/setFlatId",
       payload: requestData,
       message: `Ошибка: ${String(error)}`,
     });
@@ -108,7 +108,7 @@ export const handleUserDelete = async (
         page: `Приложение`,
         action: isPhoneDelete
           ? "Кнопка отвязать (Телефон на адресе)"
-          : "Кнопка отвязать (Договор на адресе)",
+          : "Кнопка отвязать (Договор на телефоне)",
         success: false,
         url: url,
         payload: { house_id },
@@ -138,7 +138,7 @@ export const handleUserDelete = async (
       page: `Приложение`,
       action: isPhoneDelete
         ? "Кнопка отвязать (Телефон на адресе)"
-        : "Кнопка отвязать (Договор на адресе)",
+        : "Кнопка отвязать (Договор на телефоне)",
       success: true,
       url: url,
       payload: { house_id },
@@ -173,7 +173,7 @@ export const handleUserDelete = async (
       page: `Приложение`,
       action: isPhoneDelete
         ? "Кнопка отвязать (Телефон на адресе)"
-        : "Кнопка отвязать (Договор на адресе)",
+        : "Кнопка отвязать (Договор на телефоне)",
       success: false,
       url: url,
       payload: { house_id },
@@ -271,7 +271,7 @@ export const ChangeRole = async (
 };
 
 export const Relocate = async (
-  phones: number[],
+  phones: number[] | null,
   UUID2: string,
   flat: string,
   address_house_id: number,
@@ -280,13 +280,18 @@ export const Relocate = async (
 ) => {
   const url = `/v1/app/relocate`;
 
+  const requestData: Record<string, any> = {
+    UUID2,
+    flat,
+    address_house_id,
+  };
+
+  if (phones && phones.length > 0) {
+    requestData.phones = phones;
+  }
+
   try {
-    const response = await api.patch(url, {
-      phones,
-      UUID2,
-      flat,
-      address_house_id,
-    });
+    const response = await api.patch(url, requestData);
 
     if (response.status !== 200) {
       await LogData({

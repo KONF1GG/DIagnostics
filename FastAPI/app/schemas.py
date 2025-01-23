@@ -318,7 +318,7 @@ class ChangeRoleRequest(BaseModel):
     role: int
 
 class RelocateRequest(BaseModel):
-    phones: List[int]
+    phones: Optional[List[int]] = None
     UUID2: str
     flat: str
     address_house_id: int

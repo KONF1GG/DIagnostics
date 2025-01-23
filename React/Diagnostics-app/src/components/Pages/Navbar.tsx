@@ -8,6 +8,8 @@ import debounce from "lodash/debounce"; // Подключаем lodash для д
 import MenuButton from "./Default/MenuOpen";
 import { useSidebar } from "../../DataContext/SidebarContext";
 import Loader from "./Default/FormLoader";
+import Login from "./Login";
+import { red } from "@mui/material/colors";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ const Navbar = () => {
   const [activeIndex, setActiveIndex] = useState<number>(-1); // Для управления навигацией
   const navigate = useNavigate();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const { searchedLogin, setSearchedLogin } = useSidebar();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchLogins = useCallback(
@@ -75,9 +78,11 @@ const Navbar = () => {
 
   useEffect(() => {
     if (loginsList.length === 1) {
+      setSearchedLogin(loginsList[0]);
+      console.log(loginsList[0]);
       handleLoginSearchChoice(loginsList[0].login);
     }
-  }, [loginsList]); // Этот useEffect срабатывает только когда изменяется loginsList
+  }, [loginsList]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -125,12 +130,26 @@ const Navbar = () => {
 
     switch (e.key) {
       case "ArrowDown":
-        setActiveIndex((prev) => (prev + 1) % loginsList.length);
+        setActiveIndex((prev) => {
+          const newIndex = (prev + 1) % loginsList.length;
+          const activeItem =
+            document.querySelectorAll(".dropdown-item")[newIndex];
+          if (activeItem) {
+            activeItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+          return newIndex;
+        });
         break;
       case "ArrowUp":
-        setActiveIndex(
-          (prev) => (prev - 1 + loginsList.length) % loginsList.length
-        );
+        setActiveIndex((prev) => {
+          const newIndex = (prev - 1 + loginsList.length) % loginsList.length;
+          const activeItem =
+            document.querySelectorAll(".dropdown-item")[newIndex];
+          if (activeItem) {
+            activeItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+          return newIndex;
+        });
         break;
       case "Enter":
         if (activeIndex >= 0 && activeIndex < loginsList.length) {
@@ -221,6 +240,17 @@ const Navbar = () => {
               ))}
             </ul>
           )}
+        </div>
+        <div
+          className="d-flex flex-column align-items-center hidden-on-small"
+          style={{
+            width: "450px",
+            margin: "15px",
+            paddingTop: "15px",
+          }}
+        >
+          <strong className="">{searchedLogin?.login}</strong>
+          <p className="">{searchedLogin?.address}</p>
         </div>
         <div className="profile-icon" onClick={() => navigate("/users")}>
           <img src={userIcon} style={{ height: "50px", cursor: "pointer" }} />
