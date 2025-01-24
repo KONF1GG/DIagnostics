@@ -63,7 +63,7 @@ async def log(
     current_user_id = token.user_id
     current_user = await crud.get_item(session, User, current_user_id)
     
-    user_name = current_user.name
+    user_name = current_user.username
     login = data.login
     page = data.page
     action = data.action

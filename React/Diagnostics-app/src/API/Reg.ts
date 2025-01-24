@@ -9,12 +9,17 @@ interface ItemId {
     id: number;
 }
 
-const Reg = async (username: string, password: string): Promise<ItemId | string> => {
+const Reg = async (username: string, password: string, firstName: string, lastName: string, middleName: string): Promise<ItemId | string> => {
+    const RegData = {
+        username: username,
+        password: password,
+        firstname: firstName,
+        lastname: lastName,
+        middlename: middleName
+    }
+
     try {
-        const response = await api.post<ItemId>("/v1/reg", {
-            name: username,
-            password, 
-        });
+        const response = await api.post<ItemId>("/v1/reg", RegData);
 
         return response.data; 
     } catch (err) {
@@ -24,7 +29,7 @@ const Reg = async (username: string, password: string): Promise<ItemId | string>
             const errorDetail = error.response.data.detail || "Произошла ошибка при создании пользователя";
             return errorDetail;
         }
-        return "Произошла ошибка при создании пользователя."; 
+        return "Произошла ошибка при создании пользователя"; 
     }
 };
 

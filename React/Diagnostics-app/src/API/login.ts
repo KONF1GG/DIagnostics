@@ -13,7 +13,7 @@ const handleLogin = async (username: string, password: string): Promise<LoginRes
     try {
 
         const response = await api.post<LoginResponse>("/v1/login", {
-            name: username,
+            username,
             password,
         });
         return response.data; 
@@ -25,7 +25,7 @@ const handleLogin = async (username: string, password: string): Promise<LoginRes
             const errorDetail = error.response.data.detail || "Произошла ошибка при авторизации";
             return errorDetail;
         }
-        return "Произошла ошибка при авторизации."; 
+        return "Произошла ошибка при авторизации"; 
     }
 };
 

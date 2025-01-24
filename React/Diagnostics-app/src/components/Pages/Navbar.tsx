@@ -249,7 +249,7 @@ const Navbar = () => {
             paddingTop: "15px",
           }}
         >
-          <strong className="">{searchedLogin?.login}</strong>
+          <strong className="">{searchedLogin?.name}</strong>
           <p className="">{searchedLogin?.address}</p>
         </div>
         <div className="profile-icon" onClick={() => navigate("/users")}>

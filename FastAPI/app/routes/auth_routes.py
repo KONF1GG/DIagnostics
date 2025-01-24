@@ -13,7 +13,7 @@ async def login_user(login_data: Login, session: SessionDependency):
 
     """Эндпоинт для логина пользователя"""
 
-    user_query = select(User).where(User.name == login_data.name)
+    user_query = select(User).where(User.username == login_data.username)
     user_model = await session.scalar(user_query)
     if user_model is None:
         raise HTTPException(status_code=401, detail="Неверное имя или пароль")
@@ -35,8 +35,8 @@ async def create_user(
         user_data: CreateUser,
         session: SessionDependency,
 ):
-    user_data.role_id = 2
     """Эндпоинт для регистрации"""
+    user_data.role_id = 2
     user = User(**user_data.dict())
     user.password = await auth.hash_password(user_data.password)
     user = await crud.add_item(session, user)

@@ -15,11 +15,16 @@ class ItemId(BaseModel):
 
 
 class BaseUser(BaseModel):
-    name: str
+    username: str
     password: str
 
 
+
 class CreateUser(BaseUser):
+    firstname: str
+    lastname: str
+    middlename: str
+    password: str
     role_id: Optional[int] = None
 
 class Reg(BaseUser):
