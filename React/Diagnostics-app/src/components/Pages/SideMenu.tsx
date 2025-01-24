@@ -29,8 +29,48 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   const selectedSubsectionName = query.get("subsection");
 
   const openSubsection = (subsectionName: string) => {
-    const url = `/subsection?subsection=${encodeURIComponent(subsectionName)}&login=${encodeURIComponent(login)}`;
+    const url = `/subsection?subsection=${encodeURIComponent(
+      subsectionName
+    )}&login=${encodeURIComponent(login)}`;
     navigate(url);
+  };
+
+  const handleSectionClick = (section: any, index: number) => {
+    const isMatchedSection = sectionList.find(
+      (item) => item.label === section.section
+    );
+
+    // Проверяем, если секция имеет ссылку или нет
+    const hasLink = isMatchedSection && isMatchedSection.path;
+    const isActiveSection = hasLink
+      ? location.pathname.includes(isMatchedSection.path) // Если есть путь, то проверяем его
+      : false;
+
+    if (openSections[index]) {
+      // Если секция открыта
+      if (isActiveSection) {
+        // Если секция активная, то закрываем её
+        toggleSection(index);
+      } else {
+        // Если секция не активная, то переходим по ссылке и выполняем запрос
+        if (hasLink) {
+          navigate(
+            `/${isMatchedSection.path}?login=${encodeURIComponent(login)}`
+          );
+        } else {
+          toggleSection(index);
+        }
+      }
+    } else {
+      // Если секция закрыта
+      toggleSection(index);
+      if (hasLink) {
+        // Если секция привязана к ссылке, переходим по ней
+        navigate(
+          `/${isMatchedSection.path}?login=${encodeURIComponent(login)}`
+        );
+      }
+    }
   };
 
   return (
@@ -41,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
             const isMatchedSection = sectionList.find(
               (item) => item.label === section.section
             );
-            
+
             // Проверяем, если секция имеет ссылку или нет
             const hasLink = isMatchedSection && isMatchedSection.path;
 
@@ -54,37 +94,37 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
               <div key={index} className="section">
                 <h3
                   className={`section-title ${isActiveSection ? "active" : ""}`}
-                  onClick={() => {
-                    if (openSections[index]) {
-                      // Если секция открыта
-                      toggleSection(index);
-                    } else {
-                      // Если секция закрыта
-                      toggleSection(index);
-                      if (hasLink) {
-                        // Если секция привязана к ссылке, переходим по ней
-                        navigate(`/${isMatchedSection.path}?login=${encodeURIComponent(login)}`);
-                      }
-                    }
-                  }}
+                  onClick={() => handleSectionClick(section, index)}
                 >
                   {section.section}
-                  <span className={`toggle-icon ${openSections[index] ? "open" : ""}`}>
+                  <span
+                    className={`toggle-icon ${
+                      openSections[index] ? "open" : ""
+                    }`}
+                  >
                     {openSections[index] ? "▲" : "▼"}
                   </span>
                 </h3>
 
-                <div className={`subsections ${openSections[index] ? "open" : "closed"}`}>
+                <div
+                  className={`subsections ${
+                    openSections[index] ? "open" : "closed"
+                  }`}
+                >
                   {section.subsections &&
                     section.subsections.map((subsection, subIndex) => (
                       <div
                         key={subIndex}
                         className={`subsection ${
-                          subsection.subsection === selectedSubsectionName ? "active" : ""
+                          subsection.subsection === selectedSubsectionName
+                            ? "active"
+                            : ""
                         }`}
                         onClick={() => openSubsection(subsection.subsection)}
                       >
-                        <div className="subsection-content">{subsection.subsection}</div>
+                        <div className="subsection-content">
+                          {subsection.subsection}
+                        </div>
                       </div>
                     ))}
                 </div>
