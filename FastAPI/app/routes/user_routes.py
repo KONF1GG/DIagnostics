@@ -20,7 +20,7 @@ async def get_users(session: SessionDependency, token: TokenDependency):
 
     user_data = []
     for user in users:
-        user_data.append(UserModel(id=user.id, name=user.name, role=user.role.name))
+        user_data.append(UserModel(id=user.id, name=user.username, role=user.role.name))
 
     return user_data  
 

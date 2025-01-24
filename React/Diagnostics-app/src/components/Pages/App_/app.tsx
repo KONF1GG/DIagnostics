@@ -273,12 +273,13 @@ const App_page = () => {
                           >
                             <div className="dropdown">
                               <button
-                                className="btn btn-secondary dropdown-toggle d-flex justify-content-center align-items-center"
+                                className="btn dropdown-toggle d-flex justify-content-center align-items-center"
                                 type="button"
                                 id="dropdownMenuButton"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                                 title="Действия"
+                                style={{ border: "none" }}
                               >
                                 <div className="text-center w-100">
                                   <strong>
@@ -295,7 +296,7 @@ const App_page = () => {
                                 </div>
                               </button>
                               <ul
-                                className="dropdown-menu"
+                                className="dropdown-menu dropdown-menu-end"
                                 aria-labelledby="dropdownMenuButton"
                               >
                                 <li>

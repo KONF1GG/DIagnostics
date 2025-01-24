@@ -29,11 +29,16 @@ export interface TVIP {
     error: string | null;
 }
 
+interface additional_phone {
+    phone: string;
+    operator: string;
+}
+
 export interface TV24 {
-    phone: string | null;
+    phone: additional_phone | null;
     service1c: Service[];
     serviceOp: Service[];
-    additional_phones: string[];
+    additional_phones: additional_phone[];
     ban_on_app: boolean | null;
     isKRD: boolean | null
     error: string | null;

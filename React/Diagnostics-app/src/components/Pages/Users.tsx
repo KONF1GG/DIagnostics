@@ -65,7 +65,7 @@ const Users: React.FC = () => {
                 <tr key={user.id} className="user-row">
                   <td>{user.id}</td>
                   <td>
-                    <Link to={"/users/${user.id}"} className="user-link">
+                    <Link to={`/users/${user.id}`} className="user-link">
                       {user.name}
                     </Link>
                   </td>

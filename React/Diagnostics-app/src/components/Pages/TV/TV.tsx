@@ -11,103 +11,22 @@ import { getQueryParams } from "../Default/getData";
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
 import Loader from "../Default/Loading";
-
-interface UpdateSettingsRequest {
-  login: string;
-  operator: string;
-  not_turnoff_if_not_used: boolean;
-  ban_on_app: boolean;
-}
-
-interface CorrecrtTVData {
-  login: string;
-  operator: string;
-}
-
-interface UpdateSettingsResponse {
-  success: boolean;
-  message?: string;
-}
+import {
+  changeRegion,
+  handleChangeButton,
+  handleMakePrimary,
+  updateSettings,
+} from "./requests";
 
 interface CheckboxState {
   notTurnOffIfNotUsed: boolean;
   banOnApp: boolean;
 }
 
-const updateSettings = async (
-  login: string,
-  operator: string,
-  not_turnoff_if_not_used: boolean,
-  ban_on_app: boolean
-): Promise<UpdateSettingsResponse> => {
-  const requestData: UpdateSettingsRequest = {
-    login,
-    operator,
-    not_turnoff_if_not_used,
-    ban_on_app,
-  };
-
-  const url: string =
-    "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/settingsTV";
-
-  try {
-    console.log("Отправляем запрос с данными:", requestData);
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    });
-
-    if (!response.ok) {
-      console.error(
-        "Ошибка ответа от сервера:",
-        response.status,
-        response.statusText
-      );
-
-      await LogData({
-        login,
-        page: `TV(${operator})`,
-        action: "Изменение настроек",
-        success: false,
-        url: url,
-        payload: requestData,
-        message: `Ошибка сервера: ${response.statusText} (код: ${response.status})`,
-      });
-
-      return { success: false, message: "Ошибка сервера" };
-    }
-
-    const responseData = (await response.json()) as UpdateSettingsResponse;
-
-    await LogData({
-      login,
-      page: `TV(${operator})`,
-      action: "Изменение настроек",
-      success: true,
-      url: url,
-      payload: requestData,
-      message: "Настройки успешно обновлены",
-    });
-
-    return { success: true, message: responseData.message };
-  } catch (error) {
-    await LogData({
-      login,
-      page: `TV(${operator})`,
-      action: "Изменение настроек",
-      success: false,
-      url: url,
-      payload: requestData,
-      message: `Ошибка: ${String(error)}`,
-    });
-
-    console.error("Ошибка при отправке данных на сервер:", error);
-    return { success: false, message: "Ошибка подключения к серверу" };
-  }
-};
+interface CorrecrtTVData {
+  login: string;
+  operator: string;
+}
 
 // const showError = (message: string) => {
 //   alert(message);
@@ -244,158 +163,6 @@ const TV = () => {
     }
   };
 
-  const handleChangeButton = async (operator: string, login: string) => {
-    console.log(`Кнопка для исправить ${operator} нажата!`);
-    setchangeIsLoading(true);
-
-    try {
-      const requestData = {
-        login,
-        operator,
-      };
-
-      console.log("Отправляем запрос с данными:", requestData);
-      const url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/correctTV";
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        // Логирование ошибки
-        await LogData({
-          login,
-          page: `TV(${operator})`,
-          action: "correctTV",
-          success: false,
-          url: url,
-          payload: requestData,
-          message: `Ошибка: ${
-            response.statusText || "Не удалось обновить настройки"
-          }`,
-        });
-
-        toast.error(
-          `Ошибка: ${response.statusText || "Не удалось обновить настройки"}`,
-          { position: "bottom-right" }
-        );
-        setchangeIsLoading(false);
-        return;
-      }
-
-      // Логирование успешного выполнения
-      await LogData({
-        login,
-        page: `TV(${operator})`,
-        action: "correctTV",
-        success: true,
-        url: url,
-        payload: requestData,
-        message: response.statusText,
-      });
-
-      toast.success("Синхронизация статусов запущена", {
-        position: "bottom-right",
-      });
-
-      setTimeout(() => setchangeIsLoading(false), 5000);
-      const result = await GetTV(login);
-      setData(result);
-    } catch (error) {
-      // Логирование исключения
-      await LogData({
-        login,
-        page: `TV(${operator})`,
-        action: "correctTV",
-        success: false,
-        url: "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/correctTV",
-        payload: { login, operator },
-        message: `Ошибка: ${String(error)}`,
-      });
-
-      toast.error(`Ошибка: ${error || "Не удалось обновить настройки"}`, {
-        position: "bottom-right",
-      });
-      setchangeIsLoading(false);
-    }
-  };
-
-  const handleMakePrimary = async (phone: string, login: string) => {
-    console.log(`Кнопка для телефона ${phone} нажата!`);
-    try {
-      const payload = {
-        login: login,
-        phone: phone,
-      };
-
-      const url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone";
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      console.log(response);
-
-      if (response.ok) {
-        // Логирование успешного действия
-        await LogData({
-          login,
-          page: `TV(24ТВ)`,
-          action: "Сделать основным",
-          success: true,
-          url: url,
-          payload: payload,
-          message: response.statusText,
-        });
-
-        toast.success("Телефон сделан основным", {
-          position: "bottom-right",
-        });
-      } else {
-        // Логирование ошибки сервера
-        await LogData({
-          login,
-          page: `TV(24ТВ)`,
-          action: "Сделать основным",
-          success: false,
-          url: url,
-          payload: payload,
-          message: `Ошибка сервера: ${response.statusText} (код: ${response.status})`,
-        });
-
-        toast.error("Ошибка: Не удалось изменить основной номер", {
-          position: "bottom-right",
-        });
-      }
-
-      const result = await GetTV(queriedLogin);
-      setData(result);
-    } catch (error) {
-      // Логирование исключения
-      await LogData({
-        login,
-        page: `TV(24ТВ)`,
-        action: "Сделать основным",
-        success: false,
-        url: "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone",
-        payload: { login, phone },
-        message: `Ошибка: ${String(error)}`,
-      });
-
-      toast.error("Ошибка: Не удалось изменить основной номер", {
-        position: "bottom-right",
-      });
-    }
-  };
-
   if (!queriedLogin && !login) {
     return (
       <div>
@@ -457,7 +224,12 @@ const TV = () => {
                       } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
                       onClick={() =>
                         !ischangeLoading &&
-                        handleChangeButton("Смотрешка", queriedLogin)
+                        handleChangeButton(
+                          "Смотрешка",
+                          queriedLogin,
+                          setchangeIsLoading,
+                          setData
+                        )
                       }
                       disabled={ischangeLoading}
                     >
@@ -554,7 +326,12 @@ const TV = () => {
                       } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
                       onClick={() =>
                         !ischangeLoading &&
-                        handleChangeButton("ТВИП", queriedLogin)
+                        handleChangeButton(
+                          "ТВИП",
+                          queriedLogin,
+                          setchangeIsLoading,
+                          setData
+                        )
                       }
                       disabled={ischangeLoading}
                     >
@@ -594,7 +371,7 @@ const TV = () => {
           )}
 
           {data?.tv24?.phone && (
-            <>
+            <div className="">
               <h2
                 className={
                   data.tv24.error ? "title-red text-danger mt-5" : "title mt-5"
@@ -605,7 +382,10 @@ const TV = () => {
               <div className="d-flex align-items-center justify-content-between">
                 <div className="me-3">
                   <p className="text-start fs-4">
-                    <strong>Номер:</strong> {data.tv24.phone || "Не указан"}
+                    <strong>Номер:</strong>{" "}
+                    {data.tv24.phone.phone || "Не указан"}{" "}
+                    <strong>Регион:</strong>{" "}
+                    {data.tv24.phone.operator == "24ТВ" ? "Урал" : "Краснодар"}
                   </p>
                 </div>
                 {data.tv24.error && (
@@ -616,8 +396,18 @@ const TV = () => {
                       } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
                       onClick={() =>
                         data.tv24.isKRD
-                          ? handleChangeButton("24ТВ КРД", queriedLogin)
-                          : handleChangeButton("24ТВ", queriedLogin)
+                          ? handleChangeButton(
+                              "24ТВ КРД",
+                              queriedLogin,
+                              setchangeIsLoading,
+                              setData
+                            )
+                          : handleChangeButton(
+                              "24ТВ",
+                              queriedLogin,
+                              setchangeIsLoading,
+                              setData
+                            )
                       }
                       disabled={ischangeLoading}
                     >
@@ -664,22 +454,36 @@ const TV = () => {
               </div>
               <div className="phone-list">
                 {data?.tv24?.additional_phones?.map((phone) => (
-                  <div key={phone} className="phone-card">
-                    <div className="phone-info">
-                      <span className="phone-number">{phone}</span>
+                  <div key={phone.phone} className="phone-card">
+                    <div className="d-flex flex-column phone-info">
+                      <span className="phone-number">{phone.phone}</span>
+                      <span className="phone-number">
+                        Регион:{" "}
+                        {phone.operator == "24ТВ КРД" ? "Краснодар" : "Урал"}
+                      </span>
                     </div>
-                    <div className="button-container">
+                    <div className="button-container row g-2">
                       <button
-                        onClick={() => handleMakePrimary(phone, queriedLogin)}
+                        onClick={() =>
+                          handleMakePrimary(phone.phone, queriedLogin, setData)
+                        }
                         className="btn btn-primary make-primary-btn"
                       >
                         Сделать основным
+                      </button>
+                      <button
+                        onClick={() =>
+                          changeRegion(phone.phone, queriedLogin, setData)
+                        }
+                        className="btn btn-primary make-primary-btn"
+                      >
+                        Изменить регион{" "}
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           )}
         </div>
       </InfoList>

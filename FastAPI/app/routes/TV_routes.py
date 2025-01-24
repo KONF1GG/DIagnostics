@@ -49,7 +49,7 @@ def initialize_response_data():
     return {
         "smotreshka": {"login": None, "password": None, "not_turnoff_if_not_used": None, "service1c": [], "serviceOp": [], "ban_on_app": None, "error": None},
         "tvip": {"login": None, "password": None, "service1c": [], "serviceOp": [], "error": None},
-        "tv24": {"phone": None, "service1c": [], "serviceOp": [], "error": None, "additional_phones": [], "ban_on_app": False, "isKRD": None},
+        "tv24": {"phone": {}, "service1c": [], "serviceOp": [], "error": None, "additional_phones": [], "ban_on_app": False, "isKRD": None},
         "errors": {}
     }
 
@@ -72,9 +72,9 @@ async def update_service_data(response_data, service):
                 if data.status == 'Активный':
                     if error_data:
                         response_data['tv24']['error'] = 'Сервис подключен в доп. номере'
-            response_data['tv24']['additional_phones'].append(service.login)
+            response_data['tv24']['additional_phones'].append({'phone': service.login, 'operator': service.operator})
         else:
-            response_data["tv24"]['phone'] = service.login
+            response_data["tv24"]['phone'] = {'phone': service.login, 'operator': service.operator}
             response_data['tv24']['service1c'].append(Service1c(id=service.serviceId, name=service.service, status=service.status))
     elif service.operator == 'Смотрешка':
         response_data["smotreshka"]['login'] = service.login

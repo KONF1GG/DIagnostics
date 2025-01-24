@@ -62,7 +62,7 @@ const Navbar = () => {
         setLoginsList([]);
       } finally {
       }
-    }, 500),
+    }, 1500),
     []
   );
 
@@ -224,15 +224,15 @@ const Navbar = () => {
                       }}
                     ></span>
                     <span
-                      className="dropdown-item-field contract"
-                      dangerouslySetInnerHTML={{
-                        __html: highlightMatch(loginItem.contract, login),
-                      }}
-                    ></span>
-                    <span
                       className="dropdown-item-field address"
                       dangerouslySetInnerHTML={{
                         __html: highlightMatch(loginItem.address, login),
+                      }}
+                    ></span>
+                    <span
+                      className="dropdown-item-field contract"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightMatch(loginItem.contract, login),
                       }}
                     ></span>
                   </div>
