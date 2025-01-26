@@ -130,7 +130,6 @@ const CameraModal: React.FC<ModalProps> = ({
                 <Button
                   variant="success"
                   onClick={handleSaveClick}
-                  className="ms-2"
                 >
                   Сохранить
                 </Button>
