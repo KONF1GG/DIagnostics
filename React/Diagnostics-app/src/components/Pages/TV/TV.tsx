@@ -37,6 +37,7 @@ const TV = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [ischangeLoading, setchangeIsLoading] = useState(false);
+  const [loadingButton, setLoadingButton] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -305,9 +306,7 @@ const TV = () => {
           {data?.tvip?.login && (
             <>
               <h2
-                className={
-                  data.tvip.error ? "title-red text-danger" : "title"
-                }
+                className={data.tvip.error ? "title-red text-danger" : "title"}
               >
                 ТВИП
               </h2>
@@ -373,9 +372,7 @@ const TV = () => {
           {data?.tv24?.phone && (
             <div className="">
               <h2
-                className={
-                  data.tv24.error ? "title-red text-danger" : "title"
-                }
+                className={data.tv24.error ? "title-red text-danger" : "title"}
               >
                 24ТВ
               </h2>
@@ -465,19 +462,49 @@ const TV = () => {
                     <div className="button-container row g-2">
                       <button
                         onClick={() =>
-                          handleMakePrimary(phone.phone, queriedLogin, setData)
+                          handleMakePrimary(
+                            phone.phone,
+                            queriedLogin,
+                            setData,
+                            setLoadingButton
+                          )
                         }
+                        disabled={loadingButton !== null}
                         className="btn btn-primary make-primary-btn"
                       >
-                        Сделать основным
+                        {loadingButton === `make-primary-${phone.phone}` ? (
+                          <div
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        ) : (
+                          "Сделать основным"
+                        )}
                       </button>
                       <button
                         onClick={() =>
-                          changeRegion(phone.phone, queriedLogin, setData)
+                          changeRegion(
+                            phone.phone,
+                            queriedLogin,
+                            setData,
+                            setLoadingButton
+                          )
                         }
                         className="btn btn-primary make-primary-btn"
+                        disabled={loadingButton !== null}
                       >
-                        Изменить регион{" "}
+                        {loadingButton === `change-region-${phone.phone}` ? (
+                          <div
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        ) : (
+                          "Изменить регион"
+                        )}
                       </button>
                     </div>
                   </div>

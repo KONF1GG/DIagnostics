@@ -4,12 +4,9 @@ import "../CSS/Navbar.css";
 import { LoginData } from "../../API/getSearchLogins";
 import { GetSearchLogins } from "../../API/getSearchLogins";
 import userIcon from "../../assets/users.svg";
-import debounce from "lodash/debounce"; // Подключаем lodash для дебаунса
+import debounce from "lodash/debounce";
 import MenuButton from "./Default/MenuOpen";
 import { useSidebar } from "../../DataContext/SidebarContext";
-import Loader from "./Default/FormLoader";
-import Login from "./Login";
-import { red } from "@mui/material/colors";
 
 export const Logout = () => {
   const navigate = useNavigate();
@@ -36,7 +33,7 @@ const Navbar = () => {
   const [login, setLogin] = useState<string>("");
   const [loginsList, setLoginsList] = useState<LoginData[]>([]);
   const [isDropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const [activeIndex, setActiveIndex] = useState<number>(-1); // Для управления навигацией
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const navigate = useNavigate();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const { searchedLogin, setSearchedLogin } = useSidebar();
@@ -102,7 +99,7 @@ const Navbar = () => {
       navigate(updatedUrl);
     } else {
       const redirectUrl =
-        previousUrl === "/"
+        previousUrl === "/" && !searchedLogin?.login
           ? `/network?login=${encodeURIComponent(value)}`
           : `${previousUrl}?login=${encodeURIComponent(value)}`;
       navigate(redirectUrl);

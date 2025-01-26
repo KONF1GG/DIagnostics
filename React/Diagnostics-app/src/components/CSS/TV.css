@@ -64,7 +64,34 @@
   background-color: #0056b3;
 }
 
+.btn .spinner-border {
+  margin-right: 10px;
+}
+/* Анимация для спиннера */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
+.btn:disabled {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+  border-color: #e0e0e0;
+}
+
+/* Индикатор загрузки */
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border: 0.2em solid transparent;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
 .fix-data-component {
   padding: 20px;
 }

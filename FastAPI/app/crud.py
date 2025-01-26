@@ -16,7 +16,7 @@ import psycopg2
 from redis.commands.search.result import Result
 from yarl import Query
 from app.depencies import RedisDependency
-from app.schemas import TV24, TVIP, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
+from app.schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
 from app.models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 from app import crud
@@ -566,6 +566,14 @@ async def get_redis_key_data(login: str, redis) -> Result:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     return value
 
+async def get_schema_from_redis(redis) -> Result:
+    schema = await redis.json().get("scheme:content")
+
+    if not schema:
+        raise HTTPException(status_code=404, detail="Схема подсекций не найдена")
+    
+    return schema
+
 async def get_logins_by_flatId_redis(flat_id: int, redis: RedisDependency):
 
     query = f"@flatId:[{flat_id} {flat_id}]"
@@ -875,3 +883,27 @@ def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str
         print(f"Ошибка при записи в ClickHouse: {e}")
 
 
+async def get_last_actions(clickhouse_client) -> List[Action]:
+    query = "SELECT user_name, date, login, page, action, status FROM Diagnostic_APP.actions_logs ORDER BY date DESC LIMIT 20"
+
+    try:
+        # Выполняем запрос через метод query
+        result = clickhouse_client.query(query)
+
+        # Обработка результата (result.result_set возвращает данные)
+        actions = [
+            Action(
+                name=row[0],
+                date=row[1],
+                login=row[2],
+                page=row[3],
+                action=row[4],
+                status=row[5],
+            )
+            for row in result.result_set
+        ]
+    except Exception as e:
+        print(f"Ошибка ClickHouse: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка получения последних изменений")
+
+    return actions

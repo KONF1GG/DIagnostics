@@ -15,6 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   const navigate = useNavigate();
   const { isSidebarOpen } = useSidebar();
   const { openSections, toggleSection } = useSidebarContext(); // Используем контекст
+  const { searchedLogin, setSearchedLogin } = useSidebar();
 
   const sectionList = [
     { path: "network", label: "Сеть" },
@@ -46,6 +47,11 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
       ? location.pathname.includes(isMatchedSection.path) // Если есть путь, то проверяем его
       : false;
 
+    // Определяем значение для параметра login
+    const loginValue = searchedLogin?.login
+      ? encodeURIComponent(searchedLogin.login)
+      : encodeURIComponent(login);
+
     if (openSections[index]) {
       // Если секция открыта
       if (isActiveSection) {
@@ -54,9 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
       } else {
         // Если секция не активная, то переходим по ссылке и выполняем запрос
         if (hasLink) {
-          navigate(
-            `/${isMatchedSection.path}?login=${encodeURIComponent(login)}`
-          );
+          navigate(`/${isMatchedSection.path}?login=${loginValue}`);
         } else {
           toggleSection(index);
         }
@@ -66,9 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
       toggleSection(index);
       if (hasLink) {
         // Если секция привязана к ссылке, переходим по ней
-        navigate(
-          `/${isMatchedSection.path}?login=${encodeURIComponent(login)}`
-        );
+        navigate(`/${isMatchedSection.path}?login=${loginValue}`);
       }
     }
   };

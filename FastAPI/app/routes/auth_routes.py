@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
+
+from .default_routes import export_schema
 from .. import auth, crud
-from app.depencies import SessionDependency, TokenDependency
+from app.depencies import RedisDependency, SessionDependency, TokenDependency
 from app.schemas import CreateUser, ItemId, Login, LoginResponse, Reg, StatusResponse
 from app.models import User, Token
 from sqlalchemy import select
@@ -9,10 +11,10 @@ router = APIRouter()
 
 
 @router.post('/v1/login', response_model=LoginResponse)
-async def login_user(login_data: Login, session: SessionDependency):
+async def login_user(login_data: Login, session: SessionDependency, redis: RedisDependency):
 
     """Эндпоинт для логина пользователя"""
-
+    await export_schema(redis)
     user_query = select(User).where(User.username == login_data.username)
     print(str(user_query.compile(compile_kwargs={"literal_binds": True})))
     user_model = await session.scalar(user_query)

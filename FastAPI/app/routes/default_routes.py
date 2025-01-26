@@ -1,12 +1,13 @@
 import asyncio
+import json
 from os import access
 from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
-from sqlalchemy import JSON
+from sqlalchemy import JSON, Boolean
 
 from app import crud
 from app.depencies import SessionDependency, TokenDependency, RedisDependency, ClickhouseDepency
-from app.schemas import ItemId, CreateRole, LogData, RedisLoginSearch, SearchLogins, StatusResponse
+from app.schemas import Action, ItemId, CreateRole, LogData, RedisLoginSearch, SearchLogins, StatusResponse
 from app.models import User, Role
 
 router = APIRouter()
@@ -37,20 +38,6 @@ async def get_search_logins(
  
     result = await crud.search_logins(login, redis)
     print(result)
-    # results = await asyncio.gather(
-    #     crud.search_logins(login.lower(), redis),
-    #     crud.search_logins(login.capitalize(), redis)
-    # )
-    
-    
-    # result = []
-    # unique_logins = []
-
-    # for _ in results:
-    #     for login in _:
-    #         if login.login not in unique_logins:
-    #             result.append(login)
-    #             unique_logins.append(login.login)
     return {'logins': result}
 
 @router.post('/v1/log', response_model=StatusResponse)
@@ -71,6 +58,7 @@ async def log(
     message = data.message
     url = data.url
     payload = data.payload
+    user_id = current_user.user_id
 
 
     # Логируем данные в ClickHouse
@@ -84,7 +72,8 @@ async def log(
             success=success,
             message=message,
             url=url,
-            payload=payload
+            payload=payload,
+            user_id=user_id
         )
     except Exception as e:
         return {"status": "error", "message": f"Ошибка при логировании в ClickHouse: {e}"}
@@ -92,7 +81,22 @@ async def log(
     # Возвращаем успешный статус
     return {"status": "success"}
 
+async def export_schema(redis):
+    schema = await crud.get_schema_from_redis(redis)
+
+    file_path = "../React/Diagnostics-app/src/components/FileData/diagnosticHelper.json"
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(schema, file, indent=4, ensure_ascii=False)
+
+    return True
 
 @router.get('/v1/redis_data', response_model=Dict)
 async def get_data_from_redis_by_login(login: str, redis: RedisDependency, token: TokenDependency):
+    await export_schema(redis)
     return await crud.get_login_data(login, redis)
+
+
+@router.get('/v1/last_actioins', response_model=List[Action])
+async def get_last_actions(clickhouse: ClickhouseDepency, token: TokenDependency):
+    last_actions = await crud.get_last_actions(clickhouse)
+    return last_actions

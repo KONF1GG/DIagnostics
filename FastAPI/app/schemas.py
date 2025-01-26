@@ -327,3 +327,12 @@ class RelocateRequest(BaseModel):
     UUID2: str
     flat: str
     address_house_id: int
+
+
+class Action(BaseModel):
+    name: str
+    date: datetime
+    login: str
+    page: str
+    action: str
+    status: bool

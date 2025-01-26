@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
 import { GetTV } from "../../../API/TV";
+import setLoadingButton from "./TV";
 
 interface UpdateSettingsRequest {
   login: string;
@@ -92,9 +93,11 @@ export const updateSettings = async (
 export const handleMakePrimary = async (
   phone: string,
   login: string,
-  setData: React.Dispatch<React.SetStateAction<any>>
+  setData: React.Dispatch<React.SetStateAction<any>>,
+  setLoadingButton: (buttonId: string | null) => void
 ) => {
   console.log(`Кнопка для телефона ${phone} нажата!`);
+  setLoadingButton(`make-primary-${phone}`);
   try {
     const payload = {
       login: login,
@@ -162,6 +165,8 @@ export const handleMakePrimary = async (
     toast.error("Ошибка: Не удалось изменить основной номер", {
       position: "bottom-right",
     });
+  } finally {
+    setLoadingButton(null);
   }
 };
 
@@ -253,7 +258,62 @@ export const handleChangeButton = async (
 export const changeRegion = async (
   phone: string,
   login: string,
-  setData: React.Dispatch<React.SetStateAction<any>>
+  setData: React.Dispatch<React.SetStateAction<any>>,
+  setLoadingButton: (buttonId: string | null) => void
 ) => {
-    
+  setLoadingButton(`make-primary-${phone}`);
+  const changeOperator = true;
+
+  try {
+    const requestData = {
+      login,
+      phone,
+      changeOperator,
+    };
+
+    console.log("Отправляем запрос с данными:", requestData);
+    const url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone";
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    // Логирование успешного выполнения
+    await LogData({
+      login,
+      page: `TV(${phone})`,
+      action: "Изменение региона",
+      success: true,
+      url: url,
+      payload: requestData,
+      message: response.statusText,
+    });
+
+    toast.success("Регион успешно изменен!", {
+      position: "bottom-right",
+    });
+
+    const result = await GetTV(login);
+    setData(result);
+  } catch (error) {
+    // Логирование исключения
+    await LogData({
+      login,
+      page: `TV(${phone})`,
+      action: "Изменение региона",
+      success: false,
+      url: "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone",
+      payload: { login, phone, changeOperator },
+      message: `Ошибка: ${String(error)}`,
+    });
+
+    toast.error(`Ошибка: ${error || "Не удалось обновить настройки"}`, {
+      position: "bottom-right",
+    });
+    setLoadingButton(null);
+  }
 };
