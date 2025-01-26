@@ -13,7 +13,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ login, password }) => {
   };
 
   return (
-    <div className="text-start fs-4">
+    <div className="text-start text-mobile-big">
       <span>
         <strong>Логин:</strong> {login || "Не указан"}
       </span>

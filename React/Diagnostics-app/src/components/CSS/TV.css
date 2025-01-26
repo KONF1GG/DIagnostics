@@ -90,3 +90,10 @@
     transform: rotate(360deg);
   }
 }
+
+
+@media (min-width: 576px) {
+  .text-mobile-big {
+    font-size: 1.5rem; 
+  }
+}

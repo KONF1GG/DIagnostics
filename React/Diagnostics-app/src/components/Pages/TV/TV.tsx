@@ -306,13 +306,13 @@ const TV = () => {
             <>
               <h2
                 className={
-                  data.tvip.error ? "title-red text-danger mt-5" : "title mt-5"
+                  data.tvip.error ? "title-red text-danger" : "title"
                 }
               >
                 ТВИП
               </h2>
               <div className="d-flex align-items-center justify-content-between">
-                <div className="me-3">
+                <div className="">
                   <UserInfo
                     login={data.tvip.login}
                     password={data.tvip.password}
@@ -374,14 +374,14 @@ const TV = () => {
             <div className="">
               <h2
                 className={
-                  data.tv24.error ? "title-red text-danger mt-5" : "title mt-5"
+                  data.tv24.error ? "title-red text-danger" : "title"
                 }
               >
                 24ТВ
               </h2>
               <div className="d-flex align-items-center justify-content-between">
                 <div className="me-3">
-                  <p className="text-start fs-4">
+                  <p className="text-start text-mobile-big">
                     <strong>Номер:</strong>{" "}
                     {data.tv24.phone.phone || "Не указан"}{" "}
                     <strong>Регион:</strong>{" "}

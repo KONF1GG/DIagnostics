@@ -95,11 +95,6 @@ thead {
 }
 
 @media (max-width: 600px) {
-  .table:hover {
-      transform: none; /* Убираем масштабирование */
-      box-shadow: none; /* Убираем тень */
-  }
-
   .table {
       transform: scale(1);
       width: auto;
