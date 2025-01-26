@@ -94,18 +94,26 @@ thead {
   justify-content: flex-end;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .table:hover {
       transform: none; /* Убираем масштабирование */
       box-shadow: none; /* Убираем тень */
   }
 
   .table {
-      transform: scale(1); /* Убираем масштабирование по умолчанию */
+      transform: scale(1);
+      width: auto;
+      min-width: 100%;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  th, td {
+    font-size: 10px;
   }
 }
-
-
 
 .profile-icon:hover {
   transform: scale(1);
