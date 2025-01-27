@@ -29,9 +29,9 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    firstname: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    lastname: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    middlename: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    firstname: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
+    lastname: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
+    middlename: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
     password: Mapped[str] = mapped_column(String(72), nullable=False)
     tokens: Mapped[list['Token']] = relationship('Token', lazy='joined', back_populates='user')
     role_id: Mapped[int] = mapped_column(Integer, ForeignKey('role.id'))

@@ -31,7 +31,7 @@ const Users: React.FC = () => {
       } catch (err) {
         setError("An unexpected error occurred.");
       } finally {
-        setLoadingCount((prev) => prev - 1); // Уменьшаем счетчик загрузок
+        setLoadingCount((prev) => prev - 1); 
       }
     };
 
