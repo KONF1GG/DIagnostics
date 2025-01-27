@@ -113,7 +113,7 @@ async def change_role_in_RBT(
 
 
 @router.delete('/v1/app/houses_flats_subscribers/{house_id}/{flat_id}', response_model=StatusResponse)
-async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: int, rbt: RBTDependency):
+async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: int, rbt: RBTDependency, token: TokenDependency):
 
     return  await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)
 
@@ -121,7 +121,8 @@ async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: 
 @router.patch(('/v1/app/relocate'), response_model=StatusResponse)
 async def relocate_users(
     request: RelocateRequest, 
-    rbt: RBTDependency  
+    rbt: RBTDependency ,
+    token: TokenDependency 
 ):
     flat_id = await crud.get_flat_from_RBT_by_house_id_and_flat(request.flat, request.house_id, rbt)
 

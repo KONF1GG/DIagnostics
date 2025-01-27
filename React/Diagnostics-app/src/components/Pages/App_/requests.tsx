@@ -99,7 +99,12 @@ export const handleUserDelete = async (
   const url = `/v1/app/houses_flats_subscribers/${house_id}/${flat_id}`;
   const isPhoneDelete = deleteObject.includes("номер");
   try {
-    const response = await api.delete(url);
+    const token = localStorage.getItem("token");
+    const response = await api.delete(url, {
+      headers: {
+        "x-token": `${token}`,
+      },
+    });
 
     if (response.status !== 200) {
       // Логирование ошибки
@@ -291,7 +296,12 @@ export const Relocate = async (
   }
 
   try {
-    const response = await api.patch(url, requestData);
+    const token = localStorage.getItem("token");
+    const response = await api.patch(url, requestData, {
+      headers: {
+        "x-token": `${token}`,
+      },
+    });
 
     if (response.status !== 200) {
       await LogData({

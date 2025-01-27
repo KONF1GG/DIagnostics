@@ -31,7 +31,7 @@ const Users: React.FC = () => {
       } catch (err) {
         setError("An unexpected error occurred.");
       } finally {
-        setLoadingCount((prev) => prev - 1); 
+        setLoadingCount((prev) => prev - 1);
       }
     };
 
@@ -107,7 +107,7 @@ const Users: React.FC = () => {
             <table className="table">
               <thead className="table-secondary">
                 <tr>
-                  <th>Имя пользователя</th>
+                  <th>Пользователь</th>
                   <th>Дата</th>
                   <th>Логин</th>
                   <th>Страница</th>

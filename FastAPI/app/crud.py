@@ -857,8 +857,9 @@ async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
 
 
 def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str, success: bool, message: str, url: str, payload: Dict, user_id: int):
-    timezone = pytz.timezone('Etc/GMT-5')
-    timestamp = datetime.datetime.now(timezone).strftime('%Y-%m-%d %H:%M:%S')  # Текущее время
+    # Используем UTC+5 (Екатеринбург)
+    timezone = pytz.timezone('Asia/Yekaterinburg')  # Для Екатеринбурга UTC+5
+    timestamp = datetime.datetime.now(timezone)  # Текущее время с часовым поясом
 
     payload_json = json.dumps(payload)
 
@@ -870,11 +871,12 @@ def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str
     message = message.replace("'", "''")
     url = url.replace("'", "''")
     payload_json = payload_json.replace("'", "''")
+    user_id = user_id
 
     # Формируем SQL-запрос для вставки данных
     query = f"""
-    INSERT INTO Diagnostic_APP.actions_logs (user_name, login, page, action, status, message, date, url, payload)
-    VALUES ('{user_name}', '{login}', '{page}', '{action}', {1 if success else 0}, '{message}', '{timestamp}', '{url}', '{payload_json}')
+    INSERT INTO Diagnostic_APP.actions_logs (user_name, login, page, action, status, message, date, url, payload, user_id)
+    VALUES ('{user_name}', '{login}', '{page}', '{action}', {1 if success else 0}, '{message}', '{timestamp}', '{url}', '{payload_json}', '{user_id}')
     """
 
     try:
@@ -885,16 +887,16 @@ def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str
 
 async def get_last_actions(clickhouse_client) -> List[Action]:
     query = "SELECT user_name, date, login, page, action, status FROM Diagnostic_APP.actions_logs ORDER BY date DESC LIMIT 20"
+    target_timezone = pytz.timezone('Asia/Yekaterinburg')  # Часовой пояс Екатеринбурга (UTC+5)
 
     try:
         # Выполняем запрос через метод query
         result = clickhouse_client.query(query)
 
-        # Обработка результата (result.result_set возвращает данные)
         actions = [
             Action(
                 name=row[0],
-                date=row[1],
+                date=row[1].astimezone(target_timezone),  # Переводим из UTC в Екатеринбург
                 login=row[2],
                 page=row[3],
                 action=row[4],
