@@ -314,6 +314,7 @@ export const changeRegion = async (
     toast.error(`Ошибка: ${error || "Не удалось обновить настройки"}`, {
       position: "bottom-right",
     });
+  } finally {
     setLoadingButton(null);
   }
 };

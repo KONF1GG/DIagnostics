@@ -450,13 +450,60 @@ const TV = () => {
                 </div>
               </div>
               <div className="phone-list">
+                {data?.tv24?.phone?.phone && (
+                  <div
+                    key={data.tv24.phone.phone}
+                    className="phone-card primary-card"
+                  >
+                    <span className="phone-label text-primary fs-5">
+                      Основной номер
+                    </span>
+                    <div className="d-flex flex-column phone-info">
+                      <span className="phone-number">
+                        {data.tv24.phone.phone}
+                      </span>
+                      <span className="phone-number">
+                        Регион:{" "}
+                        {data.tv24.phone.operator === "24ТВ КРД"
+                          ? "Краснодар"
+                          : "Урал"}
+                      </span>
+                    </div>
+                    <div className="button-container row g-2">
+                      <button
+                        onClick={() =>
+                          changeRegion(
+                            data.tv24.phone.phone,
+                            queriedLogin,
+                            setData,
+                            setLoadingButton
+                          )
+                        }
+                        className="btn btn-primary make-primary-btn"
+                        disabled={loadingButton !== null}
+                      >
+                        {loadingButton ===
+                        `change-region-${data.tv24.phone.phone}` ? (
+                          <div
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        ) : (
+                          "Изменить регион"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {data?.tv24?.additional_phones?.map((phone) => (
                   <div key={phone.phone} className="phone-card">
                     <div className="d-flex flex-column phone-info">
                       <span className="phone-number">{phone.phone}</span>
                       <span className="phone-number">
                         Регион:{" "}
-                        {phone.operator == "24ТВ КРД" ? "Краснодар" : "Урал"}
+                        {phone.operator === "24ТВ КРД" ? "Краснодар" : "Урал"}
                       </span>
                     </div>
                     <div className="button-container row g-2">

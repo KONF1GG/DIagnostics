@@ -856,7 +856,7 @@ async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
     return logins_list
 
 
-def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str, success: bool, message: str, url: str, payload: Dict):
+def log_to_clickhouse(client, user_name: str, login: str, page: str, action: str, success: bool, message: str, url: str, payload: Dict, user_id: int):
     timezone = pytz.timezone('Etc/GMT-5')
     timestamp = datetime.datetime.now(timezone).strftime('%Y-%m-%d %H:%M:%S')  # Текущее время
 

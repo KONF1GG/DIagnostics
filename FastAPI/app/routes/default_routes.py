@@ -58,7 +58,7 @@ async def log(
     message = data.message
     url = data.url
     payload = data.payload
-    user_id = current_user.user_id
+    user_id = token.user_id
 
 
     # Логируем данные в ClickHouse
