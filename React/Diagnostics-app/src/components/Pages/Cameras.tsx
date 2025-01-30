@@ -387,7 +387,7 @@ const Cameras = () => {
                   const missingCameras: string[] = [];
                   const cameraDifferences: JSX.Element[] = [];
 
-                  data.cameras_difference.forEach((diff) => {
+                  data.cameras_difference.forEach((diff: any) => {
                     const redisId = diff.Redis
                       ? Object.keys(diff.Redis)[0]
                       : null;

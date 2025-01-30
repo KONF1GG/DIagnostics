@@ -7,9 +7,9 @@ interface UserEditModalProps {
   showModal: boolean;
   formData: Partial<User>;
   isItself: boolean;
-  current_user_role: string;
+  current_user_role: string | undefined;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; // Исправлено на HTMLSelectElement
+  handleSelectChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleEditUser: () => void;
   handleClose: () => void;
 }
@@ -17,8 +17,6 @@ interface UserEditModalProps {
 const UserEditModal: React.FC<UserEditModalProps> = ({
   showModal,
   formData,
-  isItself,
-  current_user_role,
   handleInputChange,
   handleSelectChange,
   handleEditUser,
@@ -97,7 +95,9 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
               name="role"
               value={formData.role || "user"}
               onChange={handleSelectChange}
-              disabled={formData.isItself || formData.current_user_role === "user"}
+              disabled={
+                formData.isItself || formData.current_user_role === "user"
+              }
             >
               <option value="user">Пользователь</option>
               <option value="admin">Администратор</option>

@@ -13,7 +13,6 @@ interface ConfirmationModalProps {
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
-  login,
   show,
   addContracts,
   phone,

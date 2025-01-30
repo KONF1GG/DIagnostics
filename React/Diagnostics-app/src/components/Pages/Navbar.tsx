@@ -35,7 +35,7 @@ const Navbar = () => {
   const [isDropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const navigate = useNavigate();
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const { setIsSidebarOpen } = useSidebar();
   const { searchedLogin, setSearchedLogin } = useSidebar();
   const dropdownRef = useRef<HTMLDivElement>(null);
 

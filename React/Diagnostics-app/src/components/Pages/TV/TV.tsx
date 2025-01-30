@@ -9,7 +9,6 @@ import InfoList from "../InfoList";
 import Checkbox from "./CheckBox";
 import { getQueryParams } from "../Default/getData";
 import { toast } from "react-toastify";
-import { LogData } from "../../../API/Log";
 import Loader from "../Default/Loading";
 import {
   changeRegion,
@@ -23,10 +22,10 @@ interface CheckboxState {
   banOnApp: boolean;
 }
 
-interface CorrecrtTVData {
-  login: string;
-  operator: string;
-}
+// interface CorrecrtTVData {
+//   login: string;
+//   operator: string;
+// }
 
 // const showError = (message: string) => {
 //   alert(message);
@@ -197,6 +196,7 @@ const TV = () => {
   return (
     <div>
       <InfoList>
+        {error && <div className="alert alert-danger">{error}</div>}
         <div className={`container fade-in ${isVisible ? "visible" : ""}`}>
           {data?.smotreshka?.login && (
             <>

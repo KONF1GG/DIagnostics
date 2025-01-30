@@ -50,7 +50,7 @@ const UserPage: React.FC = () => {
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
-      setFormData((prevState) => ({
+      setFormData((prevState: any) => ({
         ...prevState,
         [name]: value,
       }));
@@ -61,7 +61,7 @@ const UserPage: React.FC = () => {
   const handleSelectChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
-      setFormData((prevState) => ({
+      setFormData((prevState: any) => ({
         ...prevState,
         [name]: value,
       }));
@@ -91,7 +91,7 @@ const UserPage: React.FC = () => {
   const handleEditUser = async () => {
     if (!userId || !user) return;
 
-    const changes: Partial<User> = {};
+    const changes: Partial<User> | any = {};
 
     Object.keys(formData).forEach((key) => {
       const userKey = key as keyof User;
@@ -132,7 +132,9 @@ const UserPage: React.FC = () => {
       }
 
       setUser(updatedUser);
-      setFormData(updatedUser);
+      if (user !== null) {
+        setFormData(user);
+      }
       setShowModal(false);
       toast.success("Данные успешно обновлены", { position: "bottom-right" });
     } catch (error) {

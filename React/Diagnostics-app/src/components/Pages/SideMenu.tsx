@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Logout } from "./Navbar";
 import "../CSS/SideMenu.css";
@@ -15,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   const navigate = useNavigate();
   const { isSidebarOpen } = useSidebar();
   const { openSections, toggleSection } = useSidebarContext(); // Используем контекст
-  const { searchedLogin, setSearchedLogin } = useSidebar();
+  const { searchedLogin } = useSidebar();
 
   const sectionList = [
     { path: "network", label: "Сеть" },

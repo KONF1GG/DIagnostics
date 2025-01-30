@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import jsonData from "./../../../FileData/diagnosticHelper.json";
 import InfoList from "../../InfoList";
