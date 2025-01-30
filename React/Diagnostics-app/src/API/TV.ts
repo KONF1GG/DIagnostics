@@ -65,7 +65,6 @@ export const GetTV = async (login: string): Promise<ResponseData | null> => {
             },
         });
 
-        console.log(response.data)
         if (response.status === 401) {
             window.location.href = "/login";
             return null;

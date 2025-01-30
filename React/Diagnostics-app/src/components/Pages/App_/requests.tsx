@@ -14,7 +14,6 @@ export const handleContractDeleteButton = async (
     flatId: 0,
   };
   try {
-    console.log("Отправляем запрос с данными:", requestData);
     const url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/RBT/setFlatId";
 
     const response = await fetch(url, {
@@ -63,7 +62,6 @@ export const handleContractDeleteButton = async (
     const result = await GetApp(login);
 
     if (result && "detail" in result) {
-      console.log(result);
       setData(null);
     } else if (result) {
       setData(result);
@@ -72,7 +70,6 @@ export const handleContractDeleteButton = async (
     }
   } catch (error) {
     // Логирование исключения
-    console.log(error);
     await LogData({
       login,
       page: `Приложение`,
@@ -163,7 +160,6 @@ export const handleUserDelete = async (
     const result = await GetApp(login);
 
     if (result && "detail" in result) {
-      console.log(result);
       setData(null);
     } else if (result) {
       setData(result);
@@ -172,7 +168,6 @@ export const handleUserDelete = async (
     }
   } catch (error) {
     // Логирование исключения
-    console.log(error);
     await LogData({
       login,
       page: `Приложение`,
@@ -342,7 +337,6 @@ export const Relocate = async (
     const result = await GetApp(login);
 
     if (result && "detail" in result) {
-      console.log(result);
       setData(null);
     } else if (result) {
       setData(result);
@@ -351,7 +345,6 @@ export const Relocate = async (
     }
   } catch (error) {
     // Логирование исключения
-    console.log(error);
     await LogData({
       login,
       page: `Приложение`,

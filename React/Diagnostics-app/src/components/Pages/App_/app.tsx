@@ -49,7 +49,6 @@ const App_page = () => {
       const result = await GetApp(login);
 
       if (result && "detail" in result) {
-        console.log(result);
         setError(result.detail);
         setData(null);
       } else if (result) {
@@ -101,13 +100,12 @@ const App_page = () => {
     try {
       // Здесь вызывается API для смены роли (пример)
       await ChangeRole(houseId, flatId, newRole, queriedLogin, setData);
-      console.log(
-        `Роль изменена на ${newRole === 0 ? "Владелец" : "Пользователь"}`
-      );
     } catch (error) {
       console.error("Ошибка при смене роли:", error);
     }
   };
+
+  console.log(data);
 
   const handleDeleteAddress = (
     contract: RedisLogin | undefined,
@@ -118,7 +116,7 @@ const App_page = () => {
   ) => {
     const matchingContracts = phone?.contracts.filter(
       (contract) =>
-        contract.contract !== data?.main_contract && contract.flat_id === flatId
+        contract.flat_id === flatId
     );
 
     setModalAddAddresses(matchingContracts);
@@ -178,8 +176,8 @@ const App_page = () => {
     );
   }
 
-  console.log(data);
   if (!data) {
+    fetchData(queriedLogin);
     return (
       <div>
         <InfoList>

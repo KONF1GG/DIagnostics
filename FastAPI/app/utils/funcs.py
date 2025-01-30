@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict
 import json
 
@@ -25,8 +25,9 @@ async def compare_json(radius: Dict, redis: Dict):
             else:
                 time_to_radius = None
 
+            tolerance = timedelta(hours=2)
             # Сравнение значений
-            if time_to_radius != time_to_redis and time_to_radius:
+            if abs(time_to_radius - time_to_redis) > tolerance and time_to_radius:
                 differences['radius']['time_to'] = time_to_radius
                 differences['redis']['time_to'] = time_to_redis
 

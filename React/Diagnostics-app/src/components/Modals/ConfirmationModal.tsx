@@ -30,10 +30,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <p>
           {`Вы уверены, что хотите отвязать `}
           <strong>{phone ? phone.phone : contract?.login}</strong>
-          {` от `}
-          <strong>{login}</strong>
+          {`?`}
         </p>
-        {(addContracts?.length ?? 0) > 0 && (
+        {(addContracts?.length ?? 0) > 1 && (
           <>
             <p>
               <strong className="text-warning">ВНИМАНИЕ</strong> Следующие

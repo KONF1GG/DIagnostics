@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import UsersList, { Action, ActionList, User } from "../../API/users";
 import { Link, useNavigate } from "react-router-dom";
 import "../CSS/Users.css";
 import "../CSS/Loading.css";
 import InfoList from "./InfoList";
 import Loader from "../Pages/Default/Loading";
+import UsersList, { Action, ActionList, User } from "../../API/users";
 
 const Users: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [actionList, setActionList] = useState<Action[]>([]);
+  const [users, setUsers] = useState<User[] | undefined>([]);
+  const [actionList, setActionList] = useState<Action[] | undefined>([]);
   const [error, setError] = useState<string | null>(null);
   const [loadingCount, setLoadingCount] = useState<number>(2); // Отслеживание загрузок
   const navigate = useNavigate();
@@ -19,17 +19,18 @@ const Users: React.FC = () => {
         const result = await UsersList();
         if (typeof result === "string") {
           setError(result);
-          if (
-            result.includes("Invalid token") ||
-            result.includes("Unauthorized")
-          ) {
-            navigate("/login");
-          }
         } else {
-          setUsers(result);
+          // Сортировка пользователей
+          const sortedUsers = result.sort((a, b) => {
+            // Сначала по роли
+            if (a.role === "admin" && b.role !== "admin") return -1;
+            if (a.role !== "admin" && b.role === "admin") return 1;
+            return a.username.localeCompare(b.username);
+          });
+          setUsers(sortedUsers);
         }
       } catch (err) {
-        setError("An unexpected error occurred.");
+        setError("Неожиданная ошибка");
       } finally {
         setLoadingCount((prev) => prev - 1);
       }
@@ -40,17 +41,11 @@ const Users: React.FC = () => {
         const result = await ActionList();
         if (typeof result === "string") {
           setError(result);
-          if (
-            result.includes("Invalid token") ||
-            result.includes("Unauthorized")
-          ) {
-            navigate("/login");
-          }
         } else {
           setActionList(result);
         }
       } catch (err) {
-        setError("An unexpected error occurred.");
+        setError("Неожиданная ошибка");
       } finally {
         setLoadingCount((prev) => prev - 1); // Уменьшаем счетчик загрузок
       }
@@ -71,6 +66,8 @@ const Users: React.FC = () => {
     return <span>{status}</span>;
   };
 
+  console.log(users);
+
   return (
     <InfoList>
       <div className="container">
@@ -83,27 +80,31 @@ const Users: React.FC = () => {
             <table className="table">
               <thead className="table-primary">
                 <tr>
-                  <th>ID</th>
-                  <th>Имя</th>
+                  <th>логин</th>
+                  <th>ФИО</th>
                   <th>Роль</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} className="user-row">
-                    <td>{user.id}</td>
+                {users?.map((user) => (
+                  <tr key={user.id}>
                     <td>
                       <Link to={`/users/${user.id}`} className="user-link">
-                        {user.name}
+                        {user.username}
                       </Link>
                     </td>
-                    <td>{user.role}</td>
+                    <td>
+                      {user.lastname} {user.firstname} {user.middlename}
+                    </td>
+                    <td>
+                      {user.role === "admin" ? "Администратор" : "Пользователь"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            <h1 className="text-center title md-5">История изменений</h1>
+            <h1 className="text-center title md-5">Последние изменения</h1>
             <table className="table">
               <thead className="table-secondary">
                 <tr>
@@ -116,7 +117,7 @@ const Users: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {actionList.map((action, index) => (
+                {actionList?.map((action, index) => (
                   <tr key={index}>
                     <td>{action.name}</td>
                     <td>{new Date(action.date).toLocaleString()}</td>

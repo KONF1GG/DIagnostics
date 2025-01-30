@@ -59,8 +59,6 @@ const Accidents = () => {
     }
   };
 
-  console.log(FailureData);
-
   return (
     <div>
       <InfoList>

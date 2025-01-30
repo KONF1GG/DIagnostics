@@ -16,7 +16,6 @@ const Home = () => {
         const result = await check_token(token);
 
         if (typeof result === "string" && result.includes("Invalid token")) {
-          console.log(result);
           navigate("/login");
         }
         setLoading(false);

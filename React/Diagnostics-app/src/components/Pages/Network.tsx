@@ -117,6 +117,10 @@ const Network = () => {
     );
   }
 
+  // Проверка, нужно ли показывать столбцы
+  const hasRadiusData = networkData?.radius !== null;
+  const hasRedisData = networkData?.redis !== null;
+
   return (
     <InfoList>
       {!queriedLogin && !login ? (
@@ -128,21 +132,36 @@ const Network = () => {
       ) : (
         <div className={`container ${isVisible ? "fade-in" : "fade-out"}`}>
           <h2 className="title fade-in">Данные о подключении</h2>
+
+          {/* Проверка на null для radius */}
+          {networkData?.radius === null && (
+            <div className="alert alert-danger">
+              Ошибка получения данных от Radius
+            </div>
+          )}
+
+          {/* Проверка на null для redis */}
+          {networkData?.redis === null && (
+            <div className="alert alert-danger">
+              Ошибка получения данных от Redis
+            </div>
+          )}
+
           {combinedData.length > 0 ? (
             <table className="table table-bordered table-striped">
               <thead className="table-primary">
                 <tr>
                   <th>Параметр</th>
-                  <th>Radius</th>
-                  <th>Redis</th>
+                  {hasRadiusData && <th>Radius</th>}
+                  {hasRedisData && <th>Redis</th>}
                 </tr>
               </thead>
               <tbody>
                 {combinedData.map((data, index) => (
                   <tr key={index} className="user-row">
                     <td>{data.parameter}</td>
-                    <td>{data.redius}</td>
-                    <td>{data.redis}</td>
+                    {hasRadiusData && <td>{data.redius}</td>}
+                    {hasRedisData && <td>{data.redis}</td>}
                   </tr>
                 ))}
               </tbody>
@@ -150,6 +169,8 @@ const Network = () => {
           ) : (
             <div>Нет данных для отображения</div>
           )}
+
+          {/* Различия */}
           {(Object.keys(differences.radius).length > 0 ||
             Object.keys(differences.redis).length > 0) && (
             <div>
@@ -158,8 +179,8 @@ const Network = () => {
                 <thead className="table-danger">
                   <tr>
                     <th>Параметр</th>
-                    <th>Radius</th>
-                    <th>Redis</th>
+                    {hasRadiusData && <th>Radius</th>}
+                    {hasRedisData && <th>Redis</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -169,8 +190,8 @@ const Network = () => {
                     return (
                       <tr key={key} className="user-row">
                         <td>{key}</td>
-                        <td>{String(radiusValue)}</td>
-                        <td>{String(redisValue)}</td>
+                        {hasRadiusData && <td>{String(radiusValue)}</td>}
+                        {hasRedisData && <td>{String(redisValue)}</td>}
                       </tr>
                     );
                   })}

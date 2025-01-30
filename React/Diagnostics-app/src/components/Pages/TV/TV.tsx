@@ -83,7 +83,6 @@ const TV = () => {
     try {
       const result = await GetTV(login);
       setData(result);
-      console.log(result);
     } catch {
       setError("Ошибка загрузки данных");
       setData(null);
@@ -217,36 +216,37 @@ const TV = () => {
                     password={data.smotreshka.password}
                   />
                 </div>
-                {data.smotreshka.error && (
-                  <div className="ms-auto">
-                    <button
-                      className={`btn ${
-                        ischangeLoading ? "btn-secondary" : "btn-danger"
-                      } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
-                      onClick={() =>
-                        !ischangeLoading &&
-                        handleChangeButton(
-                          "Смотрешка",
-                          queriedLogin,
-                          setchangeIsLoading,
-                          setData
-                        )
-                      }
-                      disabled={ischangeLoading}
-                    >
-                      {ischangeLoading ? (
-                        <div
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                        >
-                          <span className="visually-hidden">Loading...</span>
-                        </div>
-                      ) : (
-                        "Исправить"
-                      )}
-                    </button>
-                  </div>
-                )}
+                {data.smotreshka.error &&
+                  data.smotreshka.error.includes("Данные не совпадают") && (
+                    <div className="ms-auto">
+                      <button
+                        className={`btn ${
+                          ischangeLoading ? "btn-secondary" : "btn-danger"
+                        } ${!ischangeLoading ? "btn-danger-hover" : ""}`}
+                        onClick={() =>
+                          !ischangeLoading &&
+                          handleChangeButton(
+                            "Смотрешка",
+                            queriedLogin,
+                            setchangeIsLoading,
+                            setData
+                          )
+                        }
+                        disabled={ischangeLoading}
+                      >
+                        {ischangeLoading ? (
+                          <div
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        ) : (
+                          "Исправить"
+                        )}
+                      </button>
+                    </div>
+                  )}
               </div>
               <div className="row mt-3">
                 <div className="col-md-6">
@@ -369,7 +369,7 @@ const TV = () => {
             </>
           )}
 
-          {data?.tv24?.phone && (
+          {data?.tv24?.phone?.phone && (
             <div className="">
               <h2
                 className={data.tv24.error ? "title-red text-danger" : "title"}
@@ -382,7 +382,11 @@ const TV = () => {
                     <strong>Номер:</strong>{" "}
                     {data.tv24.phone.phone || "Не указан"}{" "}
                     <strong>Регион:</strong>{" "}
-                    {data.tv24.phone.operator == "24ТВ" ? "Урал" : "Краснодар"}
+                    {data.tv24.phone.operator == "24ТВ"
+                      ? "Урал"
+                      : data.tv24.phone.operator == "24ТВ КРД"
+                      ? "Краснодар"
+                      : "Неизвестно"}
                   </p>
                 </div>
                 {data.tv24.error && (
@@ -471,19 +475,21 @@ const TV = () => {
                     </div>
                     <div className="button-container row g-2">
                       <button
-                        onClick={() =>
-                          changeRegion(
-                            data.tv24.phone.phone,
-                            queriedLogin,
-                            setData,
-                            setLoadingButton
-                          )
-                        }
+                        onClick={() => {
+                          if (data?.tv24?.phone?.phone) {
+                            changeRegion(
+                              data.tv24.phone.phone,
+                              queriedLogin,
+                              setData,
+                              setLoadingButton
+                            );
+                          }
+                        }}
                         className="btn btn-primary make-primary-btn"
                         disabled={loadingButton !== null}
                       >
                         {loadingButton ===
-                        `change-region-${data.tv24.phone.phone}` ? (
+                        `change-region-${data?.tv24?.phone?.phone}` ? (
                           <div
                             className="spinner-border spinner-border-sm"
                             role="status"

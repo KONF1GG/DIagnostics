@@ -125,7 +125,9 @@
   max-width: 800px;
   margin: 0 auto;
   position: relative;
+  transition: max-height 0.3s ease-in-out;
 }
+
 .input-wrapper-nav {
   display: flex;
   align-items: center;

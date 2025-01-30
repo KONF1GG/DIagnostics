@@ -32,7 +32,6 @@ export const updateSettings = async (
     "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/settingsTV";
 
   try {
-    console.log("Отправляем запрос с данными:", requestData);
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -96,7 +95,6 @@ export const handleMakePrimary = async (
   setData: React.Dispatch<React.SetStateAction<any>>,
   setLoadingButton: (buttonId: string | null) => void
 ) => {
-  console.log(`Кнопка для телефона ${phone} нажата!`);
   setLoadingButton(`make-primary-${phone}`);
   try {
     const payload = {
@@ -114,7 +112,6 @@ export const handleMakePrimary = async (
       body: JSON.stringify(payload),
     });
 
-    console.log(response);
 
     if (response.ok) {
       // Логирование успешного действия
@@ -176,7 +173,6 @@ export const handleChangeButton = async (
   setchangeIsLoading: React.Dispatch<React.SetStateAction<any>>,
   setData: React.Dispatch<React.SetStateAction<any>>
 ) => {
-  console.log(`Кнопка для исправить ${operator} нажата!`);
   setchangeIsLoading(true);
 
   try {
@@ -185,7 +181,6 @@ export const handleChangeButton = async (
       operator,
     };
 
-    console.log("Отправляем запрос с данными:", requestData);
     const url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/correctTV";
 
     const response = await fetch(url, {
@@ -271,7 +266,6 @@ export const changeRegion = async (
       changeOperator,
     };
 
-    console.log("Отправляем запрос с данными:", requestData);
     const url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/main24phone";
 
     const response = await fetch(url, {

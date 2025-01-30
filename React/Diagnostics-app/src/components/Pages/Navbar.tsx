@@ -76,7 +76,6 @@ const Navbar = () => {
   useEffect(() => {
     if (loginsList.length === 1) {
       setSearchedLogin(loginsList[0]);
-      console.log(loginsList[0]);
       handleLoginSearchChoice(loginsList[0].login);
     }
   }, [loginsList]);
@@ -241,7 +240,7 @@ const Navbar = () => {
         <div
           className="d-flex flex-column align-items-center hidden-on-small"
           style={{
-            width: "450px",
+            width: "500px",
             margin: "15px",
             paddingTop: "15px",
           }}

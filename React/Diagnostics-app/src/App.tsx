@@ -12,6 +12,7 @@ import App_page from "./components/Pages/App_/app";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SubsectionPage from "./components/Pages/Default/GeneralPage/GeneralSubsection";
+import UserPage from "./components/Pages/UserPage";
 
 const App = () => {
   const location = useLocation();
@@ -29,7 +30,7 @@ const App = () => {
           <Route path="/register" element={<Reg />} />
           <Route path="/" element={<Home />} />
           <Route path="/users" element={<Users />} />
-          {/* <Route path="/users/:userId" element={<UserDetails />} /> */}
+          <Route path="/users/:userId" element={<UserPage />} />
           <Route path="/network" element={<Network />} />
           <Route path="/accidents" element={<Accidents />} />
           <Route path="/cameras" element={<Cameras />} />

@@ -42,7 +42,6 @@ const GetNetwork = async (login: string): Promise<NetworkData | string> => {
             }
         });
 
-        console.log(response)
         if (response.status === 401) {
             window.location.href = '/login';
             return "Unauthorized";

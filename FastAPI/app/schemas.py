@@ -32,15 +32,28 @@ class Reg(BaseUser):
 
 
 class UpdateUser(BaseModel):
-    name: Optional[str] = None
+    username: Optional[str] = None
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
+    middlename: Optional[str] = None
     password: Optional[str] = None
     role_id: Optional[int] = None
 
 
 class UserModel(BaseModel):
     id: int
-    name: str
+    firstname: str
+    lastname: str
+    middlename: str
+    username: str
     role: str
+
+class ResponseUserData(UserModel):
+    firstname: str
+    lastname: str
+    middlename: str
+    isItself: bool
+    current_user_role: str
 
 
 class Login(BaseUser):
