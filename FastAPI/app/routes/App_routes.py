@@ -141,7 +141,6 @@ async def relocate_users(
             try:
                 phones_list = [str(phone) for phone in request.phones]
                 house_subscriber_ids_to_relocate = await crud.get_house_subscriber_ids_to_relocate_by_phones(phones_list, rbt)
-                print(house_subscriber_ids_to_relocate)
                 return StatusResponse(status='success')
             except Exception as e:
                 raise HTTPException(status_code=400, detail=f"Не удалось переселить: {str(e)}")

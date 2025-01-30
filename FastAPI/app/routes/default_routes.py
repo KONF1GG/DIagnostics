@@ -37,7 +37,6 @@ async def get_search_logins(
 ):
  
     result = await crud.search_logins(login, redis)
-    print(result)
     return {'logins': result}
 
 @router.post('/v1/log', response_model=StatusResponse)

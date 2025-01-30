@@ -16,7 +16,6 @@ async def login_user(login_data: Login, session: SessionDependency, redis: Redis
     """Эндпоинт для логина пользователя"""
     await export_schema(redis)
     user_query = select(User).where(User.username == login_data.username)
-    print(str(user_query.compile(compile_kwargs={"literal_binds": True})))
     user_model = await session.scalar(user_query)
     if user_model is None:
         raise HTTPException(status_code=401, detail="Неверное имя или пароль")

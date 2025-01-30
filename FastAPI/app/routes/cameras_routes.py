@@ -58,7 +58,6 @@ async def get_cameras_data(
         "cameras_from_flussonic": flussonic_cameras,
     }
 
-    # print(response)
     return response
 
 

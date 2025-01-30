@@ -261,7 +261,6 @@ async def check_cameras_dif(redis_cameras: List[CameraCheckModel],
 
 
 async def get_services_from_1C(services_from_1c):
-    print(services_from_1c)
     return [
         {
             'name': service['name'],
@@ -535,7 +534,6 @@ async def get_tvip_data(userId: str, service_name: str) -> TVIP:
                                         ) for service in data['data'] if not service['stop']]
                 return data
     except Exception as e:
-        print(e)
         return None
         
 
@@ -845,7 +843,6 @@ async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
         capitalize_search += f'{login.capitalize()} '
 
     search_query = f'{default_search} | {lower_search} | {capitalize_search}'
-    # print(search_query)
     result = await redis.ft('idx:searchLogin').search(search_query)
     logins_list = []
     for doc in result.docs:
@@ -905,7 +902,6 @@ async def get_last_actions(clickhouse_client) -> List[Action]:
             for row in result.result_set
         ]
     except Exception as e:
-        print(f"Ошибка ClickHouse: {e}")
         raise HTTPException(status_code=500, detail="Ошибка получения последних изменений")
 
     return actions
