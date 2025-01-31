@@ -124,12 +124,13 @@ async def relocate_users(
     rbt: RBTDependency ,
     token: TokenDependency 
 ):
-    flat_id = await crud.get_flat_from_RBT_by_house_id_and_flat(request.flat, request.house_id, rbt)
+
+    flat_id = await crud.get_flat_from_RBT_by_house_id_and_flat(request.flat, request.address_house_id, rbt)
 
     if flat_id is None:
         # Создание новой квартиры
         try:
-            flat_id = await crud.create_new_flat(request.flat, request.house_id)
+            flat_id = await crud.create_new_flat(request.flat,  request.address_house_id, rbt)
 
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Не удалось создать квартиру: {e}")
@@ -137,10 +138,12 @@ async def relocate_users(
     # Переселение
     response = await crud.change_flat_in_1C(request.flat, request.UUID2)
     if request.phones:
-        if response:
+        if response.get('code') == 200:
             try:
                 phones_list = [str(phone) for phone in request.phones]
                 house_subscriber_ids_to_relocate = await crud.get_house_subscriber_ids_to_relocate_by_phones(phones_list, rbt)
+                if house_subscriber_ids_to_relocate:
+                    await crud.change_flat_id_in_RBT(house_subscriber_ids_to_relocate, flat_id,  rbt)
                 return StatusResponse(status='success')
             except Exception as e:
                 raise HTTPException(status_code=400, detail=f"Не удалось переселить: {str(e)}")

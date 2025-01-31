@@ -746,14 +746,14 @@ async def get_flat_from_RBT_by_house_id_and_flat(flat: str, house_id: int, rbt):
 
     return result 
 
-async def create_new_flat(flat: str, house_id: int, rbt):
+async def create_new_flat(flat: str, address_house_id: int, rbt):
     async with rbt.transaction():
         query = """
         INSERT INTO "houses_flats" (address_house_id, flat)
         VALUES ($1, $2)
         RETURNING house_flat_id
         """
-        result = await rbt.fetchval(query, flat, house_id)
+        result = await rbt.fetchval(query, address_house_id, flat)
 
     return result 
 

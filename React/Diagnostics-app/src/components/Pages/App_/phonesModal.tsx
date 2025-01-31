@@ -62,18 +62,16 @@ const PhoneModal: React.FC<PhoneModalProps> = ({
           </strong>
         </p>
         <Form>
-          {phoneNumbers
-            .filter(() => contract?.phone)
-            .map((phone, index) => (
-              <Form.Check
-                key={index}
-                type="checkbox"
-                label={`${phone.name} - ${phone.phone}`}
-                value={String(phone.phone)}
-                checked={phones.includes(String(phone.phone))}
-                onChange={() => handleCheckboxChange(String(phone.phone))}
-              />
-            ))}
+          {phoneNumbers.map((phone, index) => (
+            <Form.Check
+              key={index}
+              type="checkbox"
+              label={`${phone.name} - ${phone.phone}`}
+              value={String(phone.phone)}
+              checked={phones.includes(String(phone.phone))}
+              onChange={() => handleCheckboxChange(String(phone.phone))}
+            />
+          ))}
         </Form>
       </Modal.Body>
       <Modal.Footer>
