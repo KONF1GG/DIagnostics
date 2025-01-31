@@ -136,7 +136,7 @@ async def relocate_users(
             raise HTTPException(status_code=400, detail=f"Не удалось создать квартиру: {e}")
 
     # Переселение
-    response = await crud.change_flat_in_1C(request.flat, request.UUID2)
+    response = await crud.change_flat_in_1C(flat_id, request.UUID2)
     if request.phones:
         if response.get('code') == 200:
             try:

@@ -757,9 +757,9 @@ async def create_new_flat(flat: str, address_house_id: int, rbt):
 
     return result 
 
-async def change_flat_in_1C(new_flat: str, uuid2: str):
+async def change_flat_in_1C(new_flatId: str, uuid2: str):
     url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/RBT/setFlatId"
-    payload = {"UUID2": uuid2, "flatId": new_flat}
+    payload = {"UUID2": uuid2, "flatId": new_flatId}
     
     try:
         async with aiohttp.ClientSession() as session:
