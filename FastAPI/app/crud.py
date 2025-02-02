@@ -537,8 +537,8 @@ async def get_tvip_data(userId: str, service_name: str) -> TVIP:
         return None
         
 
-async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange, old_camera_data: Camera1CModel):
-    url = "http://192.168.111.61/UNF_FULL_WS/hs/apps/setCamera"
+async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange):
+    url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/apps/setCamera"
     headers = {
         "Authorization": f"Bearer {config.UPDATE_CAMERA_TOKEN}",
         "Content-Type": "application/json"
@@ -547,7 +547,7 @@ async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange, old_
         "id": camera_id,
         "name": camera_data.name,
         "ip": camera_data.ip,
-        "CamType": old_camera_data.type
+        "CamType": camera_data.CamType
     }
     try:
         async with aiohttp.ClientSession() as session:

@@ -6,6 +6,7 @@ import asyncio
 from app import crud
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Query
+from ..schemas import CameraDataToChange, StatusResponse
 import asyncio
 import time
 
@@ -61,17 +62,16 @@ async def get_cameras_data(
     return response
 
 
-@router.post('/camera/update/{camera_id}', response_model=Dict)
+@router.post('/camera/{camera_id}', response_model=StatusResponse)
 async def camera_update(
         camera_id: int,
-        camera_data: Dict,
+        camera_data: CameraDataToChange,
         token: TokenDependency,):
     """Эндпоинт для обновления данных камеры"""
-    # response_data = await crud.camera_update_1c(camera_id, camera_data)
-    # if isinstance(response_data, dict):
-    #     if response_data['status'] == 1:
-    #         return {}
-    #     else:
-    #         return {}
 
-    return {}
+    response_data = await crud.camera_update_1c(camera_id, camera_data)
+    if isinstance(response_data, dict):
+        if response_data['status'] == 1:
+            return StatusResponse(status='success')
+        else:
+            return StatusResponse(status='error')

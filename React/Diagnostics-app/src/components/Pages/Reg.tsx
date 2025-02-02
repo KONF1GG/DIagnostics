@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Reg from "../../API/Reg";
 import "../CSS/castomInput.css";
+import Login from "./Login";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -148,7 +149,13 @@ const Register = () => {
           className="btn btn-primary w-100 mb-3"
           style={{ borderRadius: "8px" }}
           disabled={
-            password !== confirmPassword || !password || !confirmPassword
+            password !== confirmPassword ||
+            !password ||
+            !confirmPassword ||
+            !username ||
+            !firstName ||
+            !lastName ||
+            !middleName
           }
         >
           Зарегистрироваться

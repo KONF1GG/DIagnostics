@@ -4,3 +4,4 @@ __pycache__/
 /React/node_modules/
 venv/
 .vscode/
+/React/.env

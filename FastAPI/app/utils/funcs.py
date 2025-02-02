@@ -27,7 +27,7 @@ async def compare_json(radius: Dict, redis: Dict):
 
             tolerance = timedelta(hours=2)
             # Сравнение значений
-            if abs(time_to_radius - time_to_redis) > tolerance and time_to_radius:
+            if time_to_radius and abs(time_to_radius - time_to_redis) > tolerance:
                 differences['radius']['time_to'] = time_to_radius
                 differences['redis']['time_to'] = time_to_redis
 

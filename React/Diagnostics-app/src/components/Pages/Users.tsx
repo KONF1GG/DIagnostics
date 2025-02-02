@@ -47,7 +47,7 @@ const Users: React.FC = () => {
       } catch (err) {
         setError("Неожиданная ошибка");
       } finally {
-        setLoadingCount((prev) => prev - 1); // Уменьшаем счетчик загрузок
+        setLoadingCount((prev) => prev - 1); 
       }
     };
 
@@ -65,8 +65,6 @@ const Users: React.FC = () => {
     }
     return <span>{status}</span>;
   };
-
-  console.log(users);
 
   return (
     <InfoList>

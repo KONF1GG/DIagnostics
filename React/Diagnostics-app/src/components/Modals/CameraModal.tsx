@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Table, Form } from "react-bootstrap";
 import "../CSS/camera.css";
+import { ChangeCameraData, GetNetwork } from "../../API/Cameras";
+import { toast } from "react-toastify";
+import { useDataContext } from "../../DataContext/CamerasContext";
 
 export interface ModalProps {
   isOpen: boolean;
@@ -19,6 +22,7 @@ const CameraModal: React.FC<ModalProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(cameraData1C?.name || "");
+  const { setData, login } = useDataContext();
   const [ipAddress, setIpAddress] = useState(cameraData1C?.ipaddress || "");
 
   const handleEditClick = () => {
@@ -30,13 +34,43 @@ const CameraModal: React.FC<ModalProps> = ({
     setIsEditing(!isEditing);
   };
 
-  const handleSaveClick = () => {
-    // Логика сохранения нового значения
-    console.log("Новое имя:", name);
-    console.log("Новый IP-адрес:", ipAddress);
-    console.log("ID:", cameraData1C.id);
-    console.log("CAMETYPE:", cameraData1C.type);
-    setIsEditing(false);
+  const handleSaveClick = async () => {
+    const dataToSave = {
+      id: cameraData1C?.id,
+      name,
+      ip: ipAddress,
+      CamType: "Личная",
+    };
+
+    try {
+      const response = await ChangeCameraData(dataToSave);
+      setIsEditing(false);
+
+      if (response.success) {
+        if (login) {
+          try {
+            const result = await GetNetwork(login);
+            if ("error" in result) {
+              setData(null);
+            } else {
+              onClose(); 
+              setData(result);
+            }
+          } catch (fetchError) {
+            setData(null);
+          }
+          toast.success("Камера успешно изменена", {
+            position: "bottom-right",
+          });
+        } else {
+          toast.error("Ошибка при изменении камеры", {
+            position: "bottom-right",
+          });
+        }
+      }
+    } catch (error) {
+      toast.error("Ошибка при изменении камеры", { position: "bottom-right" });
+    }
   };
 
   useEffect(() => {
@@ -70,7 +104,9 @@ const CameraModal: React.FC<ModalProps> = ({
             <Table bordered>
               <tbody>
                 <tr>
-                  <td><strong>Название:</strong></td>
+                  <td>
+                    <strong>Название:</strong>
+                  </td>
                   <td>
                     {isEditing ? (
                       <Form.Control
@@ -84,7 +120,9 @@ const CameraModal: React.FC<ModalProps> = ({
                   </td>
                 </tr>
                 <tr>
-                  <td><strong>IP-адрес:</strong></td>
+                  <td>
+                    <strong>IP-адрес:</strong>
+                  </td>
                   <td>
                     {isEditing ? (
                       <Form.Control
@@ -98,39 +136,43 @@ const CameraModal: React.FC<ModalProps> = ({
                   </td>
                 </tr>
                 <tr>
-                  <td><strong>Хост:</strong></td>
+                  <td>
+                    <strong>Хост:</strong>
+                  </td>
                   <td>{cameraData1C?.host || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Доступно:</strong></td>
+                  <td>
+                    <strong>Доступно:</strong>
+                  </td>
                   <td>{cameraData1C?.available ? "Да" : "Нет"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Услуга:</strong></td>
+                  <td>
+                    <strong>Услуга:</strong>
+                  </td>
                   <td>{cameraData1C?.service || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>MAC-адрес:</strong></td>
+                  <td>
+                    <strong>MAC-адрес:</strong>
+                  </td>
                   <td>{cameraData1C?.macaddress || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Удалена:</strong></td>
+                  <td>
+                    <strong>Удалена:</strong>
+                  </td>
                   <td>{cameraData1C?.deleted ? "Да" : "Нет"}</td>
                 </tr>
               </tbody>
             </Table>
             <div className="edit-buttons">
-              <Button
-                variant="primary"
-                onClick={handleEditClick}
-              >
+              <Button variant="primary" onClick={handleEditClick}>
                 {isEditing ? "Отмена" : "Изменить"}
               </Button>
               {isEditing && (
-                <Button
-                  variant="success"
-                  onClick={handleSaveClick}
-                >
+                <Button variant="success" onClick={handleSaveClick}>
                   Сохранить
                 </Button>
               )}
@@ -143,23 +185,33 @@ const CameraModal: React.FC<ModalProps> = ({
             <Table bordered>
               <tbody>
                 <tr>
-                  <td><strong>Название:</strong></td>
+                  <td>
+                    <strong>Название:</strong>
+                  </td>
                   <td>{cameraDataRedis?.name || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>IP-адрес:</strong></td>
+                  <td>
+                    <strong>IP-адрес:</strong>
+                  </td>
                   <td>{cameraDataRedis?.ipaddress || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Хост:</strong></td>
+                  <td>
+                    <strong>Хост:</strong>
+                  </td>
                   <td>{cameraDataRedis?.host || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Доступно:</strong></td>
+                  <td>
+                    <strong>Доступно:</strong>
+                  </td>
                   <td>{cameraDataRedis?.available ? "Да" : "Нет"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Модель:</strong></td>
+                  <td>
+                    <strong>Модель:</strong>
+                  </td>
                   <td>{cameraDataRedis?.Model || "Нет данных"}</td>
                 </tr>
               </tbody>
@@ -172,19 +224,27 @@ const CameraModal: React.FC<ModalProps> = ({
             <Table bordered>
               <tbody>
                 <tr>
-                  <td><strong>Название:</strong></td>
+                  <td>
+                    <strong>Название:</strong>
+                  </td>
                   <td>{cameraFlusicData?.title || "Нет данных"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Доступно:</strong></td>
+                  <td>
+                    <strong>Доступно:</strong>
+                  </td>
                   <td>{cameraFlusicData?.alive ? "Да" : "Нет"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Running:</strong></td>
+                  <td>
+                    <strong>Running:</strong>
+                  </td>
                   <td>{cameraFlusicData?.running ? "Да" : "Нет"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Bytes In:</strong></td>
+                  <td>
+                    <strong>Bytes In:</strong>
+                  </td>
                   <td>{cameraFlusicData?.bytes_in || "Нет данных"}</td>
                 </tr>
               </tbody>

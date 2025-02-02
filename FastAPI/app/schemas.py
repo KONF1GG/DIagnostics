@@ -145,12 +145,6 @@ class CamerasData(BaseModel):
     cameras: List[Camera1CModel]
 
 
-class CameraDataToChange(BaseModel):
-    """Данные, которые можно поменять в форме изменения данных камеры 1С"""
-    name: Optional[str] = None
-    ip: Optional[str] = None
-
-
 class CameraModelShow(BaseModel):
     """Класс для генерации таблиц параметров камеры из разных баз данных"""
     Parameter: Union[int, str]
@@ -266,6 +260,9 @@ class CameraDataToChange(BaseModel):
     """Данные, которые можно поменять в форме изменения данных камеры 1С"""
     name: Optional[str] = None
     ip: Optional[str] = None
+    id: int
+    CamType: str
+
 
 
 

@@ -39,6 +39,9 @@ async def create_user(
 ):
     """Эндпоинт для регистрации"""
     user_data.role_id = 2
+    user_data.firstname, user_data.lastname, user_data.middlename = map(str.capitalize, [user_data.firstname, user_data.lastname, user_data.middlename])
+
+
     user = User(**user_data.dict())
     user.password = await auth.hash_password(user_data.password)
     user = await crud.add_item(session, user)

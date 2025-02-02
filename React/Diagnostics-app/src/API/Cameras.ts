@@ -91,6 +91,13 @@ interface ErrorResponse {
     message: string;
 }
 
+interface CameraDataToChange {
+    id: number;
+    name: string;
+    ip: string;
+    CamType: string;
+}
+
 const GetNetwork = async (login: string): Promise<ResponseData | ErrorResponse> => {
     const token = localStorage.getItem('token');
 
@@ -129,5 +136,59 @@ const GetNetwork = async (login: string): Promise<ResponseData | ErrorResponse> 
         };
     }
 };
+
+export const ChangeCameraData = async (data: CameraDataToChange) => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        return { error: true, message: "Токен не найден. Пожалуйста, авторизуйтесь." };
+    }
+
+    const url = `/camera/${data.id}`;
+
+    try {
+        const response = await api.post(url, 
+            {
+                id: data.id,
+                name: data.name,
+                ip: data.ip,
+                CamType: data.CamType
+            },
+            {
+                headers: {
+                    'x-token': token
+                }
+            }
+        );
+
+        if (response.status === 200) {
+            return { success: true, message: "Данные камеры успешно изменены" };
+        } else {
+            return { error: true, message: `Ошибка: ${response.statusText}` };
+        }
+
+    } catch (err) {
+        const error = err as AxiosError<ApiError>;
+
+        if (error.response) {
+            const errorDetail = error.response.data.detail || "Произошла ошибка при изменении данных камеры";
+            return {
+                error: true,
+                message: errorDetail
+            };
+        } else if (error.request) {
+            return {
+                error: true,
+                message: "Не удалось получить ответ от сервера"
+            };
+        } else {
+            return {
+                error: true,
+                message: "Произошла ошибка при отправке запроса"
+            };
+        }
+    }
+};
+
 
 export { GetNetwork };

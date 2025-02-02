@@ -42,12 +42,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
 
   // Валидация обязательных полей
   const handleSaveChanges = () => {
-    if (
-      !formData.username ||
-      !formData.firstname ||
-      !formData.lastname ||
-      !formData.middlename
-    ) {
+    if (!formData.username || !formData.firstname || !formData.lastname) {
       toast.error("Пожалуйста, заполните все обязательные поля.", {
         position: "bottom-right",
       });
