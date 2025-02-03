@@ -390,7 +390,7 @@ const TV = () => {
                       ? "Краснодар"
                       : "Неизвестно"}{" "}
                     {data.tv24.parental_code ? (
-                      <p>Родительсикй контроль: {data.tv24.parental_code}</p>
+                      <p>Родительский контроль: {data.tv24.parental_code}</p>
                     ) : null}
                   </p>
                 </div>
