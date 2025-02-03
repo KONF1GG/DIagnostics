@@ -708,9 +708,9 @@ async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> Status
 async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt) -> StatusResponse:
 
     query = """
-        RETURNING house_subscriber_id
-        DELETE FROM houses_flats_subscribers
-        WHERE house_subscriber_id = $1 AND house_flat_id = $2
+            DELETE FROM houses_flats_subscribers
+            WHERE house_subscriber_id = $1 AND house_flat_id = $2
+            RETURNING house_subscriber_id
     """
     try:
         async with rbt.transaction():
@@ -727,6 +727,7 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
                 )
         
     except HTTPException as http_exc:
+        print(http_exc)
         raise http_exc
         
     except Exception as e:
