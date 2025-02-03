@@ -68,10 +68,11 @@ async def update_service_data(response_data, service):
             response_data['tv24']['isKRD'] = True
         if service.password == 'Второй номер':
             error_data = await crud.get_tv24_data(service.userId, token_tv24)
-            for data in error_data:
-                if data.status == 'Активный':
-                    if error_data:
-                        response_data['tv24']['error'] = 'Сервис подключен в доп. номере'
+            if error_data:
+                for data in error_data:
+                    if data.status == 'Активный':
+                        if error_data:
+                            response_data['tv24']['error'] = 'Сервис подключен в доп. номере'
             response_data['tv24']['additional_phones'].append({'phone': service.login, 'operator': service.operator})
         else:
             response_data["tv24"]['phone'] = {'phone': service.login, 'operator': service.operator}
