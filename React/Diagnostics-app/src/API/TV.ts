@@ -40,6 +40,7 @@ export interface TV24 {
     serviceOp: Service[];
     additional_phones: additional_phone[];
     ban_on_app: boolean | null;
+    parental_code: string | null;
     isKRD: boolean | null
     error: string | null;
 }

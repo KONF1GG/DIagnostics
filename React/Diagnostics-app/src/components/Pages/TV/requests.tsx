@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
 import { GetTV } from "../../../API/TV";
-import setLoadingButton from "./TV";
 
 interface UpdateSettingsRequest {
   login: string;

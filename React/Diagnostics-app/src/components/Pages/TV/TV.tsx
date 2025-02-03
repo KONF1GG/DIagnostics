@@ -193,6 +193,8 @@ const TV = () => {
       </div>
     );
   }
+
+  console.log(data);
   return (
     <div>
       <InfoList>
@@ -386,7 +388,10 @@ const TV = () => {
                       ? "Урал"
                       : data.tv24.phone.operator == "24ТВ КРД"
                       ? "Краснодар"
-                      : "Неизвестно"}
+                      : "Неизвестно"}{" "}
+                    {data.tv24.parental_code ? (
+                      <p>Родительсикй контроль: {data.tv24.parental_code}</p>
+                    ) : null}
                   </p>
                 </div>
                 {data.tv24.error && (

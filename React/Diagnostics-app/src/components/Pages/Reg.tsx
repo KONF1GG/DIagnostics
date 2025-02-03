@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Reg from "../../API/Reg";
 import "../CSS/castomInput.css";
-import Login from "./Login";
 
 const Register = () => {
   const navigate = useNavigate();

@@ -497,6 +497,19 @@ async def get_tv24_data(login: str, token: str) -> TV24:
     except Exception as e:
         print(e)
         return None
+    
+async def get_parental_code(userId: int, token: str) -> str | None:
+    url = f"https://api.24h.tv/v2/users/{userId}?token={token}"
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                response.raise_for_status() 
+                data = await response.json()
+                return data.get('parental_code', '') if data.get('parental_status') == 'set' else None
+    except Exception as e:
+        print(e)
+        return None
+    
 
 
 async def get_smotreshka_data(login: str) -> Dict:

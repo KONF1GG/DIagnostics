@@ -27,6 +27,7 @@
     "react-router-dom": "^6.27.0",
     "react-toastify": "^10.0.6",
     "react-transition-group": "^4.4.5",
+    "serve": "^14.2.4",
     "styled-components": "^6.1.14"
   },
   "devDependencies": {

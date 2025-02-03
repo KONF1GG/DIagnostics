@@ -49,11 +49,11 @@ def initialize_response_data():
     return {
         "smotreshka": {"login": None, "password": None, "not_turnoff_if_not_used": None, "service1c": [], "serviceOp": [], "ban_on_app": None, "error": None},
         "tvip": {"login": None, "password": None, "service1c": [], "serviceOp": [], "error": None},
-        "tv24": {"phone": {}, "service1c": [], "serviceOp": [], "error": None, "additional_phones": [], "ban_on_app": False, "isKRD": None},
+        "tv24": {"phone": {}, "service1c": [], "serviceOp": [], "error": None, "additional_phones": [], "ban_on_app": False, "isKRD": None, "parental_code": None},
         "errors": {}
     }
 
-async def update_service_data(response_data, service):
+async def update_service_data(response_data, service: Service1C):
     """Обновление данных для нового оператора"""
     if service.operator == "ТВИП":
         response_data["tvip"]['login'] = service.login
@@ -63,9 +63,11 @@ async def update_service_data(response_data, service):
         if service.operator == '24ТВ':
             token_tv24 = config.CONFIG_TV24
             response_data['tv24']['isKRD'] = False
+            response_data['tv24']['parental_code'] = await crud.get_parental_code(service.userId, token_tv24)
         if service.operator == '24ТВ КРД':
             token_tv24 = config.CONFIG_TV24_KRD
             response_data['tv24']['isKRD'] = True
+            response_data['tv24']['parental_code'] = await crud.get_parental_code(service.userId, token_tv24)
         if service.password == 'Второй номер':
             error_data = await crud.get_tv24_data(service.userId, token_tv24)
             if error_data:

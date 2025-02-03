@@ -118,7 +118,7 @@ async def delete_user_from_houses_flats_subscribers_RBT(house_id: int, flat_id: 
     return  await crud.delete_from_houses_flats_subscribers(house_id, flat_id, rbt)
 
 
-@router.patch(('/v1/app/relocate'), response_model=StatusResponse)
+@router.patch('/v1/app/relocate', response_model=StatusResponse)
 async def relocate_users(
     request: RelocateRequest, 
     rbt: RBTDependency ,
