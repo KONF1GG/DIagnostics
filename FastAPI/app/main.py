@@ -2,16 +2,16 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.auth_routes import router as auth_router
-from app.routes.default_routes import router as def_routes
-from app.routes.user_routes import router as user_router
-from app.routes.failure_routes import router as failure_router
-from app.routes.network_routes import router as network_router
-from app.routes.cameras_routes import router as cameras_router
-from app.routes.TV_routes import router as TV_router
-from app.routes.App_routes import router as app_router
+from routes.auth_routes import router as auth_router
+from routes.default_routes import router as def_routes
+from routes.user_routes import router as user_router
+from routes.failure_routes import router as failure_router
+from routes.network_routes import router as network_router
+from routes.cameras_routes import router as cameras_router
+from routes.TV_routes import router as TV_router
+from routes.App_routes import router as app_router
 
-from app.lifespan import lifespan
+from lifespan import lifespan
 
 
 app = FastAPI(
@@ -27,6 +27,7 @@ origins = [
     'http://192.168.0.101:3000',
     'http://192.168.111.62:3000',
     'http://192.168.111.62:5173',
+    '*'
 ]
 
 app.add_middleware(

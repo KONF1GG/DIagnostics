@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from .default_routes import export_schema
-from .. import auth, crud
-from app.depencies import RedisDependency, SessionDependency, TokenDependency
-from app.schemas import CreateUser, ItemId, Login, LoginResponse, Reg, StatusResponse
-from app.models import User, Token
+import auth, crud
+from depencies import RedisDependency, SessionDependency, TokenDependency
+from schemas import CreateUser, ItemId, Login, LoginResponse, Reg, StatusResponse
+from models import User, Token
 from sqlalchemy import select
 
 router = APIRouter()

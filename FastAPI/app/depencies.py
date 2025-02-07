@@ -1,15 +1,14 @@
-import uuid
 import datetime
 import clickhouse_connect
 import asyncpg
 from redis.asyncio import Redis, from_url
-from app.models import Session, Token, SessionRedius
-from typing import Annotated, Optional
+from models import Session, Token, SessionRedius
+from typing import Annotated, Any, Optional
 from fastapi import Depends, Header, HTTPException
 from sqlalchemy import select
 import redis.asyncio as aioredis
 import psycopg2
-from app import config
+import config
 
 
 async def get_session():
@@ -51,7 +50,7 @@ async def get_redis_connection() -> Redis:
     finally:
         await connection.aclose()
 
-RedisDependency = Annotated[aioredis.Redis, Depends(get_redis_connection)]
+RedisDependency = Annotated[Any, Depends(get_redis_connection)]
 
 async def get_rbt_connection() -> asyncpg.connect:
     connection = await asyncpg.connect(
@@ -66,7 +65,7 @@ async def get_rbt_connection() -> asyncpg.connect:
     finally:
         await connection.close()
 
-RBTDependency = Annotated[psycopg2.connect, Depends(get_rbt_connection)]
+RBTDependency = Annotated[Any, Depends(get_rbt_connection)]
 
 
 async def get_clickhouse_connections():
@@ -83,6 +82,4 @@ async def get_clickhouse_connections():
         clickhouse_client.close()
 
 
-
-
-ClickhouseDepency = Annotated[clickhouse_connect, Depends(get_clickhouse_connections)]
+ClickhouseDependency = Annotated[Any, Depends(get_clickhouse_connections)]

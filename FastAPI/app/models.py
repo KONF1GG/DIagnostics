@@ -1,4 +1,5 @@
 import datetime
+from typing import Union
 import uuid
 from uuid import UUID
 
@@ -6,7 +7,7 @@ from sqlalchemy import Integer, String, ForeignKey, UUID, func, DateTime, CHAR
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from app.config import DSN, RADIUS_DSN
+from config import DSN, RADIUS_DSN
 
 engine = create_async_engine(
     DSN,
@@ -56,5 +57,5 @@ class Role(Base):
     users: Mapped[list[User]] = relationship('User', lazy='joined', back_populates='role')
 
 
-ORM_OBJECT = User | Token | Role
-ORM_CLS = type(User) | type(Token) | type(Role)
+ORM_OBJECT = Union[User, Token, Role]
+ORM_CLS =  Union[type(User), type(Token), type(Role)]

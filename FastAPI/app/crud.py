@@ -1,27 +1,21 @@
 import asyncio
 import datetime
-from enum import unique
 import json
 import re
 import pytz
-from tkinter import E
 from typing import Optional, Dict, List
 import aiohttp
-from datetime import date
 from aiohttp import ClientTimeout
 import aiohttp
 from fastapi import HTTPException
-from jinja2 import DictLoader
-import psycopg2
 from redis.commands.search.result import Result
 from yarl import Query
-from app.depencies import RedisDependency
-from app.schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
-from app.models import Session, ORM_OBJECT, ORM_CLS
+from depencies import RedisDependency
+from schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
+from models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
-from app import crud
-from app.config import host_tokens
-from app import config
+import crud
+import config
 
 # Добавление элемента в таблицы mysql (diagnostic_app )
 async def add_item(session: Session, item: ORM_OBJECT) -> ORM_OBJECT:
@@ -449,7 +443,7 @@ async def fetch_flussonic_stream(host: str, url: str, token: str):
 
 
 async def get_token_for_host(host):
-    token = host_tokens.get(host)
+    token = config.host_tokens.get(host)
 
     if not token:
         raise ValueError(f"Токен для хоста {host} не найден.")

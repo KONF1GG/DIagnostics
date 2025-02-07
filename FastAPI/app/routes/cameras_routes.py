@@ -1,14 +1,10 @@
-import pprint
 from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, Query
-from app.depencies import TokenDependency, RedisDependency
+from depencies import TokenDependency, RedisDependency
 import asyncio
-from app import crud
+import crud
 from typing import Dict, Any, Optional
-from fastapi import APIRouter, HTTPException, Query
-from ..schemas import CameraDataToChange, StatusResponse
-import asyncio
-import time
+from schemas import CameraDataToChange, StatusResponse
 
 router = APIRouter()
 

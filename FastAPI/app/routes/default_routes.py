@@ -1,14 +1,13 @@
-import asyncio
 import json
-from os import access
+import os
 from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy import JSON, Boolean
 
-from app import crud
-from app.depencies import SessionDependency, TokenDependency, RedisDependency, ClickhouseDepency
-from app.schemas import Action, ItemId, CreateRole, LogData, RedisLoginSearch, SearchLogins, StatusResponse
-from app.models import User, Role
+import crud
+from depencies import SessionDependency, TokenDependency, RedisDependency, ClickhouseDependency
+from schemas import Action, ItemId, CreateRole, LogData, SearchLogins, StatusResponse
+from models import User, Role
 
 router = APIRouter()
 
@@ -42,7 +41,7 @@ async def get_search_logins(
 @router.post('/v1/log', response_model=StatusResponse)
 async def log(
     session: SessionDependency,
-    clickhouse: ClickhouseDepency,
+    clickhouse: ClickhouseDependency,
     token: TokenDependency, 
     data: LogData):
 
@@ -83,7 +82,12 @@ async def log(
 async def export_schema(redis):
     schema = await crud.get_schema_from_redis(redis)
 
-    file_path = "../React/Diagnostics-app/src/components/FileData/diagnosticHelper.json"
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "../../../React/Diagnostics-app/src/components/FileData/diagnosticHelper.json")
+    file_path = os.path.abspath(os.path.normpath(file_path))
+    
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
     with open(file_path, "w", encoding="utf-8") as file:
         json.dump(schema, file, indent=4, ensure_ascii=False)
 
@@ -96,6 +100,6 @@ async def get_data_from_redis_by_login(login: str, redis: RedisDependency, token
 
 
 @router.get('/v1/last_actioins', response_model=List[Action])
-async def get_last_actions(clickhouse: ClickhouseDepency, token: TokenDependency):
+async def get_last_actions(clickhouse: ClickhouseDependency, token: TokenDependency):
     last_actions = await crud.get_last_actions(clickhouse)
     return last_actions

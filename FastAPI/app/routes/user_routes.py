@@ -2,11 +2,11 @@ from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app import crud, auth
-from app.depencies import SessionDependency, get_token, TokenDependency
-from app.schemas import ItemId, CreateUser, ResponseUserData, UpdateUser, StatusResponse, UserModel
+import crud, auth
+from depencies import SessionDependency, get_token, TokenDependency
+from schemas import ItemId, CreateUser, ResponseUserData, UpdateUser, StatusResponse, UserModel
 from sqlalchemy.orm import selectinload
-from app.models import User, Token
+from models import User, Token
 from sqlalchemy import delete, select
 
 router = APIRouter()

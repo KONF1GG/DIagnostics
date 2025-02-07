@@ -1,11 +1,10 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
-from app import crud
-from app.crud import find_failure_by_login, get_login_data
-from app.depencies import TokenDependency, RedisDependency
-from app.schemas import FailureDetail, LoginFailureData
+import crud
+from crud import find_failure_by_login, get_login_data
+from depencies import TokenDependency, RedisDependency
+from schemas import FailureDetail, LoginFailureData
 from datetime import datetime
-import app.crud
 
 router = APIRouter()
 

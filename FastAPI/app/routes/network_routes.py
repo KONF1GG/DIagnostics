@@ -1,12 +1,10 @@
 from datetime import datetime
-import json
 from typing import Dict, Optional, Any
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import text
-from app.utils.funcs import compare_json, is_active, safe_json_parse
-from app.crud import get_login_data
-from app.depencies import TokenDependency, RedisDependency, SessionRediusDependency
-from app.schemas import LoginConnData, RedisConnData, RediusConnData
+from utils.funcs import compare_json, is_active, safe_json_parse
+from crud import get_login_data
+from depencies import TokenDependency, RedisDependency, SessionRediusDependency
 
 router = APIRouter()
 

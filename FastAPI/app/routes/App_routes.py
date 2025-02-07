@@ -1,18 +1,11 @@
-import asyncio
 import json
-import re
 import time
-from operator import add
-from urllib import response
-from xml.dom.expatbuilder import theDOMImplementation
 from fastapi import APIRouter, HTTPException, Query
-from typing import Dict, List, Optional
+from typing import Dict,  Optional
+import crud
+from depencies import RedisDependency, TokenDependency, RBTDependency
+from schemas import AppResponse, ChangeRoleRequest, LoginsData, Phone, RedisLogin, RelocateRequest, StatusResponse
 
-from redis import ResponseError
-from app import crud
-from app.depencies import RedisDependency, SessionRediusDependency, TokenDependency, RBTDependency
-from app.schemas import TV24, TVIP, AppResponse, ChangeRoleRequest, LoginsData, Phone, RBT_phone, RedisLogin, RelocateRequest, Service1C, Service1c, ServiceOp, Smotreshka, StatusResponse, TVResponse
-from app import config
 
 router = APIRouter()
 
