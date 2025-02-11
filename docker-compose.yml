@@ -8,8 +8,6 @@ services:
       context: .
       dockerfile: FastAPI/Dockerfile
     container_name: fastapi
-    expose:
-      - "8000" 
     networks:
       - app-network  
     restart: always
