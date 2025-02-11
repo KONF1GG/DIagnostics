@@ -5,7 +5,9 @@ WORKDIR /app
 COPY React/package.json React/package-lock.json ./
 RUN npm install
 
-COPY React/Diagnostics-app/ ./
+RUN npm install -g typescript
+
+COPY React/Diagnostics-app ./
 RUN npm run build
 
 FROM nginx:latest AS production-stage
