@@ -13,32 +13,19 @@ services:
     networks:
       - app-network  
     restart: always
-
-  react:
+    
+  nginx-react:
+    container_name: ngixreactapp
     build:
       context: .
       dockerfile: React/Diagnostics-app/Dockerfile
-    expose:
-      - "80" 
-    depends_on: 
-      - fastapi
-    networks:
-      - app-network  
-    restart: always
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
+    restart: always
     depends_on:
       - fastapi
-      - react
     networks:
-      - app-network  
-    restart: always
+      - app-network 
 
 networks:
   app-network:
