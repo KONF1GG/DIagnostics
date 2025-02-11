@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   fastapi:
@@ -9,11 +9,13 @@ services:
       dockerfile: FastAPI/Dockerfile
     container_name: fastapi
     networks:
-      - app-network  
+      - app-network
     restart: always
-    
+    ports:
+      - "8000"
+
   nginx-react:
-    container_name: ngixreactapp
+    container_name: nginxreactapp
     build:
       context: .
       dockerfile: React/Diagnostics-app/Dockerfile
@@ -23,8 +25,8 @@ services:
     depends_on:
       - fastapi
     networks:
-      - app-network 
+      - app-network
 
 networks:
   app-network:
-    driver: bridge  
+    driver: bridge
