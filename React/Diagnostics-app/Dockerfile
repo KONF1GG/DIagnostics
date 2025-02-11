@@ -2,7 +2,7 @@ FROM node:20-alpine AS build-stage
 
 WORKDIR /app
 
-COPY React/package.json React/package-lock.json ./
+COPY React/Diagnostics-app/package.json React/Diagnostics-app/package-lock.json ./
 RUN npm install
 
 RUN npm install -g typescript
