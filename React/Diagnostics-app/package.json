@@ -28,7 +28,7 @@
     "react-toastify": "^10.0.6",
     "react-transition-group": "^4.4.5",
     "serve": "^14.2.4",
-    "styled-components": "^6.1.14"
+    "styled-components": "^6.1.15"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

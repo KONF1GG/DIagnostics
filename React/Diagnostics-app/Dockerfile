@@ -20,6 +20,9 @@ RUN npm run build
 # Используем Nginx для хостинга
 FROM nginx:alpine
 
+# Проверка папки dist
+RUN ls -lh /app/dist  # Добавьте эту строку, чтобы удостовериться в наличии dist
+
 # Копируем собранные файлы из предыдущего шага
 COPY --from=node:20-alpine /app/dist /usr/share/nginx/html
 
