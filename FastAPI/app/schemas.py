@@ -346,3 +346,24 @@ class Action(BaseModel):
     page: str
     action: str
     status: bool
+
+
+class Payments(BaseModel):
+    dt: str
+    timestamp: int
+    sum: int
+    description: str
+    comment: str
+
+class FailurePay(BaseModel):
+    dt: str
+    timestamp: int
+    status: str
+    sum: int
+    reason: str
+    autopayment: bool
+    description: str
+    paymentId: str
+
+class RecPaymnent(BaseModel):
+    recurringPayment: str | None

@@ -10,6 +10,7 @@ from routes.network_routes import router as network_router
 from routes.cameras_routes import router as cameras_router
 from routes.TV_routes import router as TV_router
 from routes.App_routes import router as app_router
+from routes.payment_routes import router as pay_router
 
 from lifespan import lifespan
 
@@ -46,7 +47,7 @@ app.include_router(network_router)
 app.include_router(cameras_router)
 app.include_router(TV_router)
 app.include_router(app_router)
-
+app.include_router(pay_router)
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, port=8000)

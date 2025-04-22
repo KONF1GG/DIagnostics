@@ -17,6 +17,12 @@ from sqlalchemy.exc import IntegrityError
 import crud
 import config
 
+
+async def fetch_data(session, url, model):
+    async with session.get(url) as response:
+        data = await response.json()
+        return [model(**item) for item in data]
+
 # Добавление элемента в таблицы mysql (diagnostic_app )
 async def add_item(session: Session, item: ORM_OBJECT) -> ORM_OBJECT:
     session.add(item)

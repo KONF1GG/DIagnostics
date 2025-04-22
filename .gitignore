@@ -5,3 +5,4 @@ __pycache__/
 venv/
 .vscode/
 /React/.env
+.DS_Store
