@@ -11,7 +11,7 @@ import formatDateTime from "./Default/formatDateTime";
 import CheckIcon from "@mui/icons-material/Check";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import Chip from "@mui/material/Chip";
+
 export const Logout = () => {
   const navigate = useNavigate();
 
