@@ -298,14 +298,16 @@ const Navbar = () => {
               flexDirection: "column",
             }}
           >
-            <div
-              className={`contract-status ${
-                getContractStatus(searchedLogin?.timeTo)?.className
-              }`}
-              style={{ marginRight: "15px" }}
-            >
-              {getContractStatus(searchedLogin?.timeTo)?.icon}
-            </div>
+            {searchedLogin?.timeTo && (
+              <div
+                className={`contract-status ${
+                  getContractStatus(searchedLogin?.timeTo)?.className
+                }`}
+                style={{ marginRight: "15px" }}
+              >
+                {getContractStatus(searchedLogin?.timeTo)?.icon}
+              </div>
+            )}
 
             {searchedLogin?.timeTo && (
               <div className="popup-tooltip">
