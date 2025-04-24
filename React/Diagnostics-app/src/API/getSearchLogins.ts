@@ -10,6 +10,7 @@ export interface LoginData {
     contract: string;
     name: string;
     address: string;
+    timeTo: number;
 }
 
 interface ResponseData{

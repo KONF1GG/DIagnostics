@@ -7,7 +7,11 @@ import userIcon from "../../assets/users.svg";
 import debounce from "lodash/debounce";
 import MenuButton from "./Default/MenuOpen";
 import { useSidebar } from "../../DataContext/SidebarContext";
-
+import formatDateTime from "./Default/formatDateTime";
+import CheckIcon from "@mui/icons-material/Check";
+import StopCircleIcon from "@mui/icons-material/StopCircle";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import Chip from "@mui/material/Chip";
 export const Logout = () => {
   const navigate = useNavigate();
 
@@ -50,6 +54,7 @@ const Navbar = () => {
               name: item.name,
               contract: item.contract,
               address: item.address,
+              timeTo: item.timeTo,
             }))
           );
         } else {
@@ -112,6 +117,51 @@ const Navbar = () => {
     if (searchInput) {
       searchInput.blur();
     }
+  };
+
+  const getContractStatus = (timeTo?: string | number) => {
+    if (!timeTo) {
+      return {
+        className: "status-red",
+        icon: <RemoveCircleOutlineIcon fontSize="small" />,
+      };
+    }
+
+    const now = new Date();
+    const timeToDate =
+      typeof timeTo === "number" ? new Date(timeTo * 1000) : new Date(timeTo);
+
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(now.getMonth() - 3);
+
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(now.getDate() - 10);
+
+    if (timeToDate > now) {
+      return {
+        className: "status-green",
+        icon: <CheckIcon fontSize="small" />,
+      };
+    }
+
+    if (timeToDate > tenDaysAgo) {
+      return {
+        className: "status-yellow",
+        icon: <StopCircleIcon fontSize="small" />,
+      };
+    }
+
+    if (timeToDate > threeMonthsAgo) {
+      return {
+        className: "status-orange",
+        icon: <RemoveCircleOutlineIcon fontSize="small" />,
+      };
+    }
+
+    return {
+      className: "status-red",
+      icon: <RemoveCircleOutlineIcon fontSize="small" />,
+    };
   };
 
   const highlightMatch = useCallback((text: string, query: string) => {
@@ -238,15 +288,51 @@ const Navbar = () => {
           )}
         </div>
         <div
-          className="d-flex flex-column align-items-center hidden-on-small"
-          style={{
-            width: "500px",
-            margin: "15px",
-            paddingTop: "15px",
-          }}
+          className="d-flex align-items-center hidden-on-small"
+          style={{ width: "500px", margin: "15px", paddingTop: "15px" }}
         >
-          <strong className="">{searchedLogin?.name}</strong>
-          <p className="">{searchedLogin?.address}</p>
+          <div
+            style={{
+              position: "relative",
+              display: "inline-flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              className={`contract-status ${
+                getContractStatus(searchedLogin?.timeTo)?.className
+              }`}
+              style={{ marginRight: "15px" }}
+            >
+              {getContractStatus(searchedLogin?.timeTo)?.icon}
+            </div>
+
+            {searchedLogin?.timeTo && (
+              <div className="popup-tooltip">
+                <div className="tooltip-content">
+                  {getContractStatus(searchedLogin.timeTo)?.className.includes(
+                    "green"
+                  ) ? (
+                    <>
+                      Действует до:{" "}
+                      <strong>{formatDateTime(searchedLogin.timeTo)}</strong>
+                    </>
+                  ) : (
+                    <>
+                      Истёк:{" "}
+                      <strong>{formatDateTime(searchedLogin.timeTo)}</strong>
+                    </>
+                  )}
+                  <div className="tooltip-tail"></div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="d-flex flex-column">
+            <strong>{searchedLogin?.name}</strong>
+            <p>{searchedLogin?.address}</p>
+          </div>
         </div>
         <div className="profile-icon" onClick={() => navigate("/users")}>
           <img src={userIcon} style={{ height: "50px", cursor: "pointer" }} />

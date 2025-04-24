@@ -32,11 +32,10 @@ async def get_payment_data(
             
             last_payments_models, canceled_payments_models, recurring_payment_model, notification_model = await asyncio.gather(*tasks)
             
-            print(notification_model)
             return PaymentResponseModel(payments=last_payments_models, 
                                         canceled_payments=canceled_payments_models, 
                                         recurringPayment=recurring_payment_model,
-                                        notifications=notification_model,)
+                                        notifications=notification_model if notification_model else None,)
             
         except aiohttp.ClientError as e:
             raise HTTPException(

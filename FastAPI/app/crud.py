@@ -866,7 +866,12 @@ async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
     for doc in result.docs:
         data = json.loads(doc.json)
         if 'loginserv' not in doc.id:
-            logins_list.append(RedisLoginSearch(login=data.get('login', ''), name=data.get('name', ''), contract=data.get('contract', ''), address=data.get('address', '')))
+            logins_list.append(RedisLoginSearch(login=data.get('login', ''),
+                                                name=data.get('name', ''),
+                                                contract=data.get('contract', ''),
+                                                address=data.get('address', ''),
+                                                timeTo=data.get('time_to'),
+                                                ))
 
     return logins_list
 

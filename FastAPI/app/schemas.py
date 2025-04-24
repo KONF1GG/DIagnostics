@@ -314,6 +314,7 @@ class RedisLoginSearch(BaseModel):
     contract: str
     name: str
     address: str
+    timeTo: int | None = None
 
 class SearchLogins(BaseModel):
     logins: List[RedisLoginSearch]
