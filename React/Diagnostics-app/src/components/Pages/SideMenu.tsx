@@ -13,7 +13,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isSidebarOpen } = useSidebar();
-  const { openSections, toggleSection } = useSidebarContext(); // Используем контекст
+  const { openSections, toggleSection } = useSidebarContext(); 
   const { searchedLogin } = useSidebar();
 
   const sectionList = [
@@ -22,9 +22,9 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
     { path: "cameras", label: "Камеры" },
     { path: "TV", label: "ТВ" },
     { path: "app", label: "Приложение" },
+    { path: "payments", label: "Оплата"},
   ];
 
-  // Парсим query-параметры
   const query = new URLSearchParams(location.search);
   const selectedSubsectionName = query.get("subsection");
 

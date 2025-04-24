@@ -74,12 +74,21 @@
   width: 100%;
 }
 
+/* Для экранов меньше 768px */
+@media (max-width: 600.98px) {
+  .responsive-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.5rem;
+    line-height: 0.8;
+  }
+}
+
 /* Адаптивные стили */
 @media (max-width: 768px) {
-  .modal-content {
-      padding: 15px; /* Уменьшаем отступы для планшетов */
-      width: 95%; /* Увеличиваем ширину для удобства на мобильных */
-  }
+  /* .modal-content {
+      padding: 15px;
+      width: 95%; 
+  } */
 
   .close-button {
       font-size: 20px; /* Уменьшаем размер кнопки закрытия на мобильных */
@@ -132,7 +141,7 @@ body {
 
 @media (max-width: 768px) {
   .col-lg-4 {
-    width: 100%; /* Занимают всю ширину */
+    width: 100%;
     margin-bottom: 15px; /* Отступ между блоками */
   }
 }
