@@ -1,8 +1,10 @@
 import { Payment } from "../../../API/payment";
+import formatDateTime from "../Default/formatDateTime";
 
 interface PaymentListProps {
   payments: Payment[];
 }
+
 
 const PaymentList = ({ payments }: PaymentListProps) => {
   return (
@@ -10,7 +12,7 @@ const PaymentList = ({ payments }: PaymentListProps) => {
       <table className="table">
         <thead className="table-primary">
           <tr>
-            <th>Дата</th>
+            <th>Дата и время</th>
             <th>Сумма</th>
             <th>Описание</th>
             <th>Комментарий</th>
@@ -19,11 +21,10 @@ const PaymentList = ({ payments }: PaymentListProps) => {
         <tbody>
           {payments.map((payment, index) => (
             <tr key={index}>
-              <td>{payment.dt}</td>
+              <td>{formatDateTime(payment.timestamp)}</td>
               <td>{payment.sum} руб.</td>
               <td>{payment.description}</td>
-              <td>{payment.comment || "-"}</td>{" "}
-              {/* fallback, если комментария нет */}
+              <td>{payment.comment || "-"}</td>
             </tr>
           ))}
         </tbody>

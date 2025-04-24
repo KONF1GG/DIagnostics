@@ -1,7 +1,8 @@
 
+from ast import Not
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException
-from schemas import PaymentResponseModel, Payment, FailurePay, RecPaymnent
+from schemas import NotificationSMS, PaymentResponseModel, Payment, FailurePay, RecPaymnent
 from depencies import TokenDependency
 import asyncio
 import aiohttp
@@ -26,13 +27,16 @@ async def get_payment_data(
                 crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=allPayments3&login={login}', Payment),
                 crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=canceledPayments&login={login}', FailurePay),
                 crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=recurringPayment&login={login}', RecPaymnent),
+                crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/getNotifications?login={login}', NotificationSMS),
             ]
             
-            last_payments_models, canceled_payments_models, recurring_payment_model = await asyncio.gather(*tasks)
+            last_payments_models, canceled_payments_models, recurring_payment_model, notification_model = await asyncio.gather(*tasks)
             
+            print(notification_model)
             return PaymentResponseModel(payments=last_payments_models, 
                                         canceled_payments=canceled_payments_models, 
-                                        recurringPayment=recurring_payment_model)
+                                        recurringPayment=recurring_payment_model,
+                                        notifications=notification_model,)
             
         except aiohttp.ClientError as e:
             raise HTTPException(

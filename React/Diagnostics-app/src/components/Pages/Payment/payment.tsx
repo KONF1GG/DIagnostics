@@ -7,6 +7,7 @@ import { getQueryParams } from "../Default/getData";
 import PaymentList from "./PaymentsList";
 import CanceledPaymentList from "./CanceledPaymentList";
 import RecurringPayment from "./RecurringPayment";
+import NotificationsList from "./NotificationList";
 
 interface DataContextType {
   data: PaymentResponseModel | null;
@@ -109,14 +110,18 @@ const PaymentPage = () => {
           <section>
             <h2 className="title">Неуспешные попытки</h2>
             {data?.canceled_payments && data.canceled_payments.length > 0 ? (
-              <CanceledPaymentList login={queriedLogin} canceledPayments={data.canceled_payments} setData={setData}/>
+              <CanceledPaymentList
+                login={queriedLogin}
+                canceledPayments={data.canceled_payments}
+                setData={setData}
+              />
             ) : (
               <p>Нет неуспешных попыток</p>
             )}
           </section>
 
           <section>
-            <h2 className="title">Автоплатеж</h2>
+            <h2 className="title">Подписка на автоплатеж</h2>
             {data?.recurringPayment?.recurringPayment ? (
               <RecurringPayment recurringPayment={data.recurringPayment} />
             ) : (
@@ -126,7 +131,11 @@ const PaymentPage = () => {
 
           <section>
             <h2 className="title">Уведомления и СМС</h2>
-            <p className="text-muted">Список уведомлений и СМС будет добавлен позже</p>
+            {data?.notifications ? (
+              <NotificationsList notifications={data?.notifications} />
+            ) : (
+              <p className="text-muted">Нет уведомлений</p>
+            )}
           </section>
         </div>
       </InfoList>

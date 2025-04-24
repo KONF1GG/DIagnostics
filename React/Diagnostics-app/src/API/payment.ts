@@ -28,10 +28,24 @@ export interface RecPaymnent {
     recurringPayment: string | null;
 }
 
+interface Destination {
+    name: string;
+    phone: string;
+}
+
+export interface NotificationSMS {
+    notification: string;
+    destination: Destination[];
+    text: string;
+    dt: string;
+}
+
+
 export interface PaymentResponseModel {
     payments: Payment[];
     canceled_payments: FailurePay[];
     recurringPayment: RecPaymnent;
+    notifications: NotificationSMS[];
 }
 
 const GetPayment = async (login: string): Promise<PaymentResponseModel | ApiError | null> => {

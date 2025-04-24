@@ -4,6 +4,7 @@ import {
   GetPayment,
   PaymentResponseModel,
 } from "../../../API/payment";
+import formatDateTime from "../Default/formatDateTime";
 
 interface CanceledPaymentListProps {
   login: string;
@@ -88,7 +89,7 @@ const CanceledPaymentList = ({
         <tbody>
           {canceledPayments.map((payment) => (
             <tr key={payment.paymentId}>
-              <td>{payment.dt}</td>
+              <td>{formatDateTime(payment.timestamp)}</td>
               <td>{payment.status}</td>
               <td>{payment.sum} руб.</td>
               <td>{payment.reason}</td>

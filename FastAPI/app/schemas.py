@@ -351,7 +351,7 @@ class Action(BaseModel):
 class Payment(BaseModel):
     dt: str
     timestamp: int
-    sum: int
+    sum: float
     description: str
     comment: str
 
@@ -359,7 +359,7 @@ class FailurePay(BaseModel):
     dt: str
     timestamp: int
     status: str
-    sum: int
+    sum: float
     reason: str
     autopayment: bool
     description: str
@@ -368,7 +368,18 @@ class FailurePay(BaseModel):
 class RecPaymnent(BaseModel):
     recurringPayment: str | None = None
 
+class Destination(BaseModel):
+    name: str
+    phone: str
+
+class NotificationSMS(BaseModel):
+    notification: str
+    destination: list[Destination]
+    text: str
+    dt: str
+
 class PaymentResponseModel(BaseModel):
-    payments: List[Payment]
-    canceled_payments: List[FailurePay]
+    payments: List[Payment] | None = None
+    canceled_payments: List[FailurePay] | None = None
     recurringPayment: RecPaymnent | None
+    notifications: List[NotificationSMS] | None = None
