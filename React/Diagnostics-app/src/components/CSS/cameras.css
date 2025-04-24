@@ -61,22 +61,22 @@
 
 @media (max-width: 768px) {
     .difference-card {
-        padding: 10px; /* Еще меньше отступы */
+        padding: 10px;
     }
 
     .difference-card h3 {
-        font-size: 1.5em; /* Уменьшаем заголовок */
+        font-size: 1.5em; 
     }
 
     .difference-item {
-        font-size: 1.1em; /* Уменьшаем размер текста для элементов различий */
+        font-size: 1.1em; 
     }
 
     .no-services-message {
-        font-size: 1.2rem; /* Уменьшаем размер текста */
+        font-size: 1.2rem;
     }
 
     .error-message {
-        font-size: 1.2rem; /* Уменьшаем размер текста */
+        font-size: 1.2rem; 
     }
 }

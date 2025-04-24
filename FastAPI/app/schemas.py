@@ -348,7 +348,7 @@ class Action(BaseModel):
     status: bool
 
 
-class Payments(BaseModel):
+class Payment(BaseModel):
     dt: str
     timestamp: int
     sum: int
@@ -366,4 +366,9 @@ class FailurePay(BaseModel):
     paymentId: str
 
 class RecPaymnent(BaseModel):
-    recurringPayment: str | None
+    recurringPayment: str | None = None
+
+class PaymentResponseModel(BaseModel):
+    payments: List[Payment]
+    canceled_payments: List[FailurePay]
+    recurringPayment: RecPaymnent | None

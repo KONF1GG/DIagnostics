@@ -1,8 +1,7 @@
 
-from http.client import HTTPException
 from typing import Optional
-from fastapi import APIRouter, Query
-from schemas import Payments, FailurePay, RecPaymnent
+from fastapi import APIRouter, Query, HTTPException
+from schemas import PaymentResponseModel, Payment, FailurePay, RecPaymnent
 from depencies import TokenDependency
 import asyncio
 import aiohttp
@@ -10,7 +9,7 @@ import crud
 
 router = APIRouter()
 
-@router.get('/v1/payment')
+@router.get('/v1/payment', response_model=PaymentResponseModel)
 async def get_payment_data(  
     token: TokenDependency, 
     login: Optional[str] = Query(None),
@@ -24,18 +23,16 @@ async def get_payment_data(
     async with aiohttp.ClientSession() as session:
         try:
             tasks = [
-                crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=allPayments3&login={login}', Payments),
+                crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=allPayments3&login={login}', Payment),
                 crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=canceledPayments&login={login}', FailurePay),
                 crud.fetch_data(session, f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=recurringPayment&login={login}', RecPaymnent),
             ]
             
             last_payments_models, canceled_payments_models, recurring_payment_model = await asyncio.gather(*tasks)
             
-            return {
-                "payments": last_payments_models,
-                "canceled_payments": canceled_payments_models,
-                "recurringPayment": recurring_payment_model if recurring_payment_model else None,
-            }
+            return PaymentResponseModel(payments=last_payments_models, 
+                                        canceled_payments=canceled_payments_models, 
+                                        recurringPayment=recurring_payment_model)
             
         except aiohttp.ClientError as e:
             raise HTTPException(

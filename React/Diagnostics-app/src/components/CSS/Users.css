@@ -94,7 +94,7 @@ thead {
   justify-content: flex-end;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .table {
       transform: scale(1);
       width: auto;
