@@ -22,9 +22,6 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
         "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/delRecPaymen",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             login: login,
           }),
