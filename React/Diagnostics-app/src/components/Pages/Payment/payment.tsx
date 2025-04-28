@@ -123,7 +123,10 @@ const PaymentPage = () => {
           <section>
             <h2 className="title">Подписка на автоплатеж</h2>
             {data?.recurringPayment?.recurringPayment ? (
-              <RecurringPayment recurringPayment={data.recurringPayment} />
+              <RecurringPayment
+                recurringPayment={data.recurringPayment}
+                login={queriedLogin}
+              />
             ) : (
               <p className="text-muted">Автоплатеж не подключен</p>
             )}

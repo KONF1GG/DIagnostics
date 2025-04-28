@@ -17,11 +17,16 @@ const CanceledPaymentList = ({
   canceledPayments,
   setData,
 }: CanceledPaymentListProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingPayments, setLoadingPayments] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
+  // Сортируем платежи по дате в порядке убывания (новые сначала)
+  const sortedPayments = [...canceledPayments].sort((a, b) => {
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  });
+
   const handleUpdateStatus = async (paymentId: string) => {
-    setIsLoading(true);
+    setLoadingPayments(prev => ({ ...prev, [paymentId]: true }));
     setError(null);
 
     try {
@@ -57,13 +62,12 @@ const CanceledPaymentList = ({
       } catch {
         setError("Ошибка загрузки данных");
         setData(null);
-      } finally {
       }
     } catch (err) {
       console.error("Error updating status:", err);
       setError("Не удалось обновить статус. Попробуйте позже.");
     } finally {
-      setIsLoading(false);
+      setLoadingPayments(prev => ({ ...prev, [paymentId]: false }));
     }
   };
 
@@ -87,7 +91,7 @@ const CanceledPaymentList = ({
           </tr>
         </thead>
         <tbody>
-          {canceledPayments.map((payment) => (
+          {sortedPayments.map((payment) => (
             <tr key={payment.paymentId}>
               <td>{formatDateTime(payment.timestamp)}</td>
               <td>{payment.status}</td>
@@ -98,9 +102,9 @@ const CanceledPaymentList = ({
                 <button
                   onClick={() => handleUpdateStatus(payment.paymentId)}
                   className="btn btn-primary btn-sm responsive-btn"
-                  disabled={isLoading}
+                  disabled={loadingPayments[payment.paymentId]}
                 >
-                  {isLoading ? "Обработка..." : "Обновить статус"}
+                  {loadingPayments[payment.paymentId] ? "Обработка..." : "Обновить статус"}
                 </button>
               </td>
             </tr>

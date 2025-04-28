@@ -361,7 +361,7 @@ class FailurePay(BaseModel):
     timestamp: int
     status: str
     sum: float
-    reason: str
+    reason: str | None = None
     autopayment: bool
     description: str
     paymentId: str

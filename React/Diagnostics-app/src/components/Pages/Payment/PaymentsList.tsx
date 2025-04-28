@@ -5,8 +5,12 @@ interface PaymentListProps {
   payments: Payment[];
 }
 
-
 const PaymentList = ({ payments }: PaymentListProps) => {
+  // Сортируем платежи по дате в порядке убывания (новые сначала)
+  const sortedPayments = [...payments].sort((a, b) => {
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  });
+
   return (
     <div>
       <table className="table">
@@ -19,7 +23,7 @@ const PaymentList = ({ payments }: PaymentListProps) => {
           </tr>
         </thead>
         <tbody>
-          {payments.map((payment, index) => (
+          {sortedPayments.map((payment, index) => (
             <tr key={index}>
               <td>{formatDateTime(payment.timestamp)}</td>
               <td>{payment.sum} руб.</td>

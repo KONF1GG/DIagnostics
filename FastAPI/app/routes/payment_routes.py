@@ -48,6 +48,7 @@ async def get_payment_data(
                 detail="Request to 1C server timed out"
             )
         except Exception as e:
+            print(e)
             raise HTTPException(
                 status_code=500,
                 detail=f"Unexpected error occurred: {str(e)}"
