@@ -213,7 +213,7 @@ const UserPage: React.FC = () => {
             </div>
 
             <div className="d-flex justify-content-center">
-              {user?.isItself && (
+              {user?.isItself || user?.current_user_role === "admin" ? (
                 <button
                   className="btn btn-warning btn-sm"
                   onClick={() => setShowPasswordModal(true)}
@@ -221,7 +221,7 @@ const UserPage: React.FC = () => {
                 >
                   Сменить пароль
                 </button>
-              )}
+              ): null}
               {user?.isItself || user?.current_user_role === "admin" ? (
                 <>
                   <button

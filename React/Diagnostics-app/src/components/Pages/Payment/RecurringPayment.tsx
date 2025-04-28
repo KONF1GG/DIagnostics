@@ -90,7 +90,7 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
         disabled={isLoading}
       >
         {isLoading ? (
-          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+          <output className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
         ) : (
           "Отвязать"
         )}
