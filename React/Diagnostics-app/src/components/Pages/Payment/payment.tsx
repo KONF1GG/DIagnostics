@@ -126,6 +126,7 @@ const PaymentPage = () => {
               <RecurringPayment
                 recurringPayment={data.recurringPayment}
                 login={queriedLogin}
+                setData={setData}
               />
             ) : (
               <p className="text-muted">Автоплатеж не подключен</p>

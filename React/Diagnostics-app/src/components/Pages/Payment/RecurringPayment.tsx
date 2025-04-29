@@ -1,4 +1,8 @@
-import { RecPaymnent } from "../../../API/payment";
+import {
+  GetPayment,
+  PaymentResponseModel,
+  RecPaymnent,
+} from "../../../API/payment";
 import { toast } from "react-toastify";
 import { LogData } from "../../../API/Log";
 import { useState } from "react";
@@ -6,11 +10,13 @@ import { useState } from "react";
 interface RecurringPaymentProps {
   recurringPayment: RecPaymnent;
   login: string;
+  setData: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const RecurringPayment: React.FC<RecurringPaymentProps> = ({
   recurringPayment,
   login,
+  setData,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,7 +25,7 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
 
     try {
       const response = await fetch(
-        "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/delRecPaymen",
+        "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/delRecPayment",
         {
           method: "POST",
           headers: {
@@ -33,6 +39,16 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
 
       if (!response.ok) {
         throw new Error(response.statusText || "Не удалось отключить подписку");
+      }
+
+      const result = await GetPayment(login);
+
+      if (result && "detail" in result) {
+        setData(null);
+      } else if (result) {
+        setData(result as PaymentResponseModel);
+      } else {
+        setData(null);
       }
 
       // Логирование успешного действия
@@ -93,9 +109,8 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
         disabled={isLoading}
       >
         {isLoading ? (
-          <span
+          <output
             className="spinner-border spinner-border-sm"
-            role="status"
             aria-hidden="true"
           />
         ) : (
