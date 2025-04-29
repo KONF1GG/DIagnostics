@@ -222,11 +222,13 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  console.log(searchedLogin);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
-      <div className="container-fluid d-flex justify-content-between align-items-center">
+      <div className="container-fluid">
         <MenuButton onClick={toggleSidebar} />
-        <div className="search-container-nav mx-auto" ref={dropdownRef}>
+        <div className="search-container-nav " ref={dropdownRef}>
           <div
             className={`input-wrapper-nav ${
               isDropdownOpen && loginsList.length > 0 ? "dropdown-open" : ""
@@ -287,10 +289,8 @@ const Navbar = () => {
             </ul>
           )}
         </div>
-        <div
-          className="d-flex align-items-center hidden-on-small"
-          style={{ width: "500px", margin: "15px", paddingTop: "15px" }}
-        >
+
+        <div className="d-flex align-items-center hidden-on-small">
           <div
             style={{
               position: "relative",
@@ -298,16 +298,13 @@ const Navbar = () => {
               flexDirection: "column",
             }}
           >
-            {searchedLogin?.timeTo && (
-              <div
-                className={`contract-status ${
-                  getContractStatus(searchedLogin?.timeTo)?.className
-                }`}
-                style={{ marginRight: "15px" }}
-              >
-                {getContractStatus(searchedLogin?.timeTo)?.icon}
-              </div>
-            )}
+            <div
+              className={`contract-status ${
+                getContractStatus(searchedLogin?.timeTo)?.className
+              }`}
+            >
+              {getContractStatus(searchedLogin?.timeTo)?.icon}
+            </div>
 
             {searchedLogin?.timeTo && (
               <div className="popup-tooltip">
@@ -330,10 +327,9 @@ const Navbar = () => {
               </div>
             )}
           </div>
-
-          <div className="d-flex flex-column">
+          <div className="d-flex flex-column align-items-center justify-content-center ms-2 me-3 ">
             <strong>{searchedLogin?.name}</strong>
-            <p>{searchedLogin?.address}</p>
+            <h6>{searchedLogin?.address}</h6>
           </div>
         </div>
         <div className="profile-icon" onClick={() => navigate("/users")}>

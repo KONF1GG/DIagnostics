@@ -123,7 +123,6 @@
 .search-container-nav {
   flex-grow: 1;
   max-width: 800px;
-  margin: 0 auto;
   position: relative;
   transition: max-height 0.3s ease-in-out;
 }
@@ -205,8 +204,9 @@
 
 .container-fluid {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
+  gap: 10px;
 }
 
 .dropdown-container {

@@ -16,12 +16,15 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
 
   const handleUnsubscribe = async () => {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(
         "http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/delRecPaymen",
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             login: login,
           }),
@@ -46,7 +49,6 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
       toast.success("Автоплатеж успешно отвязан", {
         position: "bottom-right",
       });
-
     } catch (error) {
       console.error("Error unsubscribing:", error);
 
@@ -62,7 +64,11 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
       });
 
       toast.error(
-        `Ошибка: ${error instanceof Error ? error.message : "Не удалось отключить подписку"}`,
+        `Ошибка: ${
+          error instanceof Error
+            ? error.message
+            : "Не удалось отключить подписку"
+        }`,
         { position: "bottom-right" }
       );
     } finally {
@@ -87,7 +93,11 @@ const RecurringPayment: React.FC<RecurringPaymentProps> = ({
         disabled={isLoading}
       >
         {isLoading ? (
-          <output className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+          <span
+            className="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          />
         ) : (
           "Отвязать"
         )}
