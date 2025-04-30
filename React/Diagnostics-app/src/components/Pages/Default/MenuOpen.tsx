@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useSidebar } from "../../../DataContext/SidebarContext";
+import { useSchema } from "../../../DataContext/SchemaContext";
 
 interface MenuButtonProps {
   onClick: (event: React.MouseEvent) => void;
@@ -8,6 +9,7 @@ interface MenuButtonProps {
 
 const MenuButton: React.FC<MenuButtonProps> = ({ onClick }) => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const { schema } = useSchema();
 
   // Обработчик клика для изменения состояния
   const handleClick = (event: React.MouseEvent) => {

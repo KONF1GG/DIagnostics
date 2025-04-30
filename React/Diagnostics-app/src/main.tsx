@@ -12,29 +12,32 @@ import { SidebarProvider } from "./DataContext/SidebarContext.tsx";
 import { SideMenuProvider } from "./DataContext/SideMenuContext.tsx";
 import { RedisDataProvider } from "./DataContext/RedisLoginDataContext.tsx";
 import { DataProviderPayment } from "./DataContext/PaymentContext.tsx";
+import { SchemaProvider } from "./DataContext/SchemaContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RedisDataProvider>
-      <SidebarProvider>
-        <SideMenuProvider>
-          <BrowserRouter>
-            <DataProviderPayment>
-              <DataProviderCameras>
-                <DataProviderNet>
-                  <DataProviderFailure>
-                    <DataProviderTV>
-                      <DataProviderApp>
-                        <App />
-                      </DataProviderApp>
-                    </DataProviderTV>
-                  </DataProviderFailure>
-                </DataProviderNet>
-              </DataProviderCameras>
-            </DataProviderPayment>
-          </BrowserRouter>
-        </SideMenuProvider>
-      </SidebarProvider>
+      <SchemaProvider>
+        <SidebarProvider>
+          <SideMenuProvider>
+            <BrowserRouter>
+              <DataProviderPayment>
+                <DataProviderCameras>
+                  <DataProviderNet>
+                    <DataProviderFailure>
+                      <DataProviderTV>
+                        <DataProviderApp>
+                          <App />
+                        </DataProviderApp>
+                      </DataProviderTV>
+                    </DataProviderFailure>
+                  </DataProviderNet>
+                </DataProviderCameras>
+              </DataProviderPayment>
+            </BrowserRouter>
+          </SideMenuProvider>
+        </SidebarProvider>
+      </SchemaProvider>
     </RedisDataProvider>
   </StrictMode>
 );

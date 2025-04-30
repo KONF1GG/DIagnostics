@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import jsonData from "./../../../FileData/diagnosticHelper.json";
 import InfoList from "../../InfoList";
 import "./GeneralSubsection.css";
 import { useDataContext } from "../../../../DataContext/RedisLoginDataContext";
 import { Get } from "./requests";
+import { useSchema } from "../../../../DataContext/SchemaContext";
 
 const SubsectionPage: React.FC = () => {
   const location = useLocation();
@@ -12,12 +12,17 @@ const SubsectionPage: React.FC = () => {
   const selectedSubsectionName = query.get("subsection");
   const queriedLogin = query.get("login");
   const { loginData, setLoginData } = useDataContext();
+  const { schema, refreshSchema} = useSchema();
 
+  refreshSchema
   // Находим данные для выбранного subsection
-  const selectedSubsection = jsonData
-    .flatMap((section) => section.subsections || [])
-    .find((subsection) => subsection.subsection === selectedSubsectionName);
-
+  const selectedSubsection = schema
+    .flatMap((section: any) => section.subsections || [])
+    .find(
+      (subsection: any) => subsection.subsection === selectedSubsectionName
+    );
+  console.log("dddd");
+  console.log(schema);
   if (!selectedSubsection) {
     return (
       <InfoList>
@@ -80,7 +85,7 @@ const SubsectionPage: React.FC = () => {
       <div className="container">
         <h2 className="title">{selectedSubsection.subsection}</h2>
         <div className="card-list">
-          {selectedSubsection.items.map((item, index) => {
+          {selectedSubsection.items.map((item: any, index: number) => {
             const isLarge = item.text.length > 200;
             return (
               <div

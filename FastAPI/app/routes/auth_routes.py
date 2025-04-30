@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 
-from .default_routes import export_schema
 import auth, crud
 from depencies import RedisDependency, SessionDependency, TokenDependency
 from schemas import CreateUser, ItemId, Login, LoginResponse, Reg, StatusResponse
@@ -14,7 +13,6 @@ router = APIRouter()
 async def login_user(login_data: Login, session: SessionDependency, redis: RedisDependency):
 
     """Эндпоинт для логина пользователя"""
-    await export_schema(redis)
     user_query = select(User).where(User.username == login_data.username)
     user_model = await session.scalar(user_query)
     if user_model is None:

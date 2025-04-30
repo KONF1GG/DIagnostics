@@ -3,7 +3,7 @@ import { Logout } from "./Navbar";
 import "../CSS/SideMenu.css";
 import { useSidebar } from "../../DataContext/SidebarContext";
 import { useSidebarContext } from "../../DataContext/SideMenuContext";
-import jsonData from "./../../components/FileData/diagnosticHelper.json";
+import { useSchema } from "../../DataContext/SchemaContext";
 
 interface SidebarProps {
   login: string;
@@ -13,8 +13,9 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isSidebarOpen } = useSidebar();
-  const { openSections, toggleSection } = useSidebarContext(); 
+  const { openSections, toggleSection } = useSidebarContext();
   const { searchedLogin } = useSidebar();
+  const { schema } = useSchema();
 
   const sectionList = [
     { path: "network", label: "Сеть" },
@@ -22,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
     { path: "cameras", label: "Камеры" },
     { path: "TV", label: "ТВ" },
     { path: "app", label: "Приложение" },
-    { path: "payments", label: "Оплата"},
+    { path: "payments", label: "Оплата" },
   ];
 
   const query = new URLSearchParams(location.search);
@@ -74,11 +75,12 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
     }
   };
 
+  console.log(schema);
   return (
     <div className="d-flex">
       <div className={`side-menu-wrapper ${isSidebarOpen ? "open" : ""}`}>
         <div className="side-menu">
-          {jsonData.map((section, index) => {
+          {schema.map((section: any, index: number) => {
             const isMatchedSection = sectionList.find(
               (item) => item.label === section.section
             );
@@ -113,21 +115,23 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
                   }`}
                 >
                   {section.subsections &&
-                    section.subsections.map((subsection, subIndex) => (
-                      <div
-                        key={subIndex}
-                        className={`subsection ${
-                          subsection.subsection === selectedSubsectionName
-                            ? "active"
-                            : ""
-                        }`}
-                        onClick={() => openSubsection(subsection.subsection)}
-                      >
-                        <div className="subsection-content">
-                          {subsection.subsection}
+                    section.subsections.map(
+                      (subsection: any, subIndex: any) => (
+                        <div
+                          key={subIndex}
+                          className={`subsection ${
+                            subsection.subsection === selectedSubsectionName
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() => openSubsection(subsection.subsection)}
+                        >
+                          <div className="subsection-content">
+                            {subsection.subsection}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                 </div>
               </div>
             );

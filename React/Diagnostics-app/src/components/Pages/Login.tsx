@@ -7,7 +7,7 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-    if (e) e.preventDefault(); // Предотвращаем стандартное поведение формы
+    if (e) e.preventDefault(); 
     setError(null);
 
     const result = await handleLogin(username, password);

@@ -36,3 +36,35 @@ export const Get = async (
     });
   }
 };
+
+export const GetSchema = async (
+  setData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  const url = `/v1/schema`;
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await api.get(url, {
+      headers: {
+        "x-token": token,
+      },
+    });
+
+    setData(response.data);
+  } catch (err) {
+    const error = err as AxiosError<ApiError>;
+
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+      return;
+    }
+
+    const errorDetail =
+      error.response?.data?.detail || "Не удалось получить данные схемы";
+
+    toast.error(errorDetail, {
+      position: "bottom-right",
+    });
+  }
+};

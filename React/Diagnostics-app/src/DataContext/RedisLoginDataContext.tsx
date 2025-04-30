@@ -15,7 +15,6 @@ export const RedisDataProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <RedisDataContext.Provider value={{ loginData, setLoginData }}>
       {" "}
-      {/* Обновлено здесь */}
       {children}
     </RedisDataContext.Provider>
   );

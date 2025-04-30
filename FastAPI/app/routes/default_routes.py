@@ -75,28 +75,16 @@ async def log(
         )
     except Exception as e:
         return {"status": "error", "message": f"Ошибка при логировании в ClickHouse: {e}"}
-
-    # Возвращаем успешный статус
     return {"status": "success"}
-
-async def export_schema(redis):
-    schema = await crud.get_schema_from_redis(redis)
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "../../../React/Diagnostics-app/src/components/FileData/diagnosticHelper.json")
-    file_path = os.path.abspath(os.path.normpath(file_path))
-    
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-    with open(file_path, "w", encoding="utf-8") as file:
-        json.dump(schema, file, indent=4, ensure_ascii=False)
-
-    return True
 
 @router.get('/v1/redis_data', response_model=Dict)
 async def get_data_from_redis_by_login(login: str, redis: RedisDependency, token: TokenDependency):
-    await export_schema(redis)
     return await crud.get_login_data(login, redis)
+
+@router.get('/v1/schema', response_model=List[Dict])
+async def get_setions_schema(redis: RedisDependency, token: TokenDependency):
+    schema = await crud.get_schema_from_redis(redis)
+    return schema
 
 
 @router.get('/v1/last_actioins', response_model=List[Action])
