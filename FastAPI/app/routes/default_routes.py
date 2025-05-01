@@ -82,7 +82,7 @@ async def get_data_from_redis_by_login(login: str, redis: RedisDependency, token
     return await crud.get_login_data(login, redis)
 
 @router.get('/v1/schema', response_model=List[Dict])
-async def get_setions_schema(redis: RedisDependency, token: TokenDependency):
+async def get_setions_schema(redis: RedisDependency):
     schema = await crud.get_schema_from_redis(redis)
     return schema
 

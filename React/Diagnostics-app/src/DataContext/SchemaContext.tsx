@@ -15,14 +15,8 @@ export const SchemaProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [schema, setSchema] = useState<any>([]);
   const fetchSchema = async () => {
-    const token = localStorage.getItem("token");
-
     try {
-      const response = await api.get("/v1/schema", {
-        headers: {
-          "x-token": token,
-        },
-      });
+      const response = await api.get("/v1/schema");
 
       console.log(response.data);
       setSchema(response.data);
