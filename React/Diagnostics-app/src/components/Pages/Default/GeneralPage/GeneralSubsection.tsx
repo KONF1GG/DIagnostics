@@ -12,17 +12,15 @@ const SubsectionPage: React.FC = () => {
   const selectedSubsectionName = query.get("subsection");
   const queriedLogin = query.get("login");
   const { loginData, setLoginData } = useDataContext();
-  const { schema, refreshSchema} = useSchema();
+  const { schema } = useSchema();
 
-  refreshSchema
   // Находим данные для выбранного subsection
   const selectedSubsection = schema
     .flatMap((section: any) => section.subsections || [])
     .find(
       (subsection: any) => subsection.subsection === selectedSubsectionName
     );
-  console.log("dddd");
-  console.log(schema);
+ 
   if (!selectedSubsection) {
     return (
       <InfoList>
