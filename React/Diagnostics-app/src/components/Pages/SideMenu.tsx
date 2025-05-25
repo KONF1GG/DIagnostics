@@ -75,7 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
     }
   };
 
-  console.log(schema);
   return (
     <div className="d-flex">
       <div className={`side-menu-wrapper ${isSidebarOpen ? "open" : ""}`}>

@@ -14,16 +14,19 @@ import "react-toastify/dist/ReactToastify.css";
 import SubsectionPage from "./components/Pages/Default/GeneralPage/GeneralSubsection";
 import UserPage from "./components/Pages/UserPage";
 import PaymentPage from "./components/Pages/Payment/payment";
+import ChatIcon from "./components/Pages/ChatAI/ChatIcon";
 
 const App = () => {
   const location = useLocation();
 
+  const hideOnAuthPages =
+    location.pathname === "/login" || location.pathname === "/register";
+
   return (
     <>
       <ToastContainer />
-      {location.pathname !== "/login" && location.pathname !== "/register" && (
-        <Navbar />
-      )}
+      {!hideOnAuthPages && <Navbar />}
+      {!hideOnAuthPages && <ChatIcon />}
 
       <div>
         <Routes>
@@ -36,9 +39,9 @@ const App = () => {
           <Route path="/accidents" element={<Accidents />} />
           <Route path="/cameras" element={<Cameras />} />
           <Route path="/TV" element={<TV />} />
-          <Route path="/app" element={<App_page />}></Route>
+          <Route path="/app" element={<App_page />} />
           <Route path="/subsection" element={<SubsectionPage />} />
-          <Route path="/payments" element={<PaymentPage />}></Route>
+          <Route path="/payments" element={<PaymentPage />} />
         </Routes>
       </div>
     </>
