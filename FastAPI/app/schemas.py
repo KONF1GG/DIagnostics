@@ -1,11 +1,10 @@
 from abc import ABC
 from abc import ABC
-import string
 import uuid
 from typing import Any, Literal, Dict, List, Optional, Union
 from typing import Any, Literal, Dict, List, Optional, Union
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from datetime import date
 from datetime import date
 
@@ -384,3 +383,57 @@ class PaymentResponseModel(BaseModel):
     canceled_payments: List[FailurePay] | None = None
     recurringPayment: RecPaymnent | None
     notifications: List[NotificationSMS] | None = None
+
+
+class IntercomService(BaseModel):
+    service: str
+    category: str
+    timeto: str
+
+class CategoryStatus(BaseModel):
+    category: str
+    timeto_1c: Optional[int] = None
+    timeto_redis: Optional[int] = None
+    status: str  # e.g., "match", "discrepancy", "only_in_1c", "only_in_redis", "missing"
+
+class RBTApsSettings(BaseModel):
+    address_house_id: int
+    manual_block: Optional[bool]
+    auto_block: Optional[bool] 
+    open_code: Optional[str] 
+    white_rabbit: Optional[bool]
+    admin_block: Optional[bool]
+
+    @field_validator('manual_block', 'auto_block', 'white_rabbit', 'admin_block', mode='before')
+    def convert_to_bool(cls, value):
+        if value is None:
+            return None
+        
+        if isinstance(value, bool):
+            return bool
+        
+        if isinstance(value, (int, float)):
+            return bool(value)
+        
+        if isinstance(value, str):
+            value = value.strip().lower()
+            if value in ('1', 'true', 't', 'yes', 'y', 'on'):
+                return True
+            if value in ('0', 'false', 'f', 'no', 'n', 'off', ''):
+                return False
+            return bool(value)
+    
+        return bool(value)
+
+class Passage(BaseModel):
+    date: datetime
+    address: str  # Адрес (mechanizmaDescription)
+    type: str  # Тип события (например, "открытие ключом")
+    
+class IntercomResponse(BaseModel):
+    categories: List[CategoryStatus]
+    errors: List[str]
+    update_instructions: Optional[str] = None
+    aps_settings: RBTApsSettings
+    rbt_link: str
+    passages: List[Passage]
