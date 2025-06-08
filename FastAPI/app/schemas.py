@@ -391,8 +391,8 @@ class IntercomService(BaseModel):
     timeto: str
 
 class CategoryStatus(BaseModel):
-    service: str
-    category: str
+    service: Optional[str] = None
+    category: Optional[str] = None
     timeto_1c: Optional[int] = None
     timeto_redis: Optional[int] = None
     status: str  # e.g., "match", "discrepancy", "only_in_1c", "only_in_redis", "missing"
