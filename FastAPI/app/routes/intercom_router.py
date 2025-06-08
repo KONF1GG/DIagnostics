@@ -140,7 +140,6 @@ async def get_data_for_intercom_page(
     
     # Обработка результатов
     services_1c = results[0]
-    services_1c[1].timeto=''
     services_redis = redis_data["servicecats"] if isinstance(redis_data, dict) and "servicecats" in redis_data else {}
 
     if isinstance(services_1c, Exception):
@@ -211,7 +210,7 @@ async def get_data_for_intercom_page(
     update_instructions = None
     if has_discrepancies:
         update_instructions = (
-            "Для исправления данных в редис можно перезаписать данные подключения в 1с, для этого:\n"
+            "Для обновления данных в Redis:\n"
             "1. Зайдите в карточку договора\n"
             "2. Перейдите в 'Управление договором'\n"
             "3. Откройте вкладку 'Логины'\n"
