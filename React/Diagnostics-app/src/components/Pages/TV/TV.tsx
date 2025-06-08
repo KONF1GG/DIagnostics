@@ -194,7 +194,6 @@ const TV = () => {
     );
   }
 
-  console.log(data);
   return (
     <div>
       <InfoList>

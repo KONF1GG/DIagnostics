@@ -63,7 +63,6 @@ export const ActionList = async (): Promise<Action[] | string> => {
             }
         });
 
-        console.log(response.status);
         return response.data;
     } catch (err) {
         const error = err as AxiosError<ApiError>;

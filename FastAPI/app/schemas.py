@@ -391,6 +391,7 @@ class IntercomService(BaseModel):
     timeto: str
 
 class CategoryStatus(BaseModel):
+    service: str
     category: str
     timeto_1c: Optional[int] = None
     timeto_redis: Optional[int] = None
@@ -434,6 +435,6 @@ class IntercomResponse(BaseModel):
     categories: List[CategoryStatus]
     errors: List[str]
     update_instructions: Optional[str] = None
-    aps_settings: RBTApsSettings
+    aps_settings: Optional[RBTApsSettings] = None
     rbt_link: str
     passages: List[Passage]

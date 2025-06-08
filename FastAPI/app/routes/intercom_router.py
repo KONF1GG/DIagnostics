@@ -1,3 +1,4 @@
+from ast import Dict
 import asyncio
 from typing import Optional
 import aiohttp
@@ -16,6 +17,7 @@ router = APIRouter()
 GMT_PLUS_5 = timezone(timedelta(hours=5))
 DAYS_TO_FETCH = 5
 RBT_API_URL = "https://rbt.freedom1.ru/mobile/address/plog"
+CATEGORIES_OF_INTEREST = ["barrier", "intercom", "intercomhandset"]
 
 # Преобразование даты из 1С в точный timestamp (00:00:00 GMT+05:00)
 def date_string_to_timestamp(date_str: str) -> int:
@@ -111,7 +113,6 @@ async def get_data_for_intercom_page(
     if not login:
         raise HTTPException(status_code=400, detail="Login parameter is required")
     
-    categories_of_interest = ["barrier", "intercom", "intercomhandset"]
     errors = []
     
     # Параллельное выполнение запросов
@@ -121,6 +122,16 @@ async def get_data_for_intercom_page(
     results = await asyncio.gather(services_1c_task, redis_data_task, return_exceptions=True)
     
     redis_data = results[1]
+    if redis_data.get('rbt') == False:
+        return IntercomResponse(
+            categories=[CategoryStatus(category=cat, status="missing") for cat in CATEGORIES_OF_INTEREST],
+            errors=["RBT is disabled for this login"],
+            update_instructions=None,
+            aps_settings=None,
+            rbt_link="",
+            passages=[]
+        )
+    
     flat_id = redis_data.get('flatId')
     if not flat_id:
         errors.append("flatId не найден в Redis")
@@ -129,6 +140,7 @@ async def get_data_for_intercom_page(
     
     # Обработка результатов
     services_1c = results[0]
+    services_1c[1].timeto=''
     services_redis = redis_data["servicecats"] if isinstance(redis_data, dict) and "servicecats" in redis_data else {}
 
     if isinstance(services_1c, Exception):
@@ -145,11 +157,13 @@ async def get_data_for_intercom_page(
             categories = service.category.split(',')
             for category in categories:
                 category = category.strip()
-                if category in categories_of_interest:
+                if category in CATEGORIES_OF_INTEREST:
                     try:
-                        services_1c_dict[category] = date_string_to_timestamp(service.timeto)
+                        services_1c_dict[category] = {"time_to": date_string_to_timestamp(service.timeto),
+                                                      "service": service.service}
                     except ValueError as e:
                         errors.append(f"Ошибка в дате 1С для {category}: {str(e)}")
+
     
     # Обработка данных из Redis
     services_redis_dict = {}
@@ -166,8 +180,8 @@ async def get_data_for_intercom_page(
     categories_status = []
     has_discrepancies = False
     
-    for category in categories_of_interest:
-        timeto_1c = services_1c_dict.get(category)
+    for category in CATEGORIES_OF_INTEREST:
+        timeto_1c = services_1c_dict.get(category).get('time_to')
         timeto_redis = services_redis_dict.get(category)
         
         timeto_1c_for_comparison = get_start_of_day_timestamp(timeto_1c) if timeto_1c is not None else None
@@ -186,6 +200,7 @@ async def get_data_for_intercom_page(
             status = "missing"
         
         categories_status.append(CategoryStatus(
+            service=services_1c_dict.get(category).get('service'),
             category=category,
             timeto_1c=timeto_1c,
             timeto_redis=timeto_redis,
@@ -196,7 +211,7 @@ async def get_data_for_intercom_page(
     update_instructions = None
     if has_discrepancies:
         update_instructions = (
-            "Для обновления данных в Redis:\n"
+            "Для исправления данных в редис можно перезаписать данные подключения в 1с, для этого:\n"
             "1. Зайдите в карточку договора\n"
             "2. Перейдите в 'Управление договором'\n"
             "3. Откройте вкладку 'Логины'\n"
@@ -211,6 +226,7 @@ async def get_data_for_intercom_page(
 
     # Получение данных о проходах
     passages = await passages_task if passages_task else []
+
 
     return IntercomResponse(
         categories=categories_status,

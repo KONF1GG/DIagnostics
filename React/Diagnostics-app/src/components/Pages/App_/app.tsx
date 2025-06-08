@@ -105,7 +105,6 @@ const App_page = () => {
     }
   };
 
-  console.log(data);
 
   const handleDeleteAddress = (
     contract: RedisLogin | undefined,

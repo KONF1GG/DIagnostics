@@ -14,6 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 import SubsectionPage from "./components/Pages/Default/GeneralPage/GeneralSubsection";
 import UserPage from "./components/Pages/UserPage";
 import PaymentPage from "./components/Pages/Payment/payment";
+import IntercomPage from "./components/Pages/Intercom/intercomPage";
 
 const App = () => {
   const location = useLocation();
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="/app" element={<App_page />}></Route>
           <Route path="/subsection" element={<SubsectionPage />} />
           <Route path="/payments" element={<PaymentPage />}></Route>
+          <Route path="/intercom" element={<IntercomPage />}></Route>
         </Routes>
       </div>
     </>

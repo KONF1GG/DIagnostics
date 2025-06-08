@@ -222,7 +222,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  console.log(searchedLogin);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
