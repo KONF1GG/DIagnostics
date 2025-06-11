@@ -15,6 +15,7 @@ import SubsectionPage from "./components/Pages/Default/GeneralPage/GeneralSubsec
 import UserPage from "./components/Pages/UserPage";
 import PaymentPage from "./components/Pages/Payment/payment";
 import ChatIcon from "./components/Pages/ChatAI/ChatIcon";
+import IntercomPage from "./components/Pages/Intercom/intercomPage";
 
 const App = () => {
   const location = useLocation();
@@ -41,7 +42,8 @@ const App = () => {
           <Route path="/TV" element={<TV />} />
           <Route path="/app" element={<App_page />} />
           <Route path="/subsection" element={<SubsectionPage />} />
-          <Route path="/payments" element={<PaymentPage />} />
+          <Route path="/payments" element={<PaymentPage />}/>
+          <Route path="/intercom" element={<IntercomPage />}/>
         </Routes>
       </div>
     </>

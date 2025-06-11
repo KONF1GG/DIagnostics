@@ -17,8 +17,6 @@ export const SchemaProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchSchema = async () => {
     try {
       const response = await api.get("/v1/schema");
-
-      console.log(response.data);
       setSchema(response.data);
     } catch (err) {
       setSchema([]);

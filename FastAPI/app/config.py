@@ -29,7 +29,7 @@ host_tokens = {
     "video-krd.freedom1.ru": os.getenv('KRD_TOKEN'),
     "video-mgn.freedom1.ru": os.getenv('MGN_TOKEN'),
     "video-sib.freedom1.ru": os.getenv('SIB_TOKEN'),
-    "video2-krd.freedom1.ru": os.getenv('KRD2_TOKEN')
+    "video2-krd.freedom1.ru": os.getenv('KRD2_TOKEN'), 
 }
 
 CONFIG_TV24 = os.getenv('TOKEN_24TV')

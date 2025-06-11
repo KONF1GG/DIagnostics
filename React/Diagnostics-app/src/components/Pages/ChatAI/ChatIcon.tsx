@@ -22,6 +22,7 @@ const ChatIcon = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [messageId, setMessageId] = useState<number>(0);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -174,8 +175,8 @@ const ChatIcon = () => {
             <div className="chat-description">
               <p>
                 Привет! Я Фрида — ваш корпоративный помощник. Работаю с
-                внутренней Wiki. Ответы могут содержать
-                неточности - проверяйте важную информацию.
+                внутренней Wiki. Ответы могут содержать неточности - проверяйте
+                важную информацию.
               </p>
             </div>
 
@@ -189,29 +190,11 @@ const ChatIcon = () => {
 
                   {msg.links && (
                     <div className="message-footer">
-                      <div className="sources-container">
-                        <div className="sources-header">
-                          Ответ основан на следующих источниках:
-                        </div>
-                        <table className="sources-table">
-                          <tbody>
-                            {msg.links.map((link, i) => (
-                              <tr key={i} className="source-row">
-                                <td className="source-cell">{link.source}</td>
-                                <td className="source-cell">{link.section}</td>
-                                <td className="source-cell">
-                                  {link.description}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
                       <div className="message-actions">
                         <button onClick={() => copyToClipboard(msg.text)}>
                           Копировать
                         </button>
-                        <button onClick={clearChat}>Очистить</button>
+                        <button onClick={clearChat}>Очистить чат</button>
                       </div>
                     </div>
                   )}
@@ -227,20 +210,22 @@ const ChatIcon = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="chat-examples">
-              <h4>Примеры вопросов:</h4>
-              <div className="example-buttons">
-                {exampleQuestions.map((question, index) => (
-                  <button
-                    key={index}
-                    className="example-button"
-                    onClick={() => handleQuestionClick(question)}
-                  >
-                    {question}
-                  </button>
-                ))}
+            {messages.length === 0 && (
+              <div className="chat-examples">
+                <h4>Примеры вопросов:</h4>
+                <div className="example-buttons">
+                  {exampleQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      className="example-button"
+                      onClick={() => handleQuestionClick(question)}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="chat-input-container">
               <input

@@ -93,7 +93,6 @@ const PaymentPage = () => {
     );
   }
 
-  console.log(data);
   return (
     <div>
       <InfoList>

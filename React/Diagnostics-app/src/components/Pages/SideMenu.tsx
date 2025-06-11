@@ -24,6 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ login }) => {
     { path: "TV", label: "ТВ" },
     { path: "app", label: "Приложение" },
     { path: "payments", label: "Оплата" },
+    { path: "intercom", label: "Домофон"},
   ];
 
   const query = new URLSearchParams(location.search);

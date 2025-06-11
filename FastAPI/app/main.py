@@ -11,10 +11,12 @@ from routes.cameras_routes import router as cameras_router
 from routes.TV_routes import router as TV_router
 from routes.App_routes import router as app_router
 from routes.payment_routes import router as pay_router
+from routes.intercom_router import router as intercom_router
+import logging
 
 from lifespan import lifespan
 
-
+logging.basicConfig(level=logging.INFO)
 app = FastAPI(
     title="Diagnostics API",
     version="1.0.0",
@@ -48,6 +50,7 @@ app.include_router(cameras_router)
 app.include_router(TV_router)
 app.include_router(app_router)
 app.include_router(pay_router)
+app.include_router(intercom_router)
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, port=8000)
+if __name__ == "__main__":
+    uvicorn.run("main:app", port=8000, reload=True)

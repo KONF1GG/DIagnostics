@@ -11,7 +11,7 @@ from fastapi import HTTPException
 from redis.commands.search.result import Result
 from yarl import Query
 from depencies import RedisDependency
-from schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, LoginFailureData, RBT_phone, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
+from schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, IntercomService, LoginFailureData, RBT_phone, RBTApsSettings, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
 from models import Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 import crud
@@ -67,6 +67,7 @@ async def find_failure_by_login(redis: RedisDependency, login_data: LoginFailure
                 return json.loads(result.docs[0].json)
 
     return None
+
 
 async def get_login_data(login: str, redis: RedisDependency) -> Dict:
     login_data = await redis.json().get(f"login:{login}")
@@ -576,10 +577,16 @@ async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange):
 
 
 async def get_redis_key_data(login: str, redis) -> Result:
-    value = await redis.json().get(f"login:{login}")
-    if not value:
-        raise HTTPException(status_code=404, detail="Пользователь не найден")
-    return value
+    try:
+        value = await redis.json().get(f"login:{login}")
+        if not value:
+            raise HTTPException(status_code=404, detail="Пользователь не найден")
+        return value
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching data from Redis: {str(e)}"
+        )
 
 async def get_schema_from_redis(redis) -> Result:
     schema = await redis.json().get("scheme:content")
@@ -928,3 +935,105 @@ async def get_last_actions(clickhouse_client) -> List[Action]:
         raise HTTPException(status_code=500, detail="Ошибка получения последних изменений")
 
     return actions
+
+
+async def get_1c_intercom_services(login: str) -> List[IntercomService]:
+    url = f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=intercom&login={login}'
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                try:
+                    response.raise_for_status()
+                    data = await response.json()
+                    
+                    if not isinstance(data, list):
+                        raise HTTPException(
+                            status_code=422,
+                            detail="Expected list in response data"
+                        )
+                    
+                    result = []
+                    for service in data:
+                        try:
+                            validated_service = IntercomService(
+                                service=service.get('service'),
+                                category=service.get('category'),
+                                timeto=service.get('timeto')
+                            )
+                            result.append(validated_service)
+                        except ValueError as ve:
+                            raise HTTPException(
+                                status_code=422,
+                                detail=f"Invalid service data: {str(ve)}"
+                            )
+                    
+                    if not result:
+                        raise HTTPException(
+                            status_code=404,
+                            detail="No valid services found"
+                        )
+                    
+                    return result
+                
+                except ValueError as ve:
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Invalid JSON data: {str(ve)}"
+                    )
+                    
+    except aiohttp.ClientError as ce:
+        raise HTTPException(
+            status_code=422,
+            detail=f"1C service unavailable: {str(ce)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+    
+    
+async def get_RBT_aps_settings(flat_id: int, rbt):
+    try:
+        async with rbt.transaction():
+            query = """
+            SELECT address_house_id,
+                   manual_block, 
+                   auto_block,
+                   open_code,
+                   white_rabbit,
+                   admin_block
+            FROM "houses_flats"
+            WHERE "house_flat_id" = $1
+            """
+            record = await rbt.fetchrow(query, flat_id)  # Используем fetchrow для одной записи
+            
+            if record:
+                # Правильное преобразование asyncpg Record в словарь
+                data = dict(record)
+                return RBTApsSettings.model_validate(data)
+
+            return None
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching data from RBT: {str(e)}"
+        )
+    
+async def get_RBT_token(flat_id: int, rbt) -> str:
+    query = """
+        SELECT auth_token
+        FROM houses_subscribers_mobile hsm
+        INNER JOIN houses_flats_subscribers hfs
+            ON hsm.house_subscriber_id = hfs.house_subscriber_id 
+        WHERE house_flat_id = $1 
+            AND auth_token IS NOT NULL
+        ORDER BY role DESC
+        LIMIT 1
+    """
+    token = await rbt.fetchval(query, flat_id)
+    if not token:
+        raise ValueError(f"Токен для flat_id {flat_id} не найден")
+    return token

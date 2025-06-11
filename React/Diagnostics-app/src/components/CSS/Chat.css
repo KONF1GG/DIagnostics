@@ -138,6 +138,8 @@
 /* Область сообщений */
 .chat-messages {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   padding: 16px 20px;
   scroll-behavior: smooth;
@@ -214,7 +216,6 @@
 /* Источники в сообщениях */
 .message-footer {
   margin-top: 12px;
-  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -309,6 +310,13 @@
   background: white;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  overflow: hidden;
+}
+
+.chat-examples:not(:empty) {
+  opacity: 1;
+  max-height: 200px;
 }
 
 .chat-examples h4 {
