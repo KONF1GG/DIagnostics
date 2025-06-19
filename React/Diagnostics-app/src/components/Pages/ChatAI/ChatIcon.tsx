@@ -128,9 +128,9 @@ const ChatIcon = () => {
     }
   };
 
-  const copyToClipboard = (text: string): void => {
-    navigator.clipboard.writeText(text);
-  };
+//   const copyToClipboard = (text: string): void => {
+//     navigator.clipboard.writeText(text);
+//   };
 
 //   const clearChat = (): void => {
 //     setMessages([]);
