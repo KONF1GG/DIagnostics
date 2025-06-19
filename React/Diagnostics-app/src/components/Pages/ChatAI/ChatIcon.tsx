@@ -132,11 +132,11 @@ const ChatIcon = () => {
     navigator.clipboard.writeText(text);
   };
 
-  const clearChat = (): void => {
-    setMessages([]);
-    localStorage.removeItem("chatMessages");
-    setMessageId(0);
-  };
+//   const clearChat = (): void => {
+//     setMessages([]);
+//     localStorage.removeItem("chatMessages");
+//     setMessageId(0);
+//   };
 
   return (
     <>
