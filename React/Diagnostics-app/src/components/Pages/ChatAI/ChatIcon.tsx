@@ -189,7 +189,7 @@ const ChatIcon = () => {
                       dangerouslySetInnerHTML={{ __html: msg.text }}
                     />
                   )}
-                  {!msg.isUser ? (
+                  {/* {!msg.isUser ? (
                     <div className="message-footer">
                       <div className="message-actions">
                         <button onClick={() => copyToClipboard(msg.text)}>
@@ -199,7 +199,7 @@ const ChatIcon = () => {
                     </div>
                   ) : (
                     <></>
-                  )}
+                  )} */}
                 </div>
               ))}
 
