@@ -438,3 +438,18 @@ class IntercomResponse(BaseModel):
     aps_settings: Optional[RBTApsSettings] = None
     rbt_link: str
     passages: List[Passage]
+
+
+class Search2ResponseData(BaseModel):
+    combined_context: str = Field(..., description="Контекст Вики")
+    hashs: List[str] = Field(..., description="ID контекстов которые используются")
+
+class MistralRequest(BaseModel):
+    """Схема для входных данных запроса к Mistral"""
+    text: str = Field(..., description="Текст запроса пользователя")
+    combined_context: str = Field(..., description="Контекст для обработки запроса")
+    chat_history: str = Field(..., description="История предыдущих сообщений в чате")
+    input_type: Literal['voice', 'csv', 'text'] = Field(
+        default='text',
+        description="Тип входных данных: голос, csv или текст"
+    )

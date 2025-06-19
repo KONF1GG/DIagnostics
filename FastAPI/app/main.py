@@ -12,6 +12,8 @@ from routes.TV_routes import router as TV_router
 from routes.App_routes import router as app_router
 from routes.payment_routes import router as pay_router
 from routes.intercom_router import router as intercom_router
+from routes.frida_routes import router as frida_router
+
 import logging
 
 from lifespan import lifespan
@@ -51,6 +53,7 @@ app.include_router(TV_router)
 app.include_router(app_router)
 app.include_router(pay_router)
 app.include_router(intercom_router)
+app.include_router(frida_router)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000, reload=True)

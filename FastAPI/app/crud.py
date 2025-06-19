@@ -3,16 +3,17 @@ import datetime
 import json
 import re
 import pytz
-from typing import Optional, Dict, List
+from typing import Literal, Optional, Dict, List
 import aiohttp
 from aiohttp import ClientTimeout
 import aiohttp
 from fastapi import HTTPException
 from redis.commands.search.result import Result
+from sqlalchemy import desc, select
 from yarl import Query
 from depencies import RedisDependency
-from schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, IntercomService, LoginFailureData, RBT_phone, RBTApsSettings, RedisLoginSearch, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
-from models import Session, ORM_OBJECT, ORM_CLS
+from schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, IntercomService, LoginFailureData, MistralRequest, RBT_phone, RBTApsSettings, RedisLoginSearch, Search2ResponseData, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
+from models import FridaLogs, LogHash, Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 import crud
 import config
@@ -47,6 +48,27 @@ async def get_item(session: Session, orm_class: ORM_CLS, item_id: int) -> ORM_OB
                             detail=f'{orm_class.__name__} not found with id {item_id}')
     return orm_obj
 
+async def get_last_frida_logs(session: Session, user_id: int, limit: int = 3) -> list[FridaLogs]:
+    """
+    Retrieves the last N non-error Frida logs for a given user.
+
+    Args:
+        session: Async SQLAlchemy session
+        user_id: ID of the user
+        limit: Number of logs to retrieve (default: 3)
+
+    Returns:
+        List of FridaLogs objects
+    """
+    stmt = (
+        select(FridaLogs)
+        .where(FridaLogs.user_id == user_id)
+        .where(FridaLogs.error.is_(None))  # Exclude logs with errors
+        .order_by(FridaLogs.timestamp.desc())
+        .limit(limit)
+    )
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 # Поиск аварии по логину
 
@@ -67,6 +89,7 @@ async def find_failure_by_login(redis: RedisDependency, login_data: LoginFailure
                 return json.loads(result.docs[0].json)
 
     return None
+
 
 async def get_login_data(login: str, redis: RedisDependency) -> Dict:
     login_data = await redis.json().get(f"login:{login}")
@@ -1036,3 +1059,136 @@ async def get_RBT_token(flat_id: int, rbt) -> str:
     if not token:
         raise ValueError(f"Токен для flat_id {flat_id} не найден")
     return token
+
+
+async def get_milvus_data(query: str) -> Search2ResponseData:
+    """Отправляет запрос в Milvus для получения ближайших статей по запросу
+    и возвращает данные в формате Search2ResponseData"""
+    url = f'{config.UTILS_URL}/v2/mlv_search'
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params={'text': query}) as response:
+                try:
+                    response.raise_for_status()
+                    response_data = await response.json()                    
+                    try:
+                        validated_data = Search2ResponseData(**response_data)
+                        return validated_data
+                    except ValueError as ve:
+                        raise HTTPException(
+                            status_code=422,
+                            detail=f"Invalid response format: {str(ve)}"
+                        )
+                
+                except ValueError as ve:
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Invalid JSON data: {str(ve)}"
+                    )
+                    
+    except aiohttp.ClientError as ce:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Milvus service unavailable: {str(ce)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+    
+
+
+async def get_mistral_response(
+    text: str,
+    combined_context: str,
+    chat_history: str,
+    input_type: Literal['voice', 'csv', 'text'] = 'text',
+) -> str:
+    """
+    Отправляет запрос к Mistral API с валидацией данных
+    
+    Args:
+        text: Текст запроса (обязательный)
+        combined_context: Контекст обработки
+        chat_history: История диалога
+        input_type: Тип входных данных
+    
+    Returns:
+        Ответ от Mistral API (строка)
+    
+    Raises:
+        HTTPException: При ошибках валидации или запроса
+    """
+    # Валидируем входные данные через Pydantic модель
+    try:
+        request_data = MistralRequest(
+            text=text,
+            combined_context=combined_context,
+            chat_history=chat_history,
+            input_type=input_type
+        )
+    except ValueError as ve:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid input data: {str(ve)}"
+        )
+    
+    url = f"{config.UTILS_URL}/v1/mistral"
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url,
+                json=request_data.model_dump(),
+                headers={"Content-Type": "application/json"},
+                timeout=aiohttp.ClientTimeout(total=30.0)
+            ) as response:
+                
+                response.raise_for_status()
+                response_data = await response.json()
+                
+                if "mistral_response" not in response_data:
+                    raise ValueError("Missing 'mistral_response' in API response")
+                
+                return response_data["mistral_response"]
+                
+    except aiohttp.ClientError as ce:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Mistral API connection error: {str(ce)}"
+        )
+    except ValueError as ve:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid API response: {str(ve)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error: {str(e)}"
+        )
+    
+
+async def log_frida_interaction(
+    session: Session,
+    user_id: int,
+    query: str,
+    response: str,
+    hashes: list[str],
+    error: Optional[str] = None, 
+) -> None:
+    frida_log = FridaLogs(
+        user_id=user_id,
+        query=query,
+        response=response,
+        error=error, 
+    )
+    session.add(frida_log)
+    await session.flush()
+
+    log_hashes = [LogHash(log_id=frida_log.id, hash=h) for h in hashes]
+    session.add_all(log_hashes)
+
+    await session.commit()

@@ -2,7 +2,7 @@ import datetime
 import clickhouse_connect
 import asyncpg
 from redis.asyncio import Redis, from_url
-from models import Session, Token, SessionRedius
+from models import Session, Token, SessionRadius
 from typing import Annotated, Any, Optional
 from fastapi import Depends, Header, HTTPException
 from sqlalchemy import select
@@ -20,7 +20,7 @@ SessionDependency = Annotated[Session, Depends(get_session, use_cache=True)]
 
 
 async def get_session_redius():
-    async with SessionRedius() as session_redius:
+    async with SessionRadius() as session_redius:
         yield session_redius
 
 SessionRediusDependency = Annotated[Session, Depends(get_session_redius)]

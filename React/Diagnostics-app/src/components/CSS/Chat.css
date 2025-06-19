@@ -1,0 +1,460 @@
+/* Стили для иконки чата */
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.chat-icon-content {
+  width: 70px;
+  height: 80px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chat-icon-content:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-3px);
+}
+
+.chat-sticker {
+  width: 30px;
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+.chat-label {
+  font-size: 12px;
+  margin-top: 6px;
+  color: rgb(0, 0, 0);
+  font-weight: 600;
+}
+
+/* Стили для модального окна */
+.chat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.chat-modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.chat-modal {
+  width: 800px;
+  max-width: 95%;
+  max-height: 90vh;
+  background: white;
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-modal.open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Заголовок модального окна */
+.chat-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  background: var(--primary-color);
+  color: white;
+}
+
+.chat-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.chat-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.chat-modal-close:hover {
+  opacity: 1;
+}
+
+/* Основное содержимое чата */
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  background: #f9fafc;
+}
+
+.chat-description {
+  padding: 10px 20px;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+
+/* Область сообщений */
+.chat-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px 20px;
+  scroll-behavior: smooth;
+  background: #f9fafc;
+}
+
+.message {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  line-height: 1.4;
+  position: relative;
+  margin-bottom: 12px;
+  font-size: 14px;
+  animation: messageAppear 0.3s ease;
+}
+
+@keyframes messageAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: var(--primary-color);
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(74, 107, 255, 0.2);
+}
+
+.message.bot {
+  align-self: flex-start;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.message-text {
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.message.loading {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: #666;
+  gap: 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+}
+
+.loader {
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid var(--primary-hover);
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Источники в сообщениях */
+.message-footer {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.message.user .message-footer {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+.message.bot .message-footer {
+  border-top-color: rgba(0, 0, 0, 0.05);
+}
+
+.sources-container {
+  margin-top: 8px;
+}
+
+.sources-header {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.message.bot .sources-header {
+  color: #666;
+}
+
+.sources-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.source-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message.bot .source-row {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+.source-cell {
+  padding: 6px 0;
+  vertical-align: top;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.message.bot .source-cell {
+  color: #555;
+}
+
+.source-cell:first-child {
+  font-weight: 500;
+  padding-right: 10px;
+}
+
+/* Кнопки действий */
+.message-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.message-actions button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.message.bot .message-actions button {
+  color: #666;
+}
+
+.message-actions button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.message.bot .message-actions button:hover {
+  color: var(--primary-hover);
+  background: rgba(74, 107, 255, 0.1);
+}
+
+/* Примеры вопросов */
+.chat-examples {
+  padding: 12px 20px;
+  background: white;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  overflow: hidden;
+}
+
+.chat-examples:not(:empty) {
+  opacity: 1;
+  max-height: 200px;
+}
+
+.chat-examples h4 {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.example-buttons {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+}
+
+.example-button {
+  background: #f5f7ff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.example-button:hover {
+  background: #eef0f8;
+}
+
+/* Поле ввода */
+.chat-input-container {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  background: white;
+}
+
+.chat-input-container input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+  background: #f9fafc;
+}
+
+.chat-input-container input:focus {
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.1);
+}
+
+.send-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-button:hover {
+  background: var(--primary-hover);
+}
+
+.send-button:disabled {
+  background: var(--secondary-color);
+  cursor: not-allowed;
+}
+
+/* Футер */
+.chat-disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: #999;
+  padding: 8px;
+  background: white;
+  border-top: 1px solid #eee;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .chat-modal {
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    max-width: 100%;
+  }
+  
+  .chat-content {
+    height: calc(100vh - 120px);
+  }
+  
+  .message {
+    max-width: 90%;
+  }
+  
+  .chat-input-container {
+    padding: 12px;
+  }
+  
+  .chat-modal-header {
+    padding: 14px 16px;
+  }
+}
+
+
+/* Styling for italic text (<i>) in bot messages */
+.message.bot .message-text i {
+  font-style: italic;
+  color: #000000; /* Matches --primary-color for consistency */
+  background: rgba(110, 114, 130, 0.05); /* Subtle background highlight */
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Styling for links (<a>) in bot messages */
+.message.bot .message-text a {
+  color: #016d34; /* Matches --primary-color */
+  text-decoration: none; /* Remove default underline */
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.message.bot .message-text a:hover {
+  background: rgba(25, 125, 61, 0.1); /* Subtle hover effect */
+  color: #0ca972; /* Slightly darker shade on hover */
+  text-decoration: underline; /* Underline on hover for clarity */
+}
+

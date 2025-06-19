@@ -1,4 +1,3 @@
-from ast import Dict
 import asyncio
 from typing import Optional
 import aiohttp
@@ -106,7 +105,9 @@ async def get_passages_for_flat(flat_id: int, rbt: RBTDependency, days: int = DA
 async def get_data_for_intercom_page(
     redis: RedisDependency,
     rbt: RBTDependency,
+    token: TokenDependency,
     login: Optional[str] = Query(None),
+
 ):
     """Эндпоинт для получения данных о домофоне, включая данные о проходах."""
     if not login:

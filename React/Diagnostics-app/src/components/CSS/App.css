@@ -1,6 +1,19 @@
-.highlight-owner {
+:root {
+  --primary-color: #41B3A3;
+  --primary-hover: #369b8c;
+  --secondary-color: #85dcd3;
+}
+
+/* .highlight-owner {
     background-color: rgba(0, 123, 255, 0.1); 
     border-left: 4px solid #007bff; 
     padding-left: 1rem; 
   }
+   */
+
+.highlight-owner {
+  background-color: rgba(0, 123, 255, 0.1); 
+  border-left: 4px solid var(--secondary-color); 
+  padding-left: 1rem; 
+}
   
