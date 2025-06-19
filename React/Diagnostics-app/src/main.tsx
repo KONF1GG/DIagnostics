@@ -14,31 +14,34 @@ import { RedisDataProvider } from "./DataContext/RedisLoginDataContext.tsx";
 import { DataProviderPayment } from "./DataContext/PaymentContext.tsx";
 import { SchemaProvider } from "./DataContext/SchemaContext.tsx";
 import { DataProviderIntercom } from "./DataContext/IntercomContext.tsx";
+import { DataProviderFrida } from "./DataContext/FridaContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RedisDataProvider>
       <SchemaProvider>
         <SidebarProvider>
-          <SideMenuProvider>
-            <BrowserRouter>
-              <DataProviderIntercom>
-                <DataProviderPayment>
-                  <DataProviderCameras>
-                    <DataProviderNet>
-                      <DataProviderFailure>
-                        <DataProviderTV>
-                          <DataProviderApp>
-                            <App />
-                          </DataProviderApp>
-                        </DataProviderTV>
-                      </DataProviderFailure>
-                    </DataProviderNet>
-                  </DataProviderCameras>
-                </DataProviderPayment>
-              </DataProviderIntercom>
-            </BrowserRouter>
-          </SideMenuProvider>
+          <DataProviderFrida>
+            <SideMenuProvider>
+              <BrowserRouter>
+                <DataProviderIntercom>
+                  <DataProviderPayment>
+                    <DataProviderCameras>
+                      <DataProviderNet>
+                        <DataProviderFailure>
+                          <DataProviderTV>
+                            <DataProviderApp>
+                              <App />
+                            </DataProviderApp>
+                          </DataProviderTV>
+                        </DataProviderFailure>
+                      </DataProviderNet>
+                    </DataProviderCameras>
+                  </DataProviderPayment>
+                </DataProviderIntercom>
+              </BrowserRouter>
+            </SideMenuProvider>
+          </DataProviderFrida>
         </SidebarProvider>
       </SchemaProvider>
     </RedisDataProvider>
