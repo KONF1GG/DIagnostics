@@ -1,5 +1,5 @@
 import datetime
-from typing import Union
+from typing import Optional, Union
 import uuid
 from uuid import UUID
 
@@ -66,6 +66,7 @@ class FridaLogs(Base):
     timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, server_default=func.now())
     query: Mapped[str] = mapped_column(Text, nullable=False)
     response: Mapped[str] = mapped_column(Text, nullable=False)
+    error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     user: Mapped[User] = relationship('User', back_populates='frida_logs')
     hashes: Mapped[list['LogHash']] = relationship('LogHash', back_populates='log')
 

@@ -431,3 +431,30 @@
     padding: 14px 16px;
   }
 }
+
+
+/* Styling for italic text (<i>) in bot messages */
+.message.bot .message-text i {
+  font-style: italic;
+  color: #000000; /* Matches --primary-color for consistency */
+  background: rgba(110, 114, 130, 0.05); /* Subtle background highlight */
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Styling for links (<a>) in bot messages */
+.message.bot .message-text a {
+  color: #016d34; /* Matches --primary-color */
+  text-decoration: none; /* Remove default underline */
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.message.bot .message-text a:hover {
+  background: rgba(25, 125, 61, 0.1); /* Subtle hover effect */
+  color: #0ca972; /* Slightly darker shade on hover */
+  text-decoration: underline; /* Underline on hover for clarity */
+}
+

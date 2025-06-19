@@ -13,7 +13,7 @@ from sqlalchemy import desc, select
 from yarl import Query
 from depencies import RedisDependency
 from schemas import TV24, TVIP, Action, Camera1CModel, CameraCheckModel, CameraDataToChange, CameraRedisModel, CamerasData, FlussonicModel, IntercomService, LoginFailureData, MistralRequest, RBT_phone, RBTApsSettings, RedisLoginSearch, Search2ResponseData, Service1C, ServiceOp, Smotreshka, ServiceOp, SmotreshkaOperator, StatusResponse, TV24Operator, TVIPOperator
-from models import FridaLogs, Session, ORM_OBJECT, ORM_CLS
+from models import FridaLogs, LogHash, Session, ORM_OBJECT, ORM_CLS
 from sqlalchemy.exc import IntegrityError
 import crud
 import config
@@ -49,12 +49,25 @@ async def get_item(session: Session, orm_class: ORM_CLS, item_id: int) -> ORM_OB
     return orm_obj
 
 async def get_last_frida_logs(session: Session, user_id: int, limit: int = 3) -> list[FridaLogs]:
-    result = await session.execute(
+    """
+    Retrieves the last N non-error Frida logs for a given user.
+
+    Args:
+        session: Async SQLAlchemy session
+        user_id: ID of the user
+        limit: Number of logs to retrieve (default: 3)
+
+    Returns:
+        List of FridaLogs objects
+    """
+    stmt = (
         select(FridaLogs)
         .where(FridaLogs.user_id == user_id)
-        .order_by(desc(FridaLogs.timestamp))
+        .where(FridaLogs.error.is_(None))  # Exclude logs with errors
+        .order_by(FridaLogs.timestamp.desc())
         .limit(limit)
     )
+    result = await session.execute(stmt)
     return result.scalars().all()
 
 # Поиск аварии по логину
@@ -1156,3 +1169,26 @@ async def get_mistral_response(
             status_code=500,
             detail=f"Unexpected error: {str(e)}"
         )
+    
+
+async def log_frida_interaction(
+    session: Session,
+    user_id: int,
+    query: str,
+    response: str,
+    hashes: list[str],
+    error: Optional[str] = None, 
+) -> None:
+    frida_log = FridaLogs(
+        user_id=user_id,
+        query=query,
+        response=response,
+        error=error, 
+    )
+    session.add(frida_log)
+    await session.flush()
+
+    log_hashes = [LogHash(log_id=frida_log.id, hash=h) for h in hashes]
+    session.add_all(log_hashes)
+
+    await session.commit()
