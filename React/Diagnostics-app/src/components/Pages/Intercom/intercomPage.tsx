@@ -5,6 +5,7 @@ import Loader from "../Default/Loading";
 import { getQueryParams } from "../Default/getData";
 import { GetIntercom, IntercomResponse } from "../../../API/Intercom";
 import "../../CSS/Intercom.css";
+import FixManualBlockButton from "./FixManualBlockButton";
 
 interface DataContextType {
   data: IntercomResponse | null;
@@ -14,7 +15,8 @@ interface DataContextType {
 }
 
 const IntercomPage = () => {
-  const { data, setData, login, setLogin } = useDataContext() as DataContextType;
+  const { data, setData, login, setLogin } =
+    useDataContext() as DataContextType;
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -96,7 +98,8 @@ const IntercomPage = () => {
   if (
     !data ||
     (data.errors && data.errors.includes("RBT is disabled for this login")) ||
-    (data.categories && data.categories.every((cat) => cat.status === "missing"))
+    (data.categories &&
+      data.categories.every((cat) => cat.status === "missing"))
   ) {
     return (
       <div>
@@ -107,8 +110,11 @@ const IntercomPage = () => {
     );
   }
 
-  const hasDiscrepancy = data.categories.some((category) => category.status === "discrepancy");
+  const hasDiscrepancy = data.categories.some(
+    (category) => category.status === "discrepancy"
+  );
 
+  console.log(data)
   return (
     <div>
       <InfoList>
@@ -118,7 +124,9 @@ const IntercomPage = () => {
             {data.errors && data.errors.length > 0 && (
               <div className="error-messages">
                 {data.errors.map((err, index) => (
-                  <p key={index} className="error-text">{err}</p>
+                  <p key={index} className="error-text">
+                    {err}
+                  </p>
                 ))}
               </div>
             )}
@@ -140,14 +148,30 @@ const IntercomPage = () => {
                     <tr key={index}>
                       <td>{category.service}</td>
                       <td>{category.category}</td>
-                      <td className={category.status === "discrepancy" ? "discrepancy-cell" : ""}>
+                      <td
+                        className={
+                          category.status === "discrepancy"
+                            ? "discrepancy-cell"
+                            : ""
+                        }
+                      >
                         {category.timeto_1c
-                          ? new Date(category.timeto_1c * 1000).toLocaleDateString()
+                          ? new Date(
+                              category.timeto_1c * 1000
+                            ).toLocaleDateString()
                           : "-"}
                       </td>
-                      <td className={category.status === "discrepancy" ? "discrepancy-cell" : ""}>
+                      <td
+                        className={
+                          category.status === "discrepancy"
+                            ? "discrepancy-cell"
+                            : ""
+                        }
+                      >
                         {category.timeto_redis
-                          ? new Date(category.timeto_redis * 1000).toLocaleDateString()
+                          ? new Date(
+                              category.timeto_redis * 1000
+                            ).toLocaleDateString()
                           : "-"}
                       </td>
                     </tr>
@@ -159,7 +183,9 @@ const IntercomPage = () => {
             )}
             {hasDiscrepancy && (
               <div className="update-instructions">
-                <h3 className="update-instructions-title">Инструкция по обновлению данных</h3>
+                <h3 className="update-instructions-title">
+                  Инструкция по обновлению данных
+                </h3>
                 <ol className="update-instructions-list">
                   <li>Зайдите в карточку договора</li>
                   <li>Перейдите в раздел "Управление договором"</li>
@@ -168,7 +194,8 @@ const IntercomPage = () => {
                   <li>Нажмите "Записать и закрыть"</li>
                 </ol>
                 <p className="update-instructions-note">
-                  Данные автоматически обновятся в течение 5 минут после сохранения.
+                  Данные автоматически обновятся в течение 5 минут после
+                  сохранения.
                 </p>
               </div>
             )}
@@ -181,10 +208,17 @@ const IntercomPage = () => {
                 className="rbt-link"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
               >
                 Настройки квартиры в
-                <span className="rbt-highlight" style={{ display: "inline-flex", alignItems: "center" }}>
+                <span
+                  className="rbt-highlight"
+                  style={{ display: "inline-flex", alignItems: "center" }}
+                >
                   RBT
                   <svg
                     width="16"
@@ -192,7 +226,10 @@ const IntercomPage = () => {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    style={{ marginLeft: "4px", transition: "transform 0.2s ease" }}
+                    style={{
+                      marginLeft: "4px",
+                      transition: "transform 0.2s ease",
+                    }}
                   >
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                     <polyline points="15 3 21 3 21 9"></polyline>
@@ -215,7 +252,28 @@ const IntercomPage = () => {
               <tbody>
                 <tr>
                   <td>{data.aps_settings?.address_house_id || "-"}</td>
-                  <td>{data.aps_settings?.manual_block ? "Да" : "Нет"}</td>
+                  <td>
+                    {data.aps_settings?.manual_block ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <span>Да</span>
+                        <FixManualBlockButton
+                          houseFlatId={data.aps_settings?.house_flat_id}
+                          login={login || queriedLogin || ""}
+                          onFixed={() => {
+                            if (login) fetchData(login);
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      "Нет"
+                    )}
+                  </td>
                   <td>{data.aps_settings?.auto_block ? "Да" : "Нет"}</td>
                   <td>{data.aps_settings?.open_code || "-"}</td>
                   <td>{data.aps_settings?.white_rabbit ? "Да" : "Нет"}</td>

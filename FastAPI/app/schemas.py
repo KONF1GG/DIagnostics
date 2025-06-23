@@ -398,6 +398,7 @@ class CategoryStatus(BaseModel):
     status: str  # e.g., "match", "discrepancy", "only_in_1c", "only_in_redis", "missing"
 
 class RBTApsSettings(BaseModel):
+    house_flat_id: int
     address_house_id: int
     manual_block: Optional[bool]
     auto_block: Optional[bool] 
@@ -453,3 +454,13 @@ class MistralRequest(BaseModel):
         default='text',
         description="Тип входных данных: голос, csv или текст"
     )
+
+
+class FixManualBlockRequest(BaseModel):
+    house_flat_id: int
+
+class FixManualBlockResponse(BaseModel):
+    status: str
+    message: str
+    changed: bool
+    house_flat_id: int

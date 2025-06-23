@@ -1020,7 +1020,8 @@ async def get_RBT_aps_settings(flat_id: int, rbt):
     try:
         async with rbt.transaction():
             query = """
-            SELECT address_house_id,
+            SELECT house_flat_id,
+                   address_house_id,
                    manual_block, 
                    auto_block,
                    open_code,
@@ -1042,6 +1043,41 @@ async def get_RBT_aps_settings(flat_id: int, rbt):
         raise HTTPException(
             status_code=500,
             detail=f"Error fetching data from RBT: {str(e)}"
+        )
+    
+async def update_manual_block(flat_id: int, value: bool, rbt) -> bool:
+    """
+    Обновление значения manual_block для указанной квартиры
+    Возвращает True, если значение было изменено
+    """
+    try:
+        async with rbt.transaction():
+            # Сначала проверяем текущее значение
+            current = await rbt.fetchval(
+                "SELECT manual_block FROM houses_flats WHERE house_flat_id = $1",
+                flat_id
+            )
+            
+            if current is None:
+                raise HTTPException(status_code=404, detail="Квартира не найдена")
+                
+            if current == value:
+                return False
+                
+            # Обновляем значение
+            await rbt.execute(
+                "UPDATE houses_flats SET manual_block = $1 WHERE house_flat_id = $2",
+                value, flat_id
+            )
+            
+            return True
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка при обновлении manual_block: {str(e)}"
         )
     
 async def get_RBT_token(flat_id: int, rbt) -> str:

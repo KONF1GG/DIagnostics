@@ -20,6 +20,7 @@ export interface CategoryStatus {
 }
 
 export interface RBTApsSettings {
+  house_flat_id: number;
   address_house_id: number;
   manual_block?: boolean;
   auto_block?: boolean;

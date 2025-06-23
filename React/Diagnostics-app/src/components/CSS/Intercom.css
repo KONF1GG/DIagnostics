@@ -103,3 +103,58 @@
     font-size: 0.5em;
   }
 }
+.fix-manual-block-container {
+  display: inline-block;
+}
+
+.fix-manual-block-btn {
+  padding: 0.2rem 0.4rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 4px;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.fix-manual-block-btn:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .fix-manual-block-btn {
+    padding: 0.15rem 0.3rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .table {
+    font-size: 0.8rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .error-text,
+  .no-services-message,
+  .update-instructions-note {
+    font-size: 0.8rem;
+  }
+
+  .update-instructions-title {
+    font-size: 1rem;
+  }
+
+  .update-instructions-list {
+    font-size: 0.8rem;
+    padding-left: 1.2rem;
+  }
+
+  .rbt-link {
+    font-size: 0.9rem;
+  }
+
+  .rbt-highlight svg {
+    width: 14px;
+    height: 14px;
+  }
+}

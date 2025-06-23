@@ -3,7 +3,7 @@ from typing import Optional
 import aiohttp
 from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime, timedelta, timezone
-from schemas import CategoryStatus, IntercomResponse, Passage
+from schemas import CategoryStatus, FixManualBlockRequest, FixManualBlockResponse, IntercomResponse, Passage
 import crud
 from depencies import RBTDependency, RedisDependency, TokenDependency
 import logging
@@ -230,3 +230,61 @@ async def get_data_for_intercom_page(
         rbt_link=rbt_link,
         passages=passages
     )
+
+@router.post('/v1/intercom/fix-manual-block', 
+             status_code=200,
+             response_model=FixManualBlockResponse)
+async def fix_manual_block(
+    rbt: RBTDependency,
+    request_data: FixManualBlockRequest,
+):
+    """
+    Эндпоинт для исправления ручного отключения домофонии (manual_block).
+    
+    Возвращает:
+    - 200: если значение было изменено 
+    - 400: если manual_block уже был 0
+    - 404: если квартира не найдена
+    """
+    try:
+        async with rbt.transaction():
+            # Проверяем текущее значение
+            current = await rbt.fetchval(
+                "SELECT manual_block FROM houses_flats WHERE house_flat_id = $1",
+                request_data.house_flat_id
+            )
+            
+            if current is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Квартира не найдена"
+                )
+                
+            if not current: 
+                raise HTTPException(
+                    status_code=400,
+                    detail="Manual_block уже установлен в 0"
+                )
+            
+            # Обновляем значение
+            await rbt.execute(
+                "UPDATE houses_flats SET manual_block = FALSE WHERE house_flat_id = $1",
+                request_data.house_flat_id
+            )
+            
+            logger.info(f"Обновлён manual_block для квартиры {request_data.house_flat_id}")
+            return {
+                "status": "success",
+                "message": "Manual_block установлен в 0",
+                "changed": True,
+                "house_flat_id": request_data.house_flat_id
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Ошибка при обновлении manual_block: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Внутренняя ошибка сервера"
+        )
