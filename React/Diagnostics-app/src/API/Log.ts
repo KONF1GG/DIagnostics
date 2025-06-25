@@ -18,6 +18,7 @@ export interface Data {
 const LogData = async (data: Data): Promise<string> => {
   const token = localStorage.getItem("token");
   try {
+    
     const response = await api.post("/v1/log", data, {
       headers: {
         "Content-Type": "application/json",
@@ -36,6 +37,7 @@ const LogData = async (data: Data): Promise<string> => {
     return "Неизвестная ошибка.";
   } catch (err) {
     const error = err as AxiosError<ApiError>;
+
 
     if (error.response && error.response.data) {
       const errorDetail = error.response.data.detail || "Произошла ошибка записи лога.";

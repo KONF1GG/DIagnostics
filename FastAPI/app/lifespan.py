@@ -1,12 +1,16 @@
+"""
+Управление жизненным циклом приложения.
+"""
+import logging
 from contextlib import asynccontextmanager
-from models import Base, engine
+from app.models import Base, engine
 from fastapi import FastAPI
 
-
+logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print('START')
+    logger.info('START')
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    print('STOP')
+    logger.info('STOP')

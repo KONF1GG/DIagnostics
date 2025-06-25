@@ -12,7 +12,7 @@ export interface RedisLogin {
 }
 
 export interface RBTPhone {
-  house_id: number;
+  house_subscriber_id: number;
   flat_id: number;
   phone: number; // id
   name: string;

@@ -1,36 +1,39 @@
-from abc import ABC
-from abc import ABC
+"""
+Схемы данных для FastAPI.
+"""
+
 import uuid
-from typing import Any, Literal, Dict, List, Optional, Union
 from typing import Any, Literal, Dict, List, Optional, Union
 from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
-from datetime import date
-from datetime import date
 
 
 class ItemId(BaseModel):
+    """Идентификатор объекта."""
     id: int
 
 
 class BaseUser(BaseModel):
+    """Базовые данные пользователя."""
     username: str
     password: str
 
 
-
 class CreateUser(BaseUser):
+    """Схема создания пользователя."""
     firstname: str
     lastname: str
     middlename: str
     password: str
     role_id: Optional[int] = None
 
+
 class Reg(BaseUser):
-    pass
+    """Схема регистрации пользователя."""
 
 
 class UpdateUser(BaseModel):
+    """Схема обновления данных пользователя."""
     username: Optional[str] = None
     firstname: Optional[str] = None
     lastname: Optional[str] = None
@@ -40,6 +43,7 @@ class UpdateUser(BaseModel):
 
 
 class UserModel(BaseModel):
+    """Модель пользователя."""
     id: int
     firstname: str
     lastname: str
@@ -47,7 +51,9 @@ class UserModel(BaseModel):
     username: str
     role: str
 
+
 class ResponseUserData(UserModel):
+    """Ответ с данными пользователя."""
     firstname: str
     lastname: str
     middlename: str
@@ -56,52 +62,61 @@ class ResponseUserData(UserModel):
 
 
 class Login(BaseUser):
-    pass
-
+    """Схема входа пользователя."""
 
 class LoginResponse(BaseModel):
+    """Ответ на вход пользователя."""
     token: uuid.UUID
 
 
 class CreateRole(BaseModel):
+    """Схема создания роли."""
     name: str
 
 
 class StatusResponse(BaseModel):
+    """Ответ с текущим статусом."""
     status: Literal['success', 'deleted', 'error']
 
 
 class FailureDetail(BaseModel):
+    """Детали сбоя."""
     isFailure: bool
     failure: Optional[list] = None
 
 
 class LoginFailureData(BaseModel):
+    """Данные о аварии """
     hostId: Optional[int] = None
     addressCodes: Optional[List[int]] = None
 
 
 class ConnData(BaseModel):
+    """Данные подключения."""
     GMT: Optional[int] = None
     ip_addr: Optional[str] = None
     onu_mac: Optional[str] = None
 
 
 class RediusConnData(ConnData):
+    """Данные подключения к радиусу."""
     active: bool
     json_data: Optional[str] = None
     time_to: Optional[datetime] = None
 
 
 class ServiceCategory(BaseModel):
+    """Категория сервиса."""
     timeto: Optional[int] = None
 
 
 class ServiceCats(BaseModel):
+    """Категории сервисов."""
     internet: Optional[ServiceCategory] = None
 
 
 class RedisConnData(ConnData):
+    """Данные из Redis."""
     active: bool
     servicecats: Optional[ServiceCats] = None
     mac: Optional[str] = None
@@ -109,12 +124,14 @@ class RedisConnData(ConnData):
 
 
 class LoginConnData(BaseModel):
+    """Данные для страница Сеть."""
     radius: RediusConnData
     redis: RedisConnData
     differences: Dict[str, Any]
 
-class CameraModel(BaseModel, ABC):
-    """Базовые параметры камеры"""
+
+class CameraModel(BaseModel):
+    """Базовые параметры камеры."""
     id: int
     name: str
     ipaddress: Optional[str] = None
@@ -124,7 +141,7 @@ class CameraModel(BaseModel, ABC):
 
 
 class Camera1CModel(CameraModel):
-    """Дополнительные параметры, которые есть в 1С"""
+    """Параметры камеры из 1С."""
     archive: Optional[int] = None
     service: Optional[str] = None
     macaddress: Optional[str] = None
@@ -134,24 +151,24 @@ class Camera1CModel(CameraModel):
 
 
 class CameraRedisModel(CameraModel):
-    """Дополнительные параметры для камеры из Редиса"""
+    """Параметры камеры из Redis."""
     houseIds: Optional[List[int]] = None
     Model: Optional[str] = None
 
 
 class CamerasData(BaseModel):
-    """Список камер класса Camera1CModel"""
+    """Список камер."""
     cameras: List[Camera1CModel]
 
 
 class CameraModelShow(BaseModel):
-    """Класс для генерации таблиц параметров камеры из разных баз данных"""
+    """Параметры камеры для отображения."""
     Parameter: Union[int, str]
     Value: Optional[Union[int, str, list[int], bool]] = None
 
 
 class CameraCheckModel(BaseModel):
-    """Поля камеры, которые будут сравниваться (1С и Редис)"""
+    """Поля камеры для сравнения."""
     id: int
     name: str
     ipaddress: str
@@ -160,7 +177,7 @@ class CameraCheckModel(BaseModel):
 
 
 class CameraDifference(BaseModel):
-    """Параметры по которым различаются камеры из Редиса и 1С"""
+    """Различия параметров камер."""
     Parameter: str
     DB_1C: Optional[Union[int, str, bool, list]] = None
     Redis: Optional[Union[int, str, bool, list]] = None
@@ -183,11 +200,13 @@ class FlussonicModel(BaseModel):
     bytes_in: Optional[int] = None
 
 class Service(BaseModel):
+    """Сервис с именем и описанием."""
     name: str
-    description: str  
+    description: str
 
 
 class Service1C(BaseModel):
+    """Сервис из 1С."""
     service: str
     status: str
     date: str
@@ -201,29 +220,38 @@ class Service1C(BaseModel):
     ban_on_app: bool
 
 
-class Service1c(BaseModel):
-    name: str
-    id: str
-    status: str
-
-class ServiceOp(BaseModel):
+class ServiceTV(BaseModel):
+    """Базовая модель для ТВ сервисов"""
     id: int
     name: str
     status: str
 
+class Service1c(ServiceTV):
+    """Сервисы 1С"""
+
+class ServiceOp(ServiceTV):
+    """Оператор сервиса."""
+
 class SmotreshkaOperator(ServiceOp):
+    """Оператор Smotreshka."""
     login: str
     password: str
     not_turnoff_if_not_used: bool
 
+
 class TV24Operator(ServiceOp):
+    """Оператор TV24."""
     phone: str
 
+
 class TVIPOperator(ServiceOp):
+    """Оператор TVIP."""
     login: str
     password: str
 
+
 class Smotreshka(BaseModel):
+    """Данные Smotreshka."""
     login: str
     password: str
     not_turnoff_if_not_used: bool
@@ -233,6 +261,7 @@ class Smotreshka(BaseModel):
 
 
 class TVIP(BaseModel):
+    """Данные TVIP."""
     login: str
     password: str
     services1c: List[Service1C]
@@ -241,6 +270,7 @@ class TVIP(BaseModel):
 
 
 class TV24(BaseModel):
+    """Данные TV24."""
     phone: str
     services1c: List[Service1C]
     servicesOp: List[ServiceOp]
@@ -250,42 +280,45 @@ class TV24(BaseModel):
 
 
 class TVResponse(BaseModel):
+    """Ответ с данными TV."""
     smotreshka: Optional[Dict] = None
     tvip: Optional[Dict] = None
     _24tv: Optional[Dict] = None
 
 
 class CameraDataToChange(BaseModel):
-    """Данные, которые можно поменять в форме изменения данных камеры 1С"""
+    """Данные для изменения камеры."""
     name: Optional[str] = None
     ip: Optional[str] = None
     id: int
     CamType: str
 
 
-
-
-# class RBT_flat(BaseModel):
-#     flat_id: int
-
 class RedisLogin(BaseModel):
+    """Данные Redis."""
     house_id: int
     flat_id: int
     login: str
     address: str
     contract: str
 
+
 class RBT(BaseModel):
-    house_id: int
+    """Данные RBT."""
+    house_subscriber_id: int
     flat_id: int
     role: int
 
+
 class RBT_phone(RBT):
-    phone: int # id
+    """Данные телефона RBT."""
+    phone: int
     name: str
     patronymic: str
 
+
 class LoginsData(BaseModel):
+    """Данные логинов."""
     phone: str
     login: str
     address_house_id: int
@@ -298,27 +331,37 @@ class LoginsData(BaseModel):
     relocate: str | None
     UUID2: str
 
+
 class Phone(RBT_phone):
+    """Телефон с привязанными договорами."""
     contracts: List[RedisLogin]
 
+
 class AppResponse(BaseModel):
+    """Ответ эндпоинта Приложения"""
     address_in_app: str
     flat_id: int
     contracts: List[LoginsData]
     main_contract: str
     phones: List[Phone]
 
+
 class RedisLoginSearch(BaseModel):
+    """Поиск логинов в Redis."""
     login: str
     contract: str
     name: str
     address: str
     timeTo: int | None = None
 
+
 class SearchLogins(BaseModel):
+    """Результаты поиска логинов в Редисе"""
     logins: List[RedisLoginSearch]
 
+
 class LogData(BaseModel):
+    """Данные лога."""
     login: str
     page: str
     action: str
@@ -327,12 +370,16 @@ class LogData(BaseModel):
     url: str
     payload: Dict[str, Any]
 
+
 class ChangeRoleRequest(BaseModel):
+    """Запрос на изменение роли."""
     house_id: int
     flat_id: int
     role: int
 
+
 class RelocateRequest(BaseModel):
+    """Запрос на переселение"""
     phones: Optional[List[int]] = None
     UUID2: str
     flat: str
@@ -340,6 +387,7 @@ class RelocateRequest(BaseModel):
 
 
 class Action(BaseModel):
+    """Действие нажатии на кнопку для логирования"""
     name: str
     date: datetime
     login: str
@@ -349,13 +397,16 @@ class Action(BaseModel):
 
 
 class Payment(BaseModel):
+    """Данные платежа."""
     dt: str
     timestamp: int
     sum: float
     description: str
     comment: str
 
+
 class FailurePay(BaseModel):
+    """Данные неудачного платежа."""
     dt: str
     timestamp: int
     status: str
@@ -365,20 +416,28 @@ class FailurePay(BaseModel):
     description: str
     paymentId: str
 
+
 class RecPaymnent(BaseModel):
+    """Данные рекуррентного платежа."""
     recurringPayment: str | None = None
 
+
 class Destination(BaseModel):
+    """Данные получателя."""
     name: str
     phone: str
 
+
 class NotificationSMS(BaseModel):
+    """Уведомление SMS."""
     notification: str
     destination: list[Destination]
     text: str
     dt: str
 
+
 class PaymentResponseModel(BaseModel):
+    """Ответ с данными платежей."""
     payments: List[Payment] | None = None
     canceled_payments: List[FailurePay] | None = None
     recurringPayment: RecPaymnent | None
@@ -386,37 +445,44 @@ class PaymentResponseModel(BaseModel):
 
 
 class IntercomService(BaseModel):
+    """Сервис домофона."""
     service: str
     category: str
     timeto: str
 
+
 class CategoryStatus(BaseModel):
+    """Статус категории."""
     service: Optional[str] = None
     category: Optional[str] = None
     timeto_1c: Optional[int] = None
     timeto_redis: Optional[int] = None
-    status: str  # e.g., "match", "discrepancy", "only_in_1c", "only_in_redis", "missing"
+    status: str
+
 
 class RBTApsSettings(BaseModel):
+    """Настройки APS."""
     house_flat_id: int
     address_house_id: int
     manual_block: Optional[bool]
-    auto_block: Optional[bool] 
-    open_code: Optional[str] 
+    auto_block: Optional[bool]
+    open_code: Optional[str]
     white_rabbit: Optional[bool]
     admin_block: Optional[bool]
 
+    @classmethod
     @field_validator('manual_block', 'auto_block', 'white_rabbit', 'admin_block', mode='before')
     def convert_to_bool(cls, value):
+        """Конвертация значения в bool."""
         if value is None:
             return None
-        
+
         if isinstance(value, bool):
-            return bool
-        
+            return value
+
         if isinstance(value, (int, float)):
             return bool(value)
-        
+
         if isinstance(value, str):
             value = value.strip().lower()
             if value in ('1', 'true', 't', 'yes', 'y', 'on'):
@@ -424,15 +490,18 @@ class RBTApsSettings(BaseModel):
             if value in ('0', 'false', 'f', 'no', 'n', 'off', ''):
                 return False
             return bool(value)
-    
         return bool(value)
 
+
 class Passage(BaseModel):
+    """Проход"""
     date: datetime
-    address: str  # Адрес (mechanizmaDescription)
-    type: str  # Тип события (например, "открытие ключом")
-    
+    address: str
+    type: str
+
+
 class IntercomResponse(BaseModel):
+    """Ответ для странички Домофон."""
     categories: List[CategoryStatus]
     errors: List[str]
     update_instructions: Optional[str] = None
@@ -442,11 +511,13 @@ class IntercomResponse(BaseModel):
 
 
 class Search2ResponseData(BaseModel):
+    """Ответ поиска по ВИКИ без истории диалога"""
     combined_context: str = Field(..., description="Контекст Вики")
     hashs: List[str] = Field(..., description="ID контекстов которые используются")
 
+
 class MistralRequest(BaseModel):
-    """Схема для входных данных запроса к Mistral"""
+    """Запрос к Mistral."""
     text: str = Field(..., description="Текст запроса пользователя")
     combined_context: str = Field(..., description="Контекст для обработки запроса")
     chat_history: str = Field(..., description="История предыдущих сообщений в чате")
@@ -457,9 +528,12 @@ class MistralRequest(BaseModel):
 
 
 class FixManualBlockRequest(BaseModel):
+    """Запрос на исправление блокировки."""
     house_flat_id: int
 
+
 class FixManualBlockResponse(BaseModel):
+    """Ответ на исправление блокировки."""
     status: str
     message: str
     changed: bool

@@ -188,6 +188,8 @@ const App_page = () => {
     );
   }
 
+  console.log(data)
+
   return (
     <div>
       <InfoList>
@@ -302,7 +304,7 @@ const App_page = () => {
                                     href="#"
                                     onClick={() =>
                                       handleRoleChange(
-                                        phone.house_id,
+                                        phone.house_subscriber_id,
                                         phone.flat_id,
                                         phone.role
                                       )
@@ -324,7 +326,7 @@ const App_page = () => {
                                         handleDeleteAddress(
                                           undefined,
                                           phone,
-                                          phone.house_id,
+                                          phone.house_subscriber_id,
                                           phone.flat_id,
                                           queriedLogin
                                         );

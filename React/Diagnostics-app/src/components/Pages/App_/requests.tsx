@@ -68,6 +68,7 @@ export const handleContractDeleteButton = async (
     } else {
       setData(null);
     }
+    
   } catch (error) {
     // Логирование исключения
     await LogData({
@@ -203,6 +204,7 @@ export const ChangeRole = async (
 ) => {
   const url = `/v1/app/change_role`;
   const token = localStorage.getItem("token");
+
   try {
     await api.patch(
       url,
