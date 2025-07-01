@@ -1196,26 +1196,25 @@ async def get_milvus_data(query: str) -> Search2ResponseData:
 
 
 
-async def get_mistral_response(
+async def get_ai_response(
     text: str,
     combined_context: str,
     chat_history: str,
     input_type: Literal['voice', 'csv', 'text'] = 'text',
+    model: Optional[str | None] = None,
 ) -> str:
     """
-    Отправляет запрос к Mistral API с валидацией данных
+    Отправляет запрос к AI API с валидацией данных
     
     Args:
         text: Текст запроса (обязательный)
         combined_context: Контекст обработки
         chat_history: История диалога
         input_type: Тип входных данных
+        model: Тип используемой модели
     
     Returns:
-        Ответ от Mistral API (строка)
-    
-    Raises:
-        HTTPException: При ошибках валидации или запроса
+        Ответ от API (строка)
     """
     # Валидируем входные данные через Pydantic модель
     try:
@@ -1223,7 +1222,8 @@ async def get_mistral_response(
             text=text,
             combined_context=combined_context,
             chat_history=chat_history,
-            input_type=input_type
+            input_type=input_type,
+            model=model,
         )
     except ValueError as ve:
         raise HTTPException(
@@ -1231,7 +1231,7 @@ async def get_mistral_response(
             detail=f"Invalid input data: {str(ve)}"
         ) from ve
 
-    url = f"{config.UTILS_URL}/v1/mistral"
+    url = f"{config.UTILS_URL}/v1/ai"
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -1243,14 +1243,14 @@ async def get_mistral_response(
             ) as response:
                 response.raise_for_status()
                 response_data = await response.json()
-                if "mistral_response" not in response_data:
-                    raise ValueError("Missing 'mistral_response' in API response")
-                return response_data["mistral_response"]
+                if "ai_response" not in response_data:
+                    raise ValueError("Missing 'ai_response' in API response")
+                return response_data["ai_response"]
 
     except aiohttp.ClientError as ce:
         raise HTTPException(
             status_code=503,
-            detail=f"Mistral API connection error: {str(ce)}"
+            detail=f"AI API connection error: {str(ce)}"
         ) from ce
     except ValueError as ve:
         raise HTTPException(

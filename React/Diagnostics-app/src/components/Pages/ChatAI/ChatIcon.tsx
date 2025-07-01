@@ -24,6 +24,9 @@ const ChatIcon = () => {
   const [inputText, setInputText] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [messageId, setMessageId] = useState<number>(0);
+  const [selectedModel, setSelectedModel] = useState<string>(
+    "mistral-large-latest"
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -35,15 +38,25 @@ const ChatIcon = () => {
 
   useEffect(() => {
     const savedMessages = localStorage.getItem("chatMessages");
+    const savedModel = localStorage.getItem("selectedModel");
+
     if (savedMessages) {
       setMessages(JSON.parse(savedMessages));
       setMessageId(JSON.parse(savedMessages).length);
+    }
+
+    if (savedModel) {
+      setSelectedModel(savedModel);
     }
   }, [setMessages]);
 
   useEffect(() => {
     localStorage.setItem("chatMessages", JSON.stringify(messages));
   }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem("selectedModel", selectedModel);
+  }, [selectedModel]);
 
   useEffect(() => {
     scrollToBottom();
@@ -79,7 +92,11 @@ const ChatIcon = () => {
     const historyCount = messageCount < 3 ? messageCount : 3;
 
     try {
-      const apiResult = await GetFridaAnswer(inputText, historyCount);
+      const apiResult = await GetFridaAnswer(
+        inputText,
+        historyCount,
+        selectedModel
+      );
 
       if (!apiResult || "detail" in apiResult) {
         const errorMsg: Message = {
@@ -128,15 +145,15 @@ const ChatIcon = () => {
     }
   };
 
-//   const copyToClipboard = (text: string): void => {
-//     navigator.clipboard.writeText(text);
-//   };
+  //   const copyToClipboard = (text: string): void => {
+  //     navigator.clipboard.writeText(text);
+  //   };
 
-//   const clearChat = (): void => {
-//     setMessages([]);
-//     localStorage.removeItem("chatMessages");
-//     setMessageId(0);
-//   };
+  //   const clearChat = (): void => {
+  //     setMessages([]);
+  //     localStorage.removeItem("chatMessages");
+  //     setMessageId(0);
+  //   };
 
   return (
     <>
@@ -238,6 +255,16 @@ const ChatIcon = () => {
                 placeholder="Спроси меня о чем-нибудь..."
                 disabled={isLoading}
               />
+              <select
+                className="model-select"
+                onChange={(e) => setSelectedModel(e.target.value)}
+                value={selectedModel}
+                disabled={isLoading}
+                title="Выберите AI модель"
+              >
+                <option value="mistral-large-latest">Mistral Large</option>
+                <option value="gpt-4o-mini">GPT-4o Mini</option>
+              </select>
               <button
                 className="send-button"
                 onClick={handleSendMessage}

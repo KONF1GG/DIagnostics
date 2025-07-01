@@ -2,6 +2,7 @@
 Схемы данных для FastAPI.
 """
 
+from token import OP
 import uuid
 from typing import Any, Literal, Dict, List, Optional, Union
 from datetime import datetime
@@ -593,6 +594,7 @@ class MistralRequest(BaseModel):
     input_type: Literal["voice", "csv", "text"] = Field(
         default="text", description="Тип входных данных: голос, csv или текст"
     )
+    model: Optional[str | None] = Field(default=None, description='Выбор запрашиваемой модели')
 
 
 class FixManualBlockRequest(BaseModel):

@@ -11,7 +11,8 @@ export interface ApiError {
 
 const GetFridaAnswer = async (
   query: string,
-  historyCount: number
+  historyCount: number,
+  model?: string
 ): Promise<FridaResponse | ApiError | null> => {
   const token = localStorage.getItem("token");
 
@@ -21,16 +22,19 @@ const GetFridaAnswer = async (
   }
 
   try {
-    const response = await api.get(
-      `/v1/frida?query=${encodeURIComponent(
-        query
-      )}&history_count=${historyCount}`,
-      {
-        headers: {
-          "x-token": token,
-        },
-      }
-    );
+    let url = `/v1/frida?query=${encodeURIComponent(
+      query
+    )}&history_count=${historyCount}`;
+    
+    if (model) {
+      url += `&model=${encodeURIComponent(model)}`;
+    }
+
+    const response = await api.get(url, {
+      headers: {
+        "x-token": token,
+      },
+    });
 
     return response.data as FridaResponse;
   } catch (err) {

@@ -10,9 +10,9 @@ from fastapi import APIRouter, HTTPException, Query
 from app.models import FridaLogs
 from app.depencies import SessionDependency, TokenDependency
 from app.crud import (
+    get_ai_response,
     get_milvus_data,
     get_last_frida_logs,
-    get_mistral_response,
     log_frida_interaction,
 )
 
@@ -41,6 +41,7 @@ async def make_request_and_get_response_from_mistral(
     session: SessionDependency,  # type: ignore
     query: str,
     history_count: Optional[int] = Query(None, ge=0, le=3),
+    model: Optional[str] = Query(None),
 ):
     """Эндпоинт для обработки запроса и получения ответа от Mistral."""
     try:
@@ -61,14 +62,15 @@ async def make_request_and_get_response_from_mistral(
 
         try:
             # Запрос к Mistral
-            mistral_response = await get_mistral_response(
+            mistral_response = await get_ai_response(
                 text=query,
                 combined_context=mlv_data.combined_context,
                 chat_history=chat_history_str,
-                input_type="text"
+                input_type="text",
+                model=model,
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Ошибка запроса к Mistral: {str(e)}") from e
+            raise HTTPException(status_code=500, detail=f"Ошибка запроса к AI: {str(e)}") from e
 
         try:
             # Логирование взаимодействия
