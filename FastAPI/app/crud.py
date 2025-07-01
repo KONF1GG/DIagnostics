@@ -1239,7 +1239,6 @@ async def get_ai_response(
                 url,
                 json=request_data.model_dump(),
                 headers={"Content-Type": "application/json"},
-                timeout=aiohttp.ClientTimeout(total=30.0)
             ) as response:
                 response.raise_for_status()
                 response_data = await response.json()

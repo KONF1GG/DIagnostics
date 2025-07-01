@@ -23,7 +23,7 @@ router = APIRouter()
 
 def format_frida_history(logs: list[FridaLogs]) -> str:
     """
-    Преобразует список логов в текстовую историю для отправки в Mistral.
+    Преобразует список логов в текстовую историю для отправки в AI.
     """
     try:
         lines = []
@@ -43,7 +43,7 @@ async def make_request_and_get_response_from_mistral(
     history_count: Optional[int] = Query(None, ge=0, le=3),
     model: Optional[str] = Query(None),
 ):
-    """Эндпоинт для обработки запроса и получения ответа от Mistral."""
+    """Эндпоинт для обработки запроса и получения ответа от AI."""
     try:
         try:
             # Получение данных из Milvus
