@@ -264,6 +264,7 @@ const ChatIcon = () => {
               >
                 <option value="mistral-large-latest">Mistral Large</option>
                 <option value="gpt-4o-mini">GPT-4o Mini</option>
+                <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3</option>
               </select>
               <button
                 className="send-button"
