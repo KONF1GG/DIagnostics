@@ -58,5 +58,7 @@ async def get_failure_by_login(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Ошибка обработки данных аварий: {e}") from e
 
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка обработки запроса: {e}") from e

@@ -181,7 +181,7 @@ class CameraRedisModel(CameraModel):
 class CamerasData(BaseModel):
     """Список камер."""
 
-    cameras: List[Camera1CModel]
+    cameras: Optional[List[Camera1CModel]] = None
 
 
 class CameraModelShow(BaseModel):

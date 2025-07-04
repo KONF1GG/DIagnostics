@@ -91,6 +91,8 @@ async def get_cameras_data(
         }
 
         return response
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка обработки запроса: {str(e)}") from e
 

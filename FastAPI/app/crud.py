@@ -222,7 +222,7 @@ async def get_cameras_from_redis(login: str, redis, login_data):
         return cameras_from_redis_list
     else:
         cameras_from_redis_list = []
-        query = "@CamType:{{Личная}}"
+        query = "@CamType:{Личная}"
         redis_result = await redis.ft("idx:camera").search(query)
         all_cameras_from_redis_list = [CameraRedisModel(id=json.loads(doc.json)['Id'],
                                                         name=json.loads(doc.json)['Name'],
@@ -233,7 +233,6 @@ async def get_cameras_from_redis(login: str, redis, login_data):
             if camera.houseIds is not None and login in camera.houseIds:
                 cameras_from_redis_list.append(camera)
         return cameras_from_redis_list
-
 
 async def check_cameras_dif(redis_cameras: List[CameraCheckModel],
                             cameras_from_1c: List[CameraCheckModel]):

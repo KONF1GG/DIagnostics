@@ -101,6 +101,7 @@ async def make_request_and_get_response_from_mistral(
         except Exception as log_error:
             logger.error("Ошибка логирования при обработке HTTPException: %s", str(log_error))
         raise
+    
     except Exception as e:
         logger.error("Unexpected error: %s", str(e))
         try:

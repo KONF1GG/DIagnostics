@@ -143,6 +143,8 @@ async def get_connection_data(
             contracts=contracts,
             phones=phones,
         )
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка получения данных приложения: {e}") from e
 

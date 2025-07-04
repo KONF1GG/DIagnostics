@@ -42,6 +42,8 @@ async def create_role(role_data: CreateRole, session: SessionDependency, token: 
         role = Role(**role_data.dict())
         role = await add_item(session, role)
         return {'id': role.id}
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка создания роли: {str(e)}") from e
 

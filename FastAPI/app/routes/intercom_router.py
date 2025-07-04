@@ -141,6 +141,7 @@ async def fetch_passages(
                     date,
                     response.status,
                 )
+                
     except Exception as e:
         logger.error("Исключение для flat_id %s, дата %s: %s", flat_id, date, e)
 
