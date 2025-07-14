@@ -352,66 +352,124 @@
 /* Поле ввода */
 .chat-input-container {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   padding: 16px 20px;
   background: white;
+  border-top: 1px solid #eee;
+}
+
+.mobile-input-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
 }
 
 .chat-input-container input {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #e5e7eb;
   border-radius: 12px;
   font-size: 14px;
-  outline: none;
-  transition: border 0.2s;
   background: #f9fafc;
+  transition: all 0.2s;
 }
 
 .chat-input-container input:focus {
-  border-color: var(--primary-hover);
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+}
+
+.chat-input-container input.inline-mode {
+  border-color: var(--primary-color);
+  background: #f0f7ff;
   box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.1);
 }
 
+/* Кнопка инлайн режима - десктоп */
+.inline-mode-button {
+  background: #fff;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(74, 107, 255, 0.08);
+}
+
+.inline-mode-button:hover,
+.inline-mode-button:focus {
+  background: #f0f7ff;
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
+}
+
+.inline-mode-button.active,
+.inline-mode-button[aria-pressed="true"] {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 16px rgba(74, 107, 255, 0.18);
+}
+
+.inline-mode-label {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+/* Кнопка отправки - десктоп */
 .send-button {
   background: var(--primary-color);
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 0 20px;
+  padding: 12px 24px;
   cursor: pointer;
-  transition: background 0.2s;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 14px;
 }
 
 .send-button:hover {
   background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 107, 255, 0.15);
 }
 
 .send-button:disabled {
-  background: var(--secondary-color);
+  background-color: #9ca3af;
   cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Селектор модели */
+/* Селектор модели - десктоп */
 .model-select {
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #e5e7eb;
   border-radius: 12px;
   font-size: 14px;
-  outline: none;
-  transition: border 0.2s;
   background: #f9fafc;
   cursor: pointer;
+  transition: all 0.2s;
   min-width: 180px;
 }
 
 .model-select:focus {
-  border-color: var(--primary-hover);
-  box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.1);
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
 }
 
 .model-select:disabled {
@@ -420,49 +478,231 @@
   opacity: 0.7;
 }
 
-/* Футер */
-.chat-disclaimer {
-  text-align: center;
-  font-size: 11px;
-  color: #999;
-  padding: 8px;
-  background: white;
-  border-top: 1px solid #eee;
-}
-
-/* Адаптивность */
-@media (max-width: 480px) {
+/* Мобильные стили - переопределяют десктопные */
+@media (max-width: 600px) {
   .chat-modal {
     height: 100vh;
     max-height: 100vh;
     border-radius: 0;
     max-width: 100%;
-  }
-  
-  .chat-content {
-    height: calc(100vh - 120px);
-  }
-  
-  .message {
-    max-width: 90%;
-  }
-  
-  .chat-input-container {
-    padding: 12px;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .model-select {
-    min-width: unset;
     width: 100%;
   }
   
+  .chat-content {
+    height: calc(100vh - 60px);
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+  
   .chat-modal-header {
-    padding: 14px 16px;
+    padding: 12px 16px;
+  }
+  
+  .chat-modal-header h3 {
+    font-size: 16px;
+  }
+
+  /* Мобильный инпут контейнер */
+  .chat-input-container {
+    flex-direction: column;
+    padding: 12px 16px 16px;
+    gap: 12px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .mobile-input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Основной инпут на всю ширину */
+  .chat-input-container input {
+    width: 100%;
+    padding: 16px 50px 16px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 24px;
+    font-size: 16px;
+    background: #f9fafc;
+  }
+
+  .chat-input-container input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+  }
+
+  .chat-input-container input.inline-mode {
+    border-color: var(--primary-color);
+    background: #f0f7ff;
+    padding-left: 50px;
+  }
+
+  /* Кнопка отправки - стрелочка справа */
+  .send-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color);
+    border: none;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .send-button:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .send-button svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
+
+  /* Кнопка лупы слева */
+  .inline-mode-button {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    background: transparent;
+    z-index: 10;
+    transition: all 0.2s;
+  }
+
+  .inline-mode-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .inline-mode-button.active {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  .inline-mode-button:hover {
+    background: #f0f7ff;
+    border-color: var(--primary-color);
+  }
+
+  .inline-mode-button.active:hover {
+    background: var(--primary-hover);
+  }
+
+  /* Скрываем лейбл на мобильном */
+  .inline-mode-label {
+    display: none;
+  }
+
+  /* Селектор модели под инпутом */
+  .model-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    background: #f9fafc;
+    margin-top: 0;
+    min-width: auto;
+  }
+
+  /* Адаптация остальных элементов */
+  .chat-examples {
+    padding: 8px 16px;
+  }
+
+  .example-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .address-search-results {
+    padding: 8px 16px;
+  }
+
+  .address-result-item {
+    padding: 8px 12px;
+  }
+
+  .inline-search-container {
+    max-height: 200px;
+  }
+
+  .inline-mode-description {
+    padding: 20px 16px;
+    margin: 12px;
+    min-height: 180px;
+  }
+
+  .inline-mode-description h3 {
+    font-size: 18px;
+  }
+
+  .description-content p {
+    font-size: 13px;
+  }
+
+  .description-steps {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
+/* Для очень маленьких экранов */
+@media (max-width: 400px) {
+  .chat-input-container {
+    padding: 10px 12px 14px;
+  }
+
+  .chat-input-container input {
+    padding: 14px 45px 14px 14px;
+    font-size: 16px;
+  }
+
+  .chat-input-container input.inline-mode {
+    padding-left: 45px;
+  }
+
+  .send-button {
+    width: 36px;
+    height: 36px;
+    right: 6px;
+  }
+
+  .inline-mode-button {
+    width: 32px;
+    height: 32px;
+    left: 6px;
+  }
+
+  .send-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .inline-mode-button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
 
 /* Styling for italic text (<i>) in bot messages */
 .message.bot .message-text i {
@@ -489,3 +729,475 @@
   text-decoration: underline; /* Underline on hover for clarity */
 }
 
+.inline-mode-button {
+  background: #fff;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 10px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(74, 107, 255, 0.08);
+}
+
+.inline-mode-button:hover,
+.inline-mode-button:focus {
+  background: #f0f7ff;
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
+}
+
+.inline-mode-button.active,
+.inline-mode-button[aria-pressed="true"] {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 16px rgba(74, 107, 255, 0.18);
+}
+
+.inline-mode-label {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+/* Инлайн режим для поля ввода */
+.chat-input-container input.inline-mode {
+  border-color: var(--primary-color);
+  background: #f0f7ff;
+  box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.1);
+}
+
+/* Контейнер результатов поиска адресов */
+.inline-search-container {
+  background: white;
+  border-top: 1px solid #eee;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Загрузка поиска адресов */
+.address-search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 10px;
+  color: #666;
+}
+
+/* Пустые результаты поиска */
+.address-search-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #999;
+  font-style: italic;
+}
+
+/* Результаты поиска адресов */
+.address-search-results {
+  padding: 16px 20px;
+}
+
+.address-results-header {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.address-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.address-result-item {
+  background: #f9fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.address-result-item:hover {
+  background: #f0f7ff;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 107, 255, 0.1);
+}
+
+.address-main {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.address-details {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.address-city {
+  font-weight: 500;
+}
+
+.address-district {
+  opacity: 0.8;
+}
+
+/* Описание инлайн-режима */
+.inline-mode-description {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.4);
+  background: rgba(74, 107, 255, 0.02);
+  border-radius: 16px;
+  margin: 20px;
+  border: 2px dashed rgba(74, 107, 255, 0.15);
+  min-height: 300px;
+}
+
+.inline-mode-icon {
+  margin-bottom: 20px;
+  opacity: 0.6;
+  color: var(--primary-color);
+}
+
+.inline-mode-description h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.description-content {
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.description-content p {
+  font-size: 15px;
+  margin-bottom: 16px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.description-steps {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(74, 107, 255, 0.08);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.step-text {
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+/* Адаптивность для новых элементов */
+@media (max-width: 710px) {
+  .inline-mode-button {
+    min-width: 44px;
+    padding: 10px 12px;
+  }
+  
+  .address-search-results {
+    padding: 12px 16px;
+  }
+  
+  .address-result-item {
+    padding: 10px 12px;
+  }
+  
+  .inline-search-container {
+    max-height: 250px;
+  }
+  
+  .inline-mode-description {
+    padding: 30px 16px;
+    margin: 16px;
+    min-height: 250px;
+  }
+  
+  .inline-mode-description h3 {
+    font-size: 20px;
+  }
+  
+  .description-content p {
+    font-size: 14px;
+  }
+  
+  .description-steps {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+  .chat-modal {
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .chat-content {
+    height: calc(100vh - 60px);
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+  
+  .chat-modal-header {
+    padding: 12px 16px;
+  }
+  
+  .chat-modal-header h3 {
+    font-size: 16px;
+  }
+
+  /* Мобильный инпут контейнер */
+  .chat-input-container {
+    flex-direction: column;
+    padding: 12px 16px 16px;
+    gap: 12px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .mobile-input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Основной инпут на всю ширину */
+  .chat-input-container input {
+    width: 100%;
+    padding: 16px 50px 16px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 24px;
+    font-size: 16px;
+    background: #f9fafc;
+  }
+
+  .chat-input-container input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+  }
+
+  .chat-input-container input.inline-mode {
+    border-color: var(--primary-color);
+    background: #f0f7ff;
+    padding-left: 50px;
+  }
+
+  /* Кнопка отправки - стрелочка справа */
+  .send-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color);
+    border: none;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .send-button:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .send-button svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
+
+  /* Кнопка лупы слева */
+  .inline-mode-button {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    background: transparent;
+    z-index: 10;
+    transition: all 0.2s;
+  }
+
+  .inline-mode-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .inline-mode-button.active {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  .inline-mode-button:hover {
+    background: #f0f7ff;
+    border-color: var(--primary-color);
+  }
+
+  .inline-mode-button.active:hover {
+    background: var(--primary-hover);
+  }
+
+  /* Скрываем лейбл на мобильном */
+  .inline-mode-label {
+    display: none;
+  }
+
+  /* Селектор модели под инпутом */
+  .model-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    background: #f9fafc;
+    margin-top: 0;
+    min-width: auto;
+  }
+
+  /* Адаптация остальных элементов */
+  .chat-examples {
+    padding: 8px 16px;
+  }
+
+  .example-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .address-search-results {
+    padding: 8px 16px;
+  }
+
+  .address-result-item {
+    padding: 8px 12px;
+  }
+
+  .inline-search-container {
+    max-height: 200px;
+  }
+
+  .inline-mode-description {
+    padding: 20px 16px;
+    margin: 12px;
+    min-height: 180px;
+  }
+
+  .inline-mode-description h3 {
+    font-size: 18px;
+  }
+
+  .description-content p {
+    font-size: 13px;
+  }
+
+  .description-steps {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 400px) {
+  .chat-input-container {
+    padding: 10px 12px 14px;
+  }
+
+  .chat-input-container input {
+    padding: 14px 45px 14px 14px;
+    font-size: 16px;
+  }
+
+  .chat-input-container input.inline-mode {
+    padding-left: 45px;
+  }
+
+  .send-button {
+    width: 36px;
+    height: 36px;
+    right: 6px;
+  }
+
+  .inline-mode-button {
+    width: 32px;
+    height: 32px;
+    left: 6px;
+  }
+
+  .send-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .inline-mode-button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
