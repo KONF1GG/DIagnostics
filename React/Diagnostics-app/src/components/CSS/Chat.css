@@ -363,6 +363,7 @@
   display: flex;
   align-items: center;
   flex: 1;
+  gap: 10px;
   position: relative;
 }
 
@@ -372,6 +373,7 @@
   border: 2px solid #e5e7eb;
   border-radius: 12px;
   font-size: 14px;
+
   background: #f9fafc;
   transition: all 0.2s;
 }
@@ -427,33 +429,62 @@
   user-select: none;
 }
 
-/* Кнопка отправки - десктоп */
+
 .send-button {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-  font-size: 14px;
+  display: none; /* СКРЫТА на десктопе */
 }
 
-.send-button:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(74, 107, 255, 0.15);
+/* Показываем кнопку отправки только на мобильных */
+@media (max-width: 600px) {
+  .send-button {
+    display: flex;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color);
+    border: none;
+    transition: background-color 0.2s; /* УБИРАЕМ transform из transition */
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  .send-button:hover {
+    background: var(--primary-hover);
+    /* УБИРАЕМ transform: translateY() при hover */
+  }
+
+  .send-button:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .send-button svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
 }
 
-.send-button:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-  opacity: 0.7;
-  transform: none;
-  box-shadow: none;
-}
+/* Для очень маленьких экранов */
+@media (max-width: 400px) {
+  .send-button {
+    width: 36px;
+    height: 36px;
+    right: 6px;
+  }
 
+  .send-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
 /* Селектор модели - десктоп */
 .model-select {
   padding: 12px 16px;
@@ -521,7 +552,7 @@
   /* Основной инпут на всю ширину */
   .chat-input-container input {
     width: 100%;
-    padding: 16px 50px 16px 16px;
+    padding: 16px 50px 16px 50px; /* ИЗМЕНЕНО: всегда отступ слева 50px */
     border: 2px solid #e5e7eb;
     border-radius: 24px;
     font-size: 16px;
@@ -536,7 +567,7 @@
   .chat-input-container input.inline-mode {
     border-color: var(--primary-color);
     background: #f0f7ff;
-    padding-left: 50px;
+    /* padding-left уже 50px, убираем дублирование */
   }
 
   /* Кнопка отправки - стрелочка справа */
@@ -673,13 +704,14 @@
   }
 
   .chat-input-container input {
-    padding: 14px 45px 14px 14px;
+    padding: 14px 45px 14px 45px; /* ИЗМЕНЕНО: всегда отступ слева 45px */
     font-size: 16px;
   }
 
-  .chat-input-container input.inline-mode {
+  /* Убираем дублирование для inline-mode */
+  /* .chat-input-container input.inline-mode {
     padding-left: 45px;
-  }
+  } */
 
   .send-button {
     width: 36px;
@@ -1019,7 +1051,7 @@
   /* Основной инпут на всю ширину */
   .chat-input-container input {
     width: 100%;
-    padding: 16px 50px 16px 16px;
+    padding: 16px 50px 16px 50px; /* ИЗМЕНЕНО: всегда отступ слева 50px */
     border: 2px solid #e5e7eb;
     border-radius: 24px;
     font-size: 16px;
@@ -1034,7 +1066,7 @@
   .chat-input-container input.inline-mode {
     border-color: var(--primary-color);
     background: #f0f7ff;
-    padding-left: 50px;
+    /* padding-left уже 50px, убираем дублирование */
   }
 
   /* Кнопка отправки - стрелочка справа */
@@ -1171,12 +1203,8 @@
   }
 
   .chat-input-container input {
-    padding: 14px 45px 14px 14px;
+    padding: 14px 45px 14px 45px; 
     font-size: 16px;
-  }
-
-  .chat-input-container input.inline-mode {
-    padding-left: 45px;
   }
 
   .send-button {

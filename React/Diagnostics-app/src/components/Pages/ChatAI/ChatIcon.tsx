@@ -410,22 +410,20 @@ const ChatIcon = () => {
                   disabled={isLoading}
                   aria-pressed={isInlineMode}
                 >
-                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <circle
-                      cx="10"
-                      cy="10"
-                      r="7"
+                      cx="11"
+                      cy="11"
+                      r="8"
                       stroke="currentColor"
                       strokeWidth="2"
                     />
-                    <line
-                      x1="16"
-                      y1="16"
-                      x2="21"
-                      y2="21"
+                    <path
+                      d="m21 21-4.35-4.35"
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </svg>
                   <span className="inline-mode-label">
