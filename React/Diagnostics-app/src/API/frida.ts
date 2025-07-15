@@ -23,19 +23,14 @@ const GetFridaAnswer = async (
   }
 
   try {
-    let url = `/v1/frida?query=${encodeURIComponent(
-      query
-    )}&history_count=${historyCount}`;
-    
-    if (model) {
-      url += `&model=${encodeURIComponent(model)}`;
-    }
+    const requestBody = {
+      query: query,
+      history_count: historyCount,
+      ...(model && { model }),
+      ...(tariffs && { tariffs })
+    };
 
-    if (tariffs) {
-      url += `&tariffs=${encodeURIComponent(JSON.stringify(tariffs))}`;
-    }
-
-    const response = await api.get(url, {
+    const response = await api.post("/v1/frida", requestBody, {
       headers: {
         "x-token": token,
       },
