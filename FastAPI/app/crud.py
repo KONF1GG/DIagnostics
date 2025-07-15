@@ -1,5 +1,5 @@
 """
-CRUD-операции и вспомогательные функции для работы с базами данных, 
+CRUD-операции и вспомогательные функции для работы с базами данных,
 Redis и внешними API.
 """
 
@@ -21,15 +21,30 @@ from sqlalchemy.exc import IntegrityError
 
 from app.depencies import RedisDependency
 from app.schemas import (
-    Action, Camera1CModel, CameraCheckModel, CameraDataToChange,
-    CameraRedisModel, CamerasData, FlussonicModel, IntercomService, LoginFailureData,
-    MistralRequest, RBT_phone, RBTApsSettings, RedisLoginSearch,
-    Search2ResponseData, Service1C, ServiceOp, StatusResponse,
+    Action,
+    Camera1CModel,
+    CameraCheckModel,
+    CameraDataToChange,
+    CameraRedisModel,
+    CamerasData,
+    FlussonicModel,
+    IntercomService,
+    LoginFailureData,
+    MistralRequest,
+    RBT_phone,
+    RBTApsSettings,
+    RedisAddressModelResponse,
+    RedisLoginSearch,
+    Search2ResponseData,
+    Service1C,
+    ServiceOp,
+    StatusResponse,
 )
 from app.models import FridaLogs, LogHash, Session, ORM_OBJECT, ORM_CLS
 from app import config
 
 logger = logging.getLogger(__name__)
+
 
 async def fetch_data(session, url, model):
     """Получение данных из внешнего API."""
@@ -44,16 +59,24 @@ async def fetch_data(session, url, model):
                 return model(**data)
             except Exception as e:
                 logger.error(f"Ошибка обработки данных из внешнего API: {e}")
-                raise HTTPException(status_code=500, detail=f"Ошибка обработки данных из внешнего API: {str(e)}") from e
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Ошибка обработки данных из внешнего API: {str(e)}",
+                ) from e
     except aiohttp.ClientError as e:
         logger.error(f"Ошибка соединения с внешним API: {e}")
-        raise HTTPException(status_code=503, detail=f"Ошибка соединения с внешним API: {str(e)}") from e
+        raise HTTPException(
+            status_code=503, detail=f"Ошибка соединения с внешним API: {str(e)}"
+        ) from e
     except Exception as e:
         logger.error(f"Неожиданная ошибка при запросе к внешнему API: {e}")
-        raise HTTPException(status_code=500, detail=f"Неожиданная ошибка при запросе к внешнему API: {str(e)}") from e
+        raise HTTPException(
+            status_code=500,
+            detail=f"Неожиданная ошибка при запросе к внешнему API: {str(e)}",
+        ) from e
 
 
-async def add_item(session: Session, item: ORM_OBJECT) -> ORM_OBJECT: # type: ignore
+async def add_item(session: Session, item: ORM_OBJECT) -> ORM_OBJECT:  # type: ignore
     """Добавление элемента в базу данных."""
     session.add(item)
     try:
@@ -61,25 +84,25 @@ async def add_item(session: Session, item: ORM_OBJECT) -> ORM_OBJECT: # type: ig
     except IntegrityError as err:
         if err.orig and err.orig.args[0] == 1062:
             raise HTTPException(
-                status_code=400,
-                detail="Пользователь с таким именем уже существует"
-                ) from err
+                status_code=400, detail="Пользователь с таким именем уже существует"
+            ) from err
         raise err
     return item
 
 
-async def get_item(session: Session, orm_class: ORM_CLS, item_id: int) -> ORM_OBJECT: # type: ignore
+async def get_item(session: Session, orm_class: ORM_CLS, item_id: int) -> ORM_OBJECT:  # type: ignore
     """Получение элемента из базы данных по ID."""
     orm_obj = await session.get(orm_class, item_id)
     if orm_obj is None:
         raise HTTPException(
-            status_code=404,
-            detail=f'{orm_class.__name__} не найден с ID {item_id}'
-            )
+            status_code=404, detail=f"{orm_class.__name__} не найден с ID {item_id}"
+        )
     return orm_obj
 
 
-async def get_last_frida_logs(session: Session, user_id: int, limit: int = 3) -> list[FridaLogs]: # type: ignore
+async def get_last_frida_logs(
+    session: Session, user_id: int, limit: int = 3
+) -> list[FridaLogs]:  # type: ignore
     """Получение последних логов Frida для пользователя."""
     stmt = (
         select(FridaLogs)
@@ -93,9 +116,8 @@ async def get_last_frida_logs(session: Session, user_id: int, limit: int = 3) ->
 
 
 async def find_failure_by_login(
-        redis: RedisDependency, 
-        login_data: LoginFailureData
-        ) -> Optional[List[dict]]:
+    redis: RedisDependency, login_data: LoginFailureData
+) -> Optional[List[dict]]:
     """Поиск аварии по логину в Redis."""
     if login_data is not None:
         if login_data.hostId:
@@ -120,12 +142,16 @@ async def get_login_data(login: str, redis: RedisDependency) -> Dict:
     if login_data:
         return login_data
     else:
-        raise HTTPException(status_code=404, detail=f'Данные по логину {login} не найдены')
+        raise HTTPException(
+            status_code=404, detail=f"Данные по логину {login} не найдены"
+        )
 
 
-async def get_cameras(login: str, retries: int = 2, timeout: int = 3) -> CamerasData | None:
+async def get_cameras(
+    login: str, retries: int = 2, timeout: int = 3
+) -> CamerasData | None:
     """Получение данных камер из внешнего API."""
-    query_string = f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=cameras&login={login}'
+    query_string = f"http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=cameras&login={login}"
     timeout_settings = ClientTimeout(total=timeout)
 
     async with aiohttp.ClientSession(timeout=timeout_settings) as session:
@@ -178,15 +204,18 @@ async def get_cameras_difference(cameras_from_1C_raw, cameras_from_redis_list):
         return None
     # 1. Получение данных камер из 1С и их преобразование в объекты CameraCheckModel
     for camera_list in cameras_from_1C_raw:
-        cameras_from_1C.extend([
-            CameraCheckModel(
-                id=camera.id,
-                name=camera.name,
-                ipaddress=camera.ipaddress,
-                available=camera.available,
-            )
-            for camera in camera_list[1] if not camera.deleted # and camera.type == 'Личная'
-        ])
+        cameras_from_1C.extend(
+            [
+                CameraCheckModel(
+                    id=camera.id,
+                    name=camera.name,
+                    ipaddress=camera.ipaddress,
+                    available=camera.available,
+                )
+                for camera in camera_list[1]
+                if not camera.deleted  # and camera.type == 'Личная'
+            ]
+        )
 
     cameras_from_redis = []
 
@@ -208,34 +237,46 @@ async def get_cameras_difference(cameras_from_1C_raw, cameras_from_redis_list):
 
 
 async def get_cameras_from_redis(login: str, redis, login_data):
-    flatId = login_data.get('flatId')
+    flatId = login_data.get("flatId")
 
     if flatId and flatId != 0:
         # Поиск камер по flatId в Redis
         query = f"@CamType:{{Личная}} @flatIds:[{flatId} {flatId}]"
         redis_result = await redis.ft("idx:camera").search(query)
-        cameras_from_redis_list = [CameraRedisModel(id=json.loads(doc.json)['Id'],
-                                                    name=json.loads(doc.json)['Name'],
-                                                    host=json.loads(doc.json)['Host'],
-                                                    ipaddress=json.loads(doc.json)['IP'],
-                                                    **json.loads(doc.json)) for doc in redis_result.docs]
+        cameras_from_redis_list = [
+            CameraRedisModel(
+                id=json.loads(doc.json)["Id"],
+                name=json.loads(doc.json)["Name"],
+                host=json.loads(doc.json)["Host"],
+                ipaddress=json.loads(doc.json)["IP"],
+                **json.loads(doc.json),
+            )
+            for doc in redis_result.docs
+        ]
         return cameras_from_redis_list
     else:
         cameras_from_redis_list = []
         query = "@CamType:{Личная}"
         redis_result = await redis.ft("idx:camera").search(query)
-        all_cameras_from_redis_list = [CameraRedisModel(id=json.loads(doc.json)['Id'],
-                                                        name=json.loads(doc.json)['Name'],
-                                                        host=json.loads(doc.json)['Host'],
-                                                        ipaddress=json.loads(doc.json)['IP'],
-                                                        **json.loads(doc.json)) for doc in redis_result.docs]
+        all_cameras_from_redis_list = [
+            CameraRedisModel(
+                id=json.loads(doc.json)["Id"],
+                name=json.loads(doc.json)["Name"],
+                host=json.loads(doc.json)["Host"],
+                ipaddress=json.loads(doc.json)["IP"],
+                **json.loads(doc.json),
+            )
+            for doc in redis_result.docs
+        ]
         for camera in all_cameras_from_redis_list:
             if camera.houseIds is not None and login in camera.houseIds:
                 cameras_from_redis_list.append(camera)
         return cameras_from_redis_list
 
-async def check_cameras_dif(redis_cameras: List[CameraCheckModel],
-                            cameras_from_1c: List[CameraCheckModel]):
+
+async def check_cameras_dif(
+    redis_cameras: List[CameraCheckModel], cameras_from_1c: List[CameraCheckModel]
+):
     """Проверка различий в данных камер между Redis и 1С."""
     differences = []
 
@@ -248,55 +289,58 @@ async def check_cameras_dif(redis_cameras: List[CameraCheckModel],
 
         if camera_id not in redis_cameras_dict:
             # Камера есть в 1С, но отсутствует в Redis
-            differences.append({
-                'Redis': None,
-                'DB_1C': {
-                    camera_id: {
-                        'name': camera_1c.name,
-                        'ipaddress': camera_1c.ipaddress,
-                        'available': camera_1c.available
-                    }
+            differences.append(
+                {
+                    "Redis": None,
+                    "DB_1C": {
+                        camera_id: {
+                            "name": camera_1c.name,
+                            "ipaddress": camera_1c.ipaddress,
+                            "available": camera_1c.available,
+                        }
+                    },
                 }
-            })
+            )
         else:
             redis_camera = redis_cameras_dict[camera_id]
 
             # Проверяем на различия между камерами в 1С и Redis
             diff = {}
             if camera_1c.name != redis_camera.name:
-                diff['name'] = camera_1c.name
+                diff["name"] = camera_1c.name
             if camera_1c.ipaddress != redis_camera.ipaddress:
-                diff['ipaddress'] = camera_1c.ipaddress
+                diff["ipaddress"] = camera_1c.ipaddress
             if camera_1c.available != redis_camera.available:
-                diff['available'] = camera_1c.available
+                diff["available"] = camera_1c.available
 
             if diff:  # Если есть различия, добавляем их в список
-                differences.append({
-                    'Redis': {
-                        camera_id: {
-                            key: redis_camera.__dict__[key]
-                            for key in diff.keys()
-                        }
-                    },
-                    'DB_1C': {
-                        camera_id: diff
+                differences.append(
+                    {
+                        "Redis": {
+                            camera_id: {
+                                key: redis_camera.__dict__[key] for key in diff.keys()
+                            }
+                        },
+                        "DB_1C": {camera_id: diff},
                     }
-                })
+                )
 
     # 2. Проверяем, есть ли камеры в Redis, которых нет в 1С
     ids_from_1c = {camera.id for camera in cameras_from_1c}
     for redis_camera in redis_cameras:
         if redis_camera.id not in ids_from_1c:
-            differences.append({
-                'Redis': {
-                    redis_camera.id: {
-                        'name': redis_camera.name,
-                        'ipaddress': redis_camera.ipaddress,
-                        'available': redis_camera.available
-                    }
-                },
-                'DB_1C': None
-            })
+            differences.append(
+                {
+                    "Redis": {
+                        redis_camera.id: {
+                            "name": redis_camera.name,
+                            "ipaddress": redis_camera.ipaddress,
+                            "available": redis_camera.available,
+                        }
+                    },
+                    "DB_1C": None,
+                }
+            )
 
     return differences
 
@@ -305,31 +349,31 @@ async def get_services_from_1C(services_from_1c):
     """Получение услуг из 1С."""
     return [
         {
-            'name': service['name'],
-            'status': service.get('status', 'Не указано'),
-            'count': service.get('count', 0),
-            'price': service.get('price', 0)
+            "name": service["name"],
+            "status": service.get("status", "Не указано"),
+            "count": service.get("count", 0),
+            "price": service.get("price", 0),
         }
         for service_list in services_from_1c
-        for service in service_list.get('services', [])
-        if service['productName'].startswith('Услуга видеонаблюдения')
+        for service in service_list.get("services", [])
+        if service["productName"].startswith("Услуга видеонаблюдения")
     ]
 
 
 def extract_archive_days(service_name):
     """Функция для извлечения количества дней архива из названия услуги."""
-    match = re.search(r'\d+', service_name)
+    match = re.search(r"\d+", service_name)
     return int(match.group()) if match else None
 
 
 async def get_services_differences(services_from_1c, cameras_from_1c):
     """Получение различий в услугах между 1С и камерами."""
     differences = {
-        'missing_services_in_cameras': [],
-        'missing_services_in_1C': [],
-        'count_discrepancies': [],
-        'status_discrepancies': [],
-        'available_discrepancies': []
+        "missing_services_in_cameras": [],
+        "missing_services_in_1C": [],
+        "count_discrepancies": [],
+        "status_discrepancies": [],
+        "available_discrepancies": [],
     }
 
     if not cameras_from_1c:
@@ -339,58 +383,58 @@ async def get_services_differences(services_from_1c, cameras_from_1c):
 
     # Count services from camera data
     for camera in cameras_from_1c.cameras:
-        if camera.deleted or camera.type != 'Личная':
+        if camera.deleted or camera.type != "Личная":
             continue
         service_name = camera.service
         archive_days = extract_archive_days(service_name)
 
         if service_name not in service_count_dict:
             service_count_dict[service_name] = {
-                'count': 1,
-                'status': camera.status,
-                'archive_days': archive_days,
-                'available': camera.available
+                "count": 1,
+                "status": camera.status,
+                "archive_days": archive_days,
+                "available": camera.available,
             }
         else:
-            service_count_dict[service_name]['count'] += 1
+            service_count_dict[service_name]["count"] += 1
 
     # Compare services from 1C with services from cameras
     for svc in services_from_1c:
-        svc_name = svc['name']
-        svc_count = svc['count']
-        svc_status = svc['status']
+        svc_name = svc["name"]
+        svc_count = svc["count"]
+        svc_status = svc["status"]
         svc_archive_days = extract_archive_days(svc_name)
 
         if svc_name in service_count_dict:
             # Camera service data
             camera_data = service_count_dict[svc_name]
-            camera_count = camera_data['count']
-            camera_status = camera_data['status']
+            camera_count = camera_data["count"]
+            camera_status = camera_data["status"]
             # camera_available = camera_data['available']
 
             # Check for count discrepancies
             if camera_count != svc_count:
-                differences['count_discrepancies'].append(
+                differences["count_discrepancies"].append(
                     f"Количество услуг '{svc_name}' отличается: в 1С ({svc_count}), в камерах ({camera_count})"
                 )
 
             # Check for status discrepancies
             if camera_status != svc_status:
-                differences['status_discrepancies'].append(
+                differences["status_discrepancies"].append(
                     f"Статус услуги '{svc_name}' отличается: в 1С ('{svc_status}'), в камерах ('{camera_status}')"
                 )
         else:
             # Look for a service with the same archive days
             for camera_service, camera_data in service_count_dict.items():
-                if camera_data['archive_days'] != svc_archive_days:
-                    differences['missing_services_in_cameras'].append(
+                if camera_data["archive_days"] != svc_archive_days:
+                    differences["missing_services_in_cameras"].append(
                         f"Обнаружено несоответствие в названии услуги: '{svc_name}' из 1С и '{camera_service}' из камер (разница в числе дней архива)"
                     )
                     break
 
     # Check for overall count mismatch
     if len(services_from_1c) != len(service_count_dict):
-        differences['missing_services_in_cameras'].append(
+        differences["missing_services_in_cameras"].append(
             f"Количество услуг в 1С и камерах не совпадает: в 1С ({len(services_from_1c)}), в камерах ({len(service_count_dict)})"
         )
 
@@ -408,14 +452,16 @@ async def get_cameras_form_flussonic(cameras):
             token = await get_token_for_host(host)
             stream_data = await fetch_flussonic_stream(host, url, token)
 
-            if not stream_data.get('error'):
-                cameras_list.append(FlussonicModel(
-                    name=stream_data.get('name', ''),
-                    title=stream_data.get('title', ''),
-                    alive=stream_data.get('stats', {}).get('alive'),
-                    running=stream_data.get('stats', {}).get('running'),
-                    bytes_in=stream_data.get('stats', {}).get('bytes_in')
-                ))
+            if not stream_data.get("error"):
+                cameras_list.append(
+                    FlussonicModel(
+                        name=stream_data.get("name", ""),
+                        title=stream_data.get("title", ""),
+                        alive=stream_data.get("stats", {}).get("alive"),
+                        running=stream_data.get("stats", {}).get("running"),
+                        bytes_in=stream_data.get("stats", {}).get("bytes_in"),
+                    )
+                )
 
     return cameras_list
 
@@ -423,9 +469,9 @@ async def get_cameras_form_flussonic(cameras):
 async def check_flussonic_streams(cameras):
     """Проверка потоков Flussonic на валидность."""
     flussonic_results = {
-        'failed_alive_checks': [],
-        'failed_running_checks': [],
-        'invalid_bytes_in': []
+        "failed_alive_checks": [],
+        "failed_running_checks": [],
+        "invalid_bytes_in": [],
     }
 
     async def check_camera(camera_model):
@@ -438,23 +484,23 @@ async def check_flussonic_streams(cameras):
                 stream_data = await fetch_flussonic_stream(host, url, token)
 
                 # Check parameters safely
-                stats = stream_data.get('stats', {})
-                alive = stats.get('alive')
-                running = stats.get('running')
-                bytes_in = stats.get('bytes_in')
+                stats = stream_data.get("stats", {})
+                alive = stats.get("alive")
+                running = stats.get("running")
+                bytes_in = stats.get("bytes_in")
 
                 if alive is not None and not alive:
-                    flussonic_results['failed_alive_checks'].append(
+                    flussonic_results["failed_alive_checks"].append(
                         f"Камера {camera_model.name}: Статус 'alive' = False"
                     )
 
                 if running is not None and not running:
-                    flussonic_results['failed_running_checks'].append(
+                    flussonic_results["failed_running_checks"].append(
                         f"Камера {camera_model.name}: Статус 'running' = False"
                     )
 
                 if bytes_in is not None and bytes_in <= 0:
-                    flussonic_results['invalid_bytes_in'].append(
+                    flussonic_results["invalid_bytes_in"].append(
                         f"{camera_model.name}: Некорректное значение 'bytes_in' = {bytes_in}"
                     )
 
@@ -480,19 +526,22 @@ async def get_camera_form_flussonic(camera_model):
         token = await get_token_for_host(host)
         stream_data = await fetch_flussonic_stream(host, url, token)
 
-        return FlussonicModel(name=stream_data['name'],
-                                title=stream_data.get('title', ''),
-                                alive=stream_data['stats']['alive'],
-                                running=stream_data['stats']['running'],
-                                bytes_in=stream_data['stats']['bytes_in'])
-
+        return FlussonicModel(
+            name=stream_data["name"],
+            title=stream_data.get("title", ""),
+            alive=stream_data["stats"]["alive"],
+            running=stream_data["stats"]["running"],
+            bytes_in=stream_data["stats"]["bytes_in"],
+        )
 
 
 async def fetch_flussonic_stream(host: str, url: str, token: str):
     """Запрос к Flussonic для получения данных о потоке."""
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"https://{host}/streamer/api/v3/streams/{url}",
-                               headers={"Authorization": f"Bearer {token}"}) as response:
+        async with session.get(
+            f"https://{host}/streamer/api/v3/streams/{url}",
+            headers={"Authorization": f"Bearer {token}"},
+        ) as response:
             response_data = await response.json()
             return response_data
 
@@ -521,33 +570,38 @@ async def get_TV_services_from_1c(login: str) -> List[Service1C] | None:
                 else:
                     return None
     except Exception as e:
-        logger.error(f'Ошибка получения TV услуг из 1С: {e}')
+        logger.error(f"Ошибка получения TV услуг из 1С: {e}")
         return None
 
 
 async def get_tv24_data(login: str, token: str) -> list[ServiceOp] | None:
     """Получение данных TV24."""
     url = f"https://api.24h.tv/v2/users/{login}/subscriptions/current?token={token}"
+
     def get_status(end_at: str):
         formatted_date = datetime.datetime.strptime(end_at, "%Y-%m-%dT%H:%M:%SZ")
         if formatted_date > datetime.datetime.now():
-            return 'Активный'
+            return "Активный"
         else:
-            return 'Неактивный'
+            return "Неактивный"
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 response.raise_for_status()  # Проверка на ошибки HTTP-запроса
                 data = await response.json()
                 if data:
-                    data = [ServiceOp(
-                                    id=service['packet']['id'],
-                                    name=service['packet']['name'],
-                                    status=get_status(service['end_at'])
-                                    ) for service in data]
+                    data = [
+                        ServiceOp(
+                            id=service["packet"]["id"],
+                            name=service["packet"]["name"],
+                            status=get_status(service["end_at"]),
+                        )
+                        for service in data
+                    ]
                 return data
     except Exception as e:
-        logger.error(f'Ошибка получения данных TV24: {e}')
+        logger.error(f"Ошибка получения данных TV24: {e}")
         return None
 
 
@@ -559,29 +613,33 @@ async def get_parental_code(userId: int, token: str) -> str | None:
             async with session.get(url) as response:
                 response.raise_for_status()
                 data = await response.json()
-                return data.get('parental_code', '') if data.get('parental_status') == 'set' else None
+                return (
+                    data.get("parental_code", "")
+                    if data.get("parental_status") == "set"
+                    else None
+                )
     except Exception as e:
-        logger.error(f'Ошибка получения родительского кода: {e}')
+        logger.error(f"Ошибка получения родительского кода: {e}")
         return None
-    
 
 
 async def get_smotreshka_data(login: str) -> list[ServiceOp] | None:
     """Получение данных Smotreshka."""
-    url = f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/getLfstrmPackets?login={login}'
+    url = f"http://server1c.freedom1.ru/UNF_CRM_WS/hs/mwapi/getLfstrmPackets?login={login}"
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 response.raise_for_status()
                 data = await response.json()
-                data = [ServiceOp(
-                                id=int(service['id']), 
-                                name=service['name'], 
-                                status='Активный'
-                                ) for service in data]
+                data = [
+                    ServiceOp(
+                        id=int(service["id"]), name=service["name"], status="Активный"
+                    )
+                    for service in data
+                ]
                 return data
     except Exception as e:
-        logger.error(f'Ошибка получения данных Smotreshka: {e}')
+        logger.error(f"Ошибка получения данных Smotreshka: {e}")
         return None
 
 
@@ -596,11 +654,15 @@ async def get_tvip_data(userId: str, service_name: str) -> list[ServiceOp] | Non
                 response.raise_for_status()  # Проверка на ошибки HTTP-запроса
                 data = await response.json()
                 if data:
-                    data = [ServiceOp(
-                                        id=service['tarif'], 
-                                        name=service_name,
-                                        status='Активный' if not service['stop'] else 'Неактивный'
-                                        ) for service in data['data'] if not service['stop']]
+                    data = [
+                        ServiceOp(
+                            id=service["tarif"],
+                            name=service_name,
+                            status="Активный" if not service["stop"] else "Неактивный",
+                        )
+                        for service in data["data"]
+                        if not service["stop"]
+                    ]
                 return data
     except Exception:
         return None
@@ -611,13 +673,13 @@ async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange):
     url = "http://server1c.freedom1.ru/UNF_CRM_WS/hs/apps/setCamera"
     headers = {
         "Authorization": f"Bearer {config.UPDATE_CAMERA_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     data = {
         "id": camera_id,
         "name": camera_data.name,
         "ip": camera_data.ip,
-        "CamType": camera_data.CamType
+        "CamType": camera_data.CamType,
     }
     try:
         async with aiohttp.ClientSession() as session:
@@ -625,7 +687,6 @@ async def camera_update_1c(camera_id: int, camera_data: CameraDataToChange):
                 return await response.json()
     except Exception as e:
         return e
-
 
 
 async def get_redis_key_data(login: str, redis) -> dict:
@@ -637,9 +698,9 @@ async def get_redis_key_data(login: str, redis) -> dict:
         return value
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Error fetching data from Redis: {str(e)}"
+            status_code=500, detail=f"Error fetching data from Redis: {str(e)}"
         ) from e
+
 
 async def get_schema_from_redis(redis) -> Result:
     """Получение схемы подсекций из Redis."""
@@ -650,6 +711,7 @@ async def get_schema_from_redis(redis) -> Result:
 
     return schema
 
+
 async def get_logins_by_flatId_redis(flat_id: int, redis: RedisDependency):
     """Получение логинов по flatId из Redis."""
     query = f"@flatId:[{flat_id} {flat_id}]"
@@ -657,6 +719,7 @@ async def get_logins_by_flatId_redis(flat_id: int, redis: RedisDependency):
     if not search_result:
         raise HTTPException(status_code=404, detail="Логины не найдены по flatId")
     return search_result.docs
+
 
 async def get_number_from_rbt(house_sub_id, rbt):
     """Получение номера из RBT по house_sub_id."""
@@ -670,6 +733,7 @@ async def get_number_from_rbt(house_sub_id, rbt):
 
     return result
 
+
 async def get_number_rbt(flat_and_house_id: dict, rbt) -> List[RBT_phone]:
     """Получение номера RBT по flat_and_house_id."""
     async with rbt.transaction():
@@ -680,17 +744,20 @@ async def get_number_rbt(flat_and_house_id: dict, rbt) -> List[RBT_phone]:
         ON fs.house_subscriber_id = sm.house_subscriber_id
         WHERE fs.house_flat_id = $1 and fs.house_subscriber_id =  $2
         """
-        result = await rbt.fetch(query, flat_and_house_id['flat_id'], flat_and_house_id['house_id'])
+        result = await rbt.fetch(
+            query, flat_and_house_id["flat_id"], flat_and_house_id["house_id"]
+        )
 
     return [
         RBT_phone(
-            house_subscriber_id=flat_and_house_id['house_id'],
-            flat_id=flat_and_house_id['flat_id'],
-            role=row['role'],
-            name=row['subscriber_name'],
-            phone=row['id'],
-            patronymic=row['subscriber_patronymic'],
-        ) for row in result
+            house_subscriber_id=flat_and_house_id["house_id"],
+            flat_id=flat_and_house_id["flat_id"],
+            role=row["role"],
+            name=row["subscriber_name"],
+            phone=row["id"],
+            patronymic=row["subscriber_patronymic"],
+        )
+        for row in result
     ]
 
 
@@ -708,13 +775,14 @@ async def get_numbers_rbt(flat_id: int, rbt) -> List[RBT_phone]:
 
         subs_list = [
             RBT_phone(
-                house_subscriber_id=row['house_subscriber_id'],
+                house_subscriber_id=row["house_subscriber_id"],
                 flat_id=flat_id,
-                role=row['role'],
-                name=row['subscriber_name'],
-                phone=row['id'],
-                patronymic=row['subscriber_patronymic'],
-            ) for row in result
+                role=row["role"],
+                name=row["subscriber_name"],
+                phone=row["id"],
+                patronymic=row["subscriber_patronymic"],
+            )
+            for row in result
         ]
 
     return subs_list
@@ -730,9 +798,13 @@ async def get_flats(house_id: int, rbt):
         """
         result = await rbt.fetch(query, house_id)
 
-        flats_list = [{'flat_id': row['house_flat_id'], 'house_id': row['house_subscriber_id']} for row in result]
+        flats_list = [
+            {"flat_id": row["house_flat_id"], "house_id": row["house_subscriber_id"]}
+            for row in result
+        ]
 
     return flats_list
+
 
 async def get_flat_from_RBT_by_flatId(flatId: int, rbt):
     """Получение данных квартиры из RBT по flatId."""
@@ -746,7 +818,10 @@ async def get_flat_from_RBT_by_flatId(flatId: int, rbt):
 
     return result
 
-async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> StatusResponse:
+
+async def change_RBT_role(
+    house_id: int, flat_id: int, role: int, rbt
+) -> StatusResponse:
     """Изменение роли в RBT."""
     query = """
         UPDATE houses_flats_subscribers
@@ -759,10 +834,7 @@ async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> Status
             result = await rbt.fetchval(query, role, house_id, flat_id)
 
             if result is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Запись не найдена"
-                )
+                raise HTTPException(status_code=404, detail="Запись не найдена")
             return StatusResponse(
                 status="success",
             )
@@ -772,11 +844,13 @@ async def change_RBT_role(house_id: int, flat_id: int, role: int, rbt) -> Status
 
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Произошла ошибка при изменении роли: {str(e)}"
+            status_code=500, detail=f"Произошла ошибка при изменении роли: {str(e)}"
         ) from e
 
-async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt) -> StatusResponse:
+
+async def delete_from_houses_flats_subscribers(
+    house_id: int, flat_id: int, rbt
+) -> StatusResponse:
     """Удаление записи из houses_flats_subscribers."""
     query = """
             DELETE FROM houses_flats_subscribers
@@ -785,15 +859,11 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
     """
     try:
         async with rbt.transaction():
-
             result = await rbt.fetchval(query, house_id, flat_id)
             if result is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Запись не найдена"
-                )
+                raise HTTPException(status_code=404, detail="Запись не найдена")
             return StatusResponse(
-                status='deleted',
+                status="deleted",
             )
 
     except HTTPException as http_exc:
@@ -802,10 +872,10 @@ async def delete_from_houses_flats_subscribers(house_id: int, flat_id: int, rbt)
 
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Произошла ошибка при удалении записи: {str(e)}" 
+            status_code=500, detail=f"Произошла ошибка при удалении записи: {str(e)}"
         ) from e
-    
+
+
 async def get_house_id_by_uuid2(uuid2: str, rbt):
     """Получение house_id по uuid2."""
     async with rbt.transaction():
@@ -818,6 +888,7 @@ async def get_house_id_by_uuid2(uuid2: str, rbt):
         result = await rbt.fetchval(query, uuid2)
 
     return result
+
 
 async def get_flat_from_RBT_by_house_id_and_flat(flat: str, house_id: int, rbt):
     """Получение flat_id по адресу квартиры и house_id."""
@@ -832,6 +903,7 @@ async def get_flat_from_RBT_by_house_id_and_flat(flat: str, house_id: int, rbt):
 
     return result
 
+
 async def create_new_flat(flat: str, address_house_id: int, rbt):
     """Создание новой квартиры."""
     async with rbt.transaction():
@@ -843,6 +915,7 @@ async def create_new_flat(flat: str, address_house_id: int, rbt):
         result = await rbt.fetchval(query, address_house_id, flat)
 
     return result
+
 
 async def change_flat_in_1C(new_flatId: str, uuid2: str):
     """Изменение flatId в 1С."""
@@ -886,6 +959,7 @@ async def change_flat_id_in_RBT(house_ids: List[int], new_flat_id: int, rbt):
         await rbt.execute(query, new_flat_id, house_ids)
     return {"status": "success"}
 
+
 async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
     """Получение количества подписчиков по flat_id."""
     async with rbt.transaction():
@@ -897,15 +971,18 @@ async def get_houses_flats_subscribers_by_flat_id(flat_id: int, rbt):
         result = await rbt.fetchval(query, flat_id)
     return result
 
+
 async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
     """Получение логинов из Redis по списку flat_house_ids."""
     unique_list = []
     for flat_house_id in flat_house_ids:
-        flat_id = flat_house_id['flat_id']
+        flat_id = flat_house_id["flat_id"]
         if flat_id not in unique_list:
             unique_list.append(flat_id)
-    search_query = " | ".join([f"@flatId:[{flat_id} {flat_id}]" for flat_id in unique_list])
-    result = await redis.ft('idx:client').search(search_query)
+    search_query = " | ".join(
+        [f"@flatId:[{flat_id} {flat_id}]" for flat_id in unique_list]
+    )
+    result = await redis.ft("idx:client").search(search_query)
 
     logins = []
     for doc in result.docs:
@@ -913,57 +990,61 @@ async def get_logins_from_redis(flat_house_ids: List[Dict], redis):
 
     return logins
 
+
 async def get_login_from_redis_by_flat_id(flat_id: int, redis):
     """Получение логина из Redis по flat_id."""
     search_query = f"@flatId:[{flat_id} {flat_id}]"
-    result = await redis.ft('idx:client').search(search_query)
+    result = await redis.ft("idx:client").search(search_query)
 
     return result.docs
 
 
 async def search_logins(search_login: str, redis) -> List[RedisLoginSearch]:
     """Поиск логинов в Redis по запросу."""
-    search_query = ''
-    default_search = ''
-    lower_search = ''
-    capitalize_search = ''
+    search_query = ""
+    default_search = ""
+    lower_search = ""
+    capitalize_search = ""
     for login in search_login.split():
         search_query += f"{login} | {login.lower()} | {login.capitalize()}"
-        default_search += f'{login} '
-        lower_search += f'{login.lower()} '
-        capitalize_search += f'{login.capitalize()} '
+        default_search += f"{login} "
+        lower_search += f"{login.lower()} "
+        capitalize_search += f"{login.capitalize()} "
 
-    search_query = f'{default_search} | {lower_search} | {capitalize_search}'
-    result = await redis.ft('idx:searchLogin').search(search_query)
+    search_query = f"{default_search} | {lower_search} | {capitalize_search}"
+    result = await redis.ft("idx:searchLogin").search(search_query)
     logins_list = []
     for doc in result.docs:
         data = json.loads(doc.json)
-        if 'loginserv' not in doc.id:
-            logins_list.append(RedisLoginSearch(login=data.get('login', ''),
-                                                name=data.get('name', ''),
-                                                contract=data.get('contract', ''),
-                                                address=data.get('address', ''),
-                                                timeTo=data.get('time_to'),
-                                                ))
+        if "loginserv" not in doc.id:
+            logins_list.append(
+                RedisLoginSearch(
+                    login=data.get("login", ""),
+                    name=data.get("name", ""),
+                    contract=data.get("contract", ""),
+                    address=data.get("address", ""),
+                    timeTo=data.get("time_to"),
+                )
+            )
 
     return logins_list
 
 
 def log_to_clickhouse(
-        client,
-        user_name: str,
-        login: str,
-        page: str,
-        action: str,
-        success: bool,
-        message: str,
-        url: str,
-        payload: Dict,
-        user_id: int
+    client,
+    user_name: str,
+    login: str,
+    page: str,
+    action: str,
+    success: bool,
+    message: str,
+    url: str,
+    payload: Dict,
+    user_id: int,
 ):
     """Логирование действий в ClickHouse."""
     # Используем UTC+5 (Екатеринбург)
-    timezone = pytz.timezone('Asia/YekATERINBURG')  # Для Екатеринбурга UTC+5
+    timezone = pytz.timezone("Asia/YekATERINBURG")  # Для Екатеринбурга UTC+5
     timestamp = datetime.datetime.now(timezone)  # Текущее время с часовым поясом
 
     payload_json = json.dumps(payload)
@@ -992,7 +1073,9 @@ def log_to_clickhouse(
 async def get_last_actions_from_clickhouse(clickhouse_client) -> List[Action]:
     """Получение последних действий из ClickHouse."""
     query = "SELECT user_name, date, login, page, action, status FROM Diagnostic_APP.actions_logs ORDER BY date DESC LIMIT 20"
-    target_timezone = pytz.timezone('Asia/YekATERINBURG')  # Часовой пояс Екатеринбурга (UTC+5)
+    target_timezone = pytz.timezone(
+        "Asia/YekATERINBURG"
+    )  # Часовой пояс Екатеринбурга (UTC+5)
 
     try:
         # Выполняем запрос через метод query
@@ -1001,7 +1084,9 @@ async def get_last_actions_from_clickhouse(clickhouse_client) -> List[Action]:
         actions = [
             Action(
                 name=row[0],
-                date=row[1].astimezone(target_timezone),  # Переводим из UTC в Екатеринбург
+                date=row[1].astimezone(
+                    target_timezone
+                ),  # Переводим из UTC в Екатеринбург
                 login=row[2],
                 page=row[3],
                 action=row[4],
@@ -1010,14 +1095,16 @@ async def get_last_actions_from_clickhouse(clickhouse_client) -> List[Action]:
             for row in result.result_set
         ]
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Ошибка получения последних изменений: " + str(e)) from e
+        raise HTTPException(
+            status_code=500, detail="Ошибка получения последних изменений: " + str(e)
+        ) from e
 
     return actions
 
 
 async def get_1c_intercom_services(login: str) -> List[IntercomService]:
     """Получение интерком услуг из 1С."""
-    url = f'http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=intercom&login={login}'
+    url = f"http://server1c.freedom1.ru/UNF_CRM_WS/hs/Grafana/anydata?query=intercom&login={login}"
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -1027,54 +1114,49 @@ async def get_1c_intercom_services(login: str) -> List[IntercomService]:
                     data = await response.json()
                     if not data:
                         raise HTTPException(
-                            status_code=404,
-                            detail="No intercom services found"
+                            status_code=404, detail="No intercom services found"
                         )
                     if not isinstance(data, list):
                         raise HTTPException(
-                            status_code=422,
-                            detail="Expected list in response data"
+                            status_code=422, detail="Expected list in response data"
                         )
 
                     result = []
                     for service in data:
                         try:
                             validated_service = IntercomService(
-                                service=service.get('service'),
-                                category=service.get('category'),
-                                timeto=service.get('timeto')
+                                service=service.get("service"),
+                                category=service.get("category"),
+                                timeto=service.get("timeto"),
                             )
                             result.append(validated_service)
                         except ValueError as ve:
                             raise HTTPException(
                                 status_code=422,
-                                detail=f"Invalid service data: {str(ve)}"
+                                detail=f"Invalid service data: {str(ve)}",
                             ) from ve
 
                     if not result:
                         raise HTTPException(
-                            status_code=404,
-                            detail="No valid services found"
+                            status_code=404, detail="No valid services found"
                         )
 
                     return result
 
                 except ValueError as ve:
                     raise HTTPException(
-                        status_code=422,
-                        detail=f"Invalid JSON data: {str(ve)}"
+                        status_code=422, detail=f"Invalid JSON data: {str(ve)}"
                     ) from ve
 
     except aiohttp.ClientError as ce:
         raise HTTPException(
-            status_code=422,
-            detail=f"1C service unavailable: {str(ce)}"
+            status_code=422, detail=f"1C service unavailable: {str(ce)}"
         ) from ce
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
+            status_code=500, detail=f"Internal server error: {str(e)}"
         ) from e
+
 
 async def get_RBT_aps_settings(flat_id: int, rbt):
     """Получение настроек RBT по flat_id."""
@@ -1091,7 +1173,9 @@ async def get_RBT_aps_settings(flat_id: int, rbt):
             FROM "houses_flats"
             WHERE "house_flat_id" = $1
             """
-            record = await rbt.fetchrow(query, flat_id)  # Используем fetchrow для одной записи
+            record = await rbt.fetchrow(
+                query, flat_id
+            )  # Используем fetchrow для одной записи
 
             if record:
                 # Правильное преобразование asyncpg Record в словарь
@@ -1102,9 +1186,9 @@ async def get_RBT_aps_settings(flat_id: int, rbt):
 
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Error fetching data from RBT: {str(e)}"
+            status_code=500, detail=f"Error fetching data from RBT: {str(e)}"
         ) from e
+
 
 async def update_manual_block(flat_id: int, value: bool, rbt) -> bool:
     """Обновление значения manual_block для указанной квартиры."""
@@ -1113,7 +1197,7 @@ async def update_manual_block(flat_id: int, value: bool, rbt) -> bool:
             # Сначала проверяем текущее значение
             current = await rbt.fetchval(
                 "SELECT manual_block FROM houses_flats WHERE house_flat_id = $1",
-                flat_id
+                flat_id,
             )
 
             if current is None:
@@ -1125,7 +1209,8 @@ async def update_manual_block(flat_id: int, value: bool, rbt) -> bool:
             # Обновляем значение
             await rbt.execute(
                 "UPDATE houses_flats SET manual_block = $1 WHERE house_flat_id = $2",
-                value, flat_id
+                value,
+                flat_id,
             )
 
             return True
@@ -1134,9 +1219,9 @@ async def update_manual_block(flat_id: int, value: bool, rbt) -> bool:
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Ошибка при обновлении manual_block: {str(e)}"
+            status_code=500, detail=f"Ошибка при обновлении manual_block: {str(e)}"
         ) from e
+
 
 async def get_RBT_token(flat_id: int, rbt) -> str:
     """Получение токена RBT по flat_id."""
@@ -1159,11 +1244,11 @@ async def get_RBT_token(flat_id: int, rbt) -> str:
 async def get_milvus_data(query: str) -> Search2ResponseData:
     """Отправляет запрос в Milvus для получения ближайших статей по запросу
     и возвращает данные в формате Search2ResponseData"""
-    url = f'{config.UTILS_URL}/v2/mlv_search'
+    url = f"{config.UTILS_URL}/v2/mlv_search"
 
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params={'text': query}) as response:
+            async with session.get(url, params={"text": query}) as response:
                 try:
                     response.raise_for_status()
                     response_data = await response.json()
@@ -1173,45 +1258,41 @@ async def get_milvus_data(query: str) -> Search2ResponseData:
                     except ValueError as ve:
                         raise HTTPException(
                             status_code=422,
-                            detail=f"Invalid response format: {str(ve)}"
+                            detail=f"Invalid response format: {str(ve)}",
                         ) from ve
 
                 except ValueError as ve:
                     raise HTTPException(
-                        status_code=422,
-                        detail=f"Invalid JSON data: {str(ve)}"
+                        status_code=422, detail=f"Invalid JSON data: {str(ve)}"
                     ) from ve
 
     except aiohttp.ClientError as ce:
         raise HTTPException(
-            status_code=422,
-            detail=f"Milvus service unavailable: {str(ce)}"
+            status_code=422, detail=f"Milvus service unavailable: {str(ce)}"
         ) from ce
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
+            status_code=500, detail=f"Internal server error: {str(e)}"
         ) from e
-
 
 
 async def get_ai_response(
     text: str,
     combined_context: str,
     chat_history: str,
-    input_type: Literal['voice', 'csv', 'text'] = 'text',
+    input_type: Literal["voice", "csv", "text"] = "text",
     model: Optional[str | None] = None,
 ) -> str:
     """
     Отправляет запрос к AI API с валидацией данных
-    
+
     Args:
         text: Текст запроса (обязательный)
         combined_context: Контекст обработки
         chat_history: История диалога
         input_type: Тип входных данных
         model: Тип используемой модели
-    
+
     Returns:
         Ответ от API (строка)
     """
@@ -1226,8 +1307,7 @@ async def get_ai_response(
         )
     except ValueError as ve:
         raise HTTPException(
-            status_code=422,
-            detail=f"Invalid input data: {str(ve)}"
+            status_code=422, detail=f"Invalid input data: {str(ve)}"
         ) from ve
 
     url = f"{config.UTILS_URL}/v1/ai"
@@ -1247,18 +1327,15 @@ async def get_ai_response(
 
     except aiohttp.ClientError as ce:
         raise HTTPException(
-            status_code=503,
-            detail=f"AI API connection error: {str(ce)}"
+            status_code=503, detail=f"AI API connection error: {str(ce)}"
         ) from ce
     except ValueError as ve:
         raise HTTPException(
-            status_code=422,
-            detail=f"Invalid API response: {str(ve)}"
+            status_code=422, detail=f"Invalid API response: {str(ve)}"
         ) from ve
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Unexpected error: {str(e)}"
+            status_code=500, detail=f"Unexpected error: {str(e)}"
         ) from e
 
 
@@ -1285,3 +1362,65 @@ async def log_frida_interaction(
 
     await session.commit()
 
+
+async def get_addresses_from_redis(query_address: str) -> RedisAddressModelResponse:
+    """Отправляет запрос на UTILS API и получает адреса из Redis по запросу"""
+    url = f"{config.UTILS_URL}/redis_addresses"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url,
+                params={"query_address": query_address},
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as response:
+                if response.status == 404:
+                    raise HTTPException(status_code=404, detail="Not found")
+                response.raise_for_status()
+                response_data = await response.json()
+
+                # Валидация ответа
+                validated_data = RedisAddressModelResponse(**response_data)
+                return validated_data
+
+    except HTTPException:
+        raise
+    except aiohttp.ClientError as ce:
+        raise HTTPException(
+            status_code=503, detail=f"UTILS service unavailable: {str(ce)}"
+        ) from ce
+    except ValueError as ve:
+        raise HTTPException(
+            status_code=422, detail=f"Invalid response format: {str(ve)}"
+        ) from ve
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error: {str(e)}"
+        ) from e
+
+
+async def get_tariffs_from_redis(territory_id: str) -> dict:
+    """Отправляет запрос на UTILS API и получает тарифы из Redis по territory_id"""
+    url = f"{config.UTILS_URL}/redis_tariffs"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url, params={"territory_id": territory_id}
+            ) as response:
+                response.raise_for_status()
+                response_data = await response.json()
+                return response_data
+
+    except aiohttp.ClientError as ce:
+        raise HTTPException(
+            status_code=503, detail=f"UTILS service unavailable: {str(ce)}"
+        ) from ce
+    except ValueError as ve:
+        raise HTTPException(
+            status_code=500, detail=f"Invalid response format: {str(ve)}"
+        ) from ve
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error: {str(e)}"
+        ) from e

@@ -1,0 +1,308 @@
+/* Стили для заголовка в тёмной теме */
+.chat-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.chat-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.chat-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-modal-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.selected-address-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.address-label {
+  font-size: 12px;
+  color: #d1fae5;
+  margin-right: 4px;
+}
+
+.address-value {
+  font-weight: 600;
+  color: #fff;
+}
+
+.clear-address-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 8px;
+  opacity: 0.7;
+  transition: all 0.2s;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-address-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tariffs-loading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #d1fae5;
+  font-size: 13px;
+}
+
+.tariffs-error {
+  color: #fecaca;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.loader-small {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid #ffffff;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}
+
+/* Мобильная адаптивность */
+@media (max-width: 640px) {
+  .chat-modal-header {
+    padding: 12px 16px;
+  }
+  
+  .chat-modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .header-actions {
+    gap: 6px;
+  }
+  
+  .clear-chat-btn,
+  .chat-modal-close {
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+  }
+  
+  .clear-chat-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .selected-address-info {
+    padding: 4px 8px;
+    gap: 6px;
+    margin-left: 12px;
+  }
+  
+  .address-label {
+    font-size: 11px;
+  }
+  
+  .address-value {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-modal-header {
+    padding: 10px 12px;
+  }
+  
+  .chat-modal-header h3 {
+    font-size: 15px;
+  }
+  
+  .clear-chat-btn,
+  .chat-modal-close {
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+  }
+  
+  .clear-chat-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .selected-address-info {
+    margin-left: 8px;
+    padding: 3px 6px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clear-chat-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  padding: 6px;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-chat-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.clear-chat-btn svg {
+  flex-shrink: 0;
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+}
+
+.mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  background: #10b981;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.mode-indicator.wiki {
+  background: #10b981;
+}
+
+.mode-indicator.tariffSearch {
+  background: #3b82f6;
+}
+
+.mode-indicator.tariffChat {
+  background: #8b5cf6;
+}
+
+.telegram-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0088cc;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-decoration: none;
+  margin-right: 8px;
+  box-shadow: 0 2px 8px rgba(0, 136, 204, 0.3);
+}
+
+.telegram-btn:hover {
+  background: #0077b3;
+  opacity: 1;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4);
+}
+
+.telegram-btn:active {
+  transform: scale(0.95);
+}
+
+.telegram-btn svg {
+  flex-shrink: 0;
+}
+
+/* Адаптивные стили для кнопки Telegram */
+@media (max-width: 768px) {
+  .telegram-btn {
+    width: 28px;
+    height: 28px;
+    margin-right: 6px;
+  }
+  
+  .telegram-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .telegram-btn {
+    width: 26px;
+    height: 26px;
+    margin-right: 4px;
+  }
+  
+  .telegram-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}

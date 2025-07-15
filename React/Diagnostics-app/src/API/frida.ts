@@ -12,7 +12,8 @@ export interface ApiError {
 const GetFridaAnswer = async (
   query: string,
   historyCount: number,
-  model?: string
+  model?: string,
+  tariffs?: any
 ): Promise<FridaResponse | ApiError | null> => {
   const token = localStorage.getItem("token");
 
@@ -28,6 +29,10 @@ const GetFridaAnswer = async (
     
     if (model) {
       url += `&model=${encodeURIComponent(model)}`;
+    }
+
+    if (tariffs) {
+      url += `&tariffs=${encodeURIComponent(JSON.stringify(tariffs))}`;
     }
 
     const response = await api.get(url, {

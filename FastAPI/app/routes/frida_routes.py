@@ -7,9 +7,12 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
+from app.schemas import RedisAddressModelResponse, RedisTariffsResponse
 from app.models import FridaLogs
 from app.depencies import SessionDependency, TokenDependency
 from app.crud import (
+    get_addresses_from_redis,
+    get_tariffs_from_redis,
     get_ai_response,
     get_milvus_data,
     get_last_frida_logs,
@@ -32,45 +35,82 @@ def format_frida_history(logs: list[FridaLogs]) -> str:
             lines.append(f"Модель: {log.response}")
         return "\n".join(lines)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка форматирования истории: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Ошибка форматирования истории: {str(e)}"
+        ) from e
 
 
-@router.get('/v1/frida', tags=["Фрида"])
+@router.get("/v1/frida", tags=["Фрида"])
 async def make_request_and_get_response_from_mistral(
     token: TokenDependency,
     session: SessionDependency,  # type: ignore
     query: str,
     history_count: Optional[int] = Query(None, ge=0, le=3),
     model: Optional[str] = Query(None),
+    tariffs: Optional[str] = Query(None, description="JSON строка с тарифами"),
 ):
     """Эндпоинт для обработки запроса и получения ответа от AI."""
     try:
-        try:
-            # Получение данных из Milvus
-            mlv_data = await get_milvus_data(query)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Ошибка получения данных из Milvus: {str(e)}") from e
-
         user_id = token.user_id
 
-        try:
-            # Получение истории логов
-            history_logs = await get_last_frida_logs(session, user_id, limit=history_count or 3)
-            chat_history_str = format_frida_history(history_logs) if history_logs else "нет истории диалога"
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Ошибка получения истории логов: {str(e)}") from e
+        # Проверяем, переданы ли тарифы
+        if tariffs:
+            try:
+                import json
+
+                tariffs_data = json.loads(tariffs)
+                # Используем тарифы как контекст вместо Milvus
+                combined_context = (
+                    f"Контекст тарифов: {json.dumps(tariffs_data, ensure_ascii=False)}"
+                )
+                mlv_hashes = []
+            except json.JSONDecodeError:
+                logger.warning(f"Некорректный JSON в параметре tariffs: {tariffs}")
+                # Если JSON некорректный, делаем обычный запрос к Milvus
+                mlv_data = await get_milvus_data(query)
+                combined_context = mlv_data.combined_context
+                mlv_hashes = mlv_data.hashs
+        else:
+            # Обычный запрос к Milvus, если тарифы не переданы
+            try:
+                mlv_data = await get_milvus_data(query)
+                combined_context = mlv_data.combined_context
+                mlv_hashes = mlv_data.hashs
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Ошибка получения данных из Milvus: {str(e)}",
+                ) from e
+
+        # Получение истории логов только если history_count > 0
+        if history_count is not None and history_count == 0:
+            chat_history_str = "нет истории диалога"
+        else:
+            try:
+                count = history_count if history_count in (1, 2, 3) else 3
+                history_logs = await get_last_frida_logs(session, user_id, limit=count)
+                chat_history_str = (
+                    format_frida_history(history_logs)
+                    if history_logs
+                    else "нет истории диалога"
+                )
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500, detail=f"Ошибка получения истории логов: {str(e)}"
+                ) from e
 
         try:
-            # Запрос к Mistral
             mistral_response = await get_ai_response(
                 text=query,
-                combined_context=mlv_data.combined_context,
+                combined_context=combined_context,
                 chat_history=chat_history_str,
                 input_type="text",
                 model=model,
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Ошибка запроса к AI: {str(e)}") from e
+            raise HTTPException(
+                status_code=500, detail=f"Ошибка запроса к AI: {str(e)}"
+            ) from e
 
         try:
             # Логирование взаимодействия
@@ -79,11 +119,13 @@ async def make_request_and_get_response_from_mistral(
                 user_id=user_id,
                 query=query,
                 response=mistral_response,
-                hashes=mlv_data.hashs,
+                hashes=mlv_hashes,
                 error=None,
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Ошибка логирования взаимодействия: {str(e)}") from e
+            raise HTTPException(
+                status_code=500, detail=f"Ошибка логирования взаимодействия: {str(e)}"
+            ) from e
 
         return {"response": mistral_response}
 
@@ -99,9 +141,11 @@ async def make_request_and_get_response_from_mistral(
                 error=str(e),
             )
         except Exception as log_error:
-            logger.error("Ошибка логирования при обработке HTTPException: %s", str(log_error))
+            logger.error(
+                "Ошибка логирования при обработке HTTPException: %s", str(log_error)
+            )
         raise
-    
+
     except Exception as e:
         logger.error("Unexpected error: %s", str(e))
         try:
@@ -114,5 +158,71 @@ async def make_request_and_get_response_from_mistral(
                 error=str(e),
             )
         except Exception as log_error:
-            logger.error("Ошибка логирования при обработке Unexpected error: %s", str(log_error))
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}") from e
+            logger.error(
+                "Ошибка логирования при обработке Unexpected error: %s", str(log_error)
+            )
+        raise HTTPException(
+            status_code=500, detail=f"Unexpected error: {str(e)}"
+        ) from e
+
+
+@router.get(
+    "/v1/redis_addresses", tags=["Фрида"], response_model=RedisAddressModelResponse
+)
+async def get_redis_addresses(
+    token: TokenDependency,
+    query_address: str = Query(
+        ..., min_length=3, max_length=200, description="Адрес для поиска"
+    ),
+):
+    """
+    Получает список адресов из Redis по запросу.
+
+    Args:
+        token: Токен авторизации
+        query_address: Адрес для поиска (минимум 3 символа)
+
+    Returns:
+        RedisAddressModelResponse: Список найденных адресов
+    """
+    logger.info(f"Поиск адресов по запросу: {query_address}")
+
+    try:
+        result = await get_addresses_from_redis(query_address)
+
+        logger.info(
+            f"Найдено адресов: {len(result.addresses) if result.addresses else 0}"
+        )
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Неожиданная ошибка при поиске адресов: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Внутренняя ошибка сервера при поиске адресов: {str(e)}",
+        ) from e
+
+
+@router.get("/v1/redis_tariff", tags=["Фрида"], response_model=RedisTariffsResponse)
+async def get_redis_tariffs(
+    token: TokenDependency,
+    territory_id: str = Query(
+        ..., min_length=1, max_length=50, description="ID территории для поиска тарифов"
+    ),
+):
+    """
+    Получает список тарифов из Redis по ID территории.
+
+    Args:
+        token: Токен авторизации
+        territory_id: ID территории для поиска тарифов
+
+    Returns:
+        RedisTariffsResponse: Данные тарифов для территории
+    """
+    logger.info(f"Поиск тарифов для территории: {territory_id}")
+
+    result = await get_tariffs_from_redis(territory_id)
+    return RedisTariffsResponse(tariffs=result)
