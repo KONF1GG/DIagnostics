@@ -27,6 +27,7 @@ router = APIRouter()
 
 class FridaRequest(BaseModel):
     """Модель для POST запроса к Frida API."""
+
     query: str
     history_count: Optional[int] = None
     model: Optional[str] = None
@@ -58,7 +59,7 @@ async def make_request_and_get_response_from_mistral(
     """Эндпоинт для обработки запроса и получения ответа от AI."""
     try:
         user_id = token.user_id
-        
+
         # Извлекаем данные из request body
         query = request.query
         history_count = request.history_count
@@ -69,7 +70,7 @@ async def make_request_and_get_response_from_mistral(
         if tariffs:
             try:
                 import json
-                
+
                 # В POST запросе tariffs уже dict, не нужно парсить JSON
                 tariffs_data = tariffs
                 # Используем тарифы как контекст вместо Milvus

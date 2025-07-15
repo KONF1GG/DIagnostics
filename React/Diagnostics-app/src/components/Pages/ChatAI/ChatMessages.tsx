@@ -1,5 +1,6 @@
 import React from "react";
 import "./ChatMessages.css";
+import { copyToClipboard } from "../../../utils/copyUtils";
 
 interface ChatMessagesProps {
   messages: any[];
@@ -418,10 +419,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         {!msg.isUser && (
           <button
             className="copy-message-btn"
-            onClick={() => {
+            onClick={async () => {
               const textContent = msg.text.replace(/<[^>]*>/g, ""); // Remove HTML tags
-              navigator.clipboard.writeText(textContent);
-              onShowCopyNotification("Ответ скопирован! 📋");
+              const success = await copyToClipboard(textContent);
+              if (success) {
+                onShowCopyNotification("Ответ скопирован! 📋");
+              } else {
+                onShowCopyNotification(
+                  "Не удалось скопировать. Попробуйте выделить текст вручную."
+                );
+              }
             }}
             title="Скопировать ответ"
           >

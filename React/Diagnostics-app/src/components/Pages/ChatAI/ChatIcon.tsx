@@ -8,6 +8,7 @@ import { useDataContext } from "../../../DataContext/FridaContext";
 import { GetFridaAnswer } from "../../../API/frida";
 import { useRedisAddressSearch } from "../../../hooks/useRedisAddressSearch";
 import { RedisAddressModel } from "../../../API/redisAddresses";
+import { copyToClipboard } from "../../../utils/copyUtils";
 import { GetRedisTariff } from "../../../API/redisTariff";
 
 interface SourceLink {
@@ -197,12 +198,16 @@ const ChatIcon = () => {
   };
 
   const handleCopyCommand = async (command: string): Promise<void> => {
-    try {
-      await navigator.clipboard.writeText(command);
+    const success = await copyToClipboard(command);
+
+    if (success) {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error("Не удалось скопировать команду:", err);
+    } else {
+      setCopyNotification(
+        "Не удалось скопировать. Попробуйте выделить текст вручную."
+      );
+      setTimeout(() => setCopyNotification(""), 3000);
     }
   };
 
