@@ -26,7 +26,15 @@ interface Message {
 }
 
 const ChatIcon = () => {
-  const { messages, setMessages } = useDataContext();
+  const {
+    chatMode,
+    setChatMode,
+    wikiMessages,
+    setWikiMessages,
+    tariffChatMessages,
+    setTariffChatMessages,
+  } = useDataContext();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -48,6 +56,40 @@ const ChatIcon = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+
+  // Получаем текущие сообщения в зависимости от режима
+  const getCurrentMessages = (): Message[] => {
+    switch (chatMode) {
+      case "wiki":
+        return wikiMessages;
+      case "tariffSearch":
+        return []; // Для режима поиска нет истории
+      case "tariffChat":
+        return tariffChatMessages;
+      default:
+        return wikiMessages;
+    }
+  };
+
+  // Устанавливаем сообщения для текущего режима
+  const setCurrentMessages = (
+    messages: Message[] | ((prev: Message[]) => Message[])
+  ): void => {
+    switch (chatMode) {
+      case "wiki":
+        setWikiMessages(messages);
+        break;
+      case "tariffSearch":
+        // Для режима поиска не сохраняем историю
+        break;
+      case "tariffChat":
+        setTariffChatMessages(messages);
+        break;
+    }
+  };
+
+  const messages = getCurrentMessages();
 
   const {
     results: addressResults,
@@ -56,14 +98,21 @@ const ChatIcon = () => {
   } = useRedisAddressSearch(inlineQuery, isInlineMode);
 
   useEffect(() => {
-    const savedMessages = localStorage.getItem("chatMessages");
     const savedModel = localStorage.getItem("selectedModel");
     const savedAddress = localStorage.getItem("selectedAddress");
     const savedTariffs = localStorage.getItem("addressTariffs");
 
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-      setMessageId(JSON.parse(savedMessages).length);
+    // Загружаем сообщения для каждого режима
+    const savedWikiMessages = localStorage.getItem("wikiMessages");
+    const savedTariffChatMessages = localStorage.getItem("tariffChatMessages");
+    const savedChatMode = localStorage.getItem("chatMode");
+
+    if (savedWikiMessages) {
+      setWikiMessages(JSON.parse(savedWikiMessages));
+    }
+
+    if (savedTariffChatMessages) {
+      setTariffChatMessages(JSON.parse(savedTariffChatMessages));
     }
 
     if (savedModel) {
@@ -71,17 +120,44 @@ const ChatIcon = () => {
     }
 
     if (savedAddress) {
-      setSelectedAddress(JSON.parse(savedAddress));
+      const address = JSON.parse(savedAddress);
+      setSelectedAddress(address);
+
+      // Если есть сохраненный режим, используем его, иначе устанавливаем tariffChat
+      if (savedChatMode) {
+        setChatMode(savedChatMode as any);
+      } else {
+        setChatMode("tariffChat");
+      }
+    } else {
+      // Если нет адреса, устанавливаем режим по умолчанию
+      if (savedChatMode) {
+        setChatMode(savedChatMode as any);
+      } else {
+        setChatMode("wiki");
+      }
     }
 
     if (savedTariffs) {
       setAddressTariffs(JSON.parse(savedTariffs));
     }
-  }, [setMessages]);
+  }, [setWikiMessages, setTariffChatMessages, setChatMode]);
+
+  // Сохраняем сообщения в localStorage для каждого режима
+  useEffect(() => {
+    localStorage.setItem("wikiMessages", JSON.stringify(wikiMessages));
+  }, [wikiMessages]);
 
   useEffect(() => {
-    localStorage.setItem("chatMessages", JSON.stringify(messages));
-  }, [messages]);
+    localStorage.setItem(
+      "tariffChatMessages",
+      JSON.stringify(tariffChatMessages)
+    );
+  }, [tariffChatMessages]);
+
+  useEffect(() => {
+    localStorage.setItem("chatMode", chatMode);
+  }, [chatMode]);
 
   useEffect(() => {
     localStorage.setItem("selectedModel", selectedModel);
@@ -103,8 +179,21 @@ const ChatIcon = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // Автопрокрутка к результатам поиска
+  useEffect(() => {
+    if (addressResults.length > 0 && chatMode === "tariffSearch") {
+      setTimeout(() => {
+        scrollToSearchResults();
+      }, 100); // Небольшая задержка для рендеринга
+    }
+  }, [addressResults, chatMode]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToSearchResults = () => {
+    searchResultsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleCopyCommand = async (command: string): Promise<void> => {
@@ -118,9 +207,20 @@ const ChatIcon = () => {
   };
 
   const handleClearChat = (): void => {
-    setMessages([]);
+    setCurrentMessages([]);
     setMessageId(0);
-    localStorage.removeItem("chatMessages");
+    // Удаляем из localStorage только для текущего режима
+    switch (chatMode) {
+      case "wiki":
+        localStorage.removeItem("wikiMessages");
+        break;
+      case "tariffSearch":
+        // Для режима поиска нет истории для очистки
+        break;
+      case "tariffChat":
+        localStorage.removeItem("tariffChatMessages");
+        break;
+    }
     setCopyNotification("Чат очищен ✨");
     setTimeout(() => setCopyNotification(""), 2000);
   };
@@ -137,10 +237,17 @@ const ChatIcon = () => {
       return;
     }
 
-    setIsInlineMode(!isInlineMode);
-    if (!isInlineMode) {
+    const newInlineMode = !isInlineMode;
+    setIsInlineMode(newInlineMode);
+
+    if (newInlineMode) {
+      // Переходим в режим поиска тарифов
+      setChatMode("tariffSearch");
       setInlineQuery("");
       clearResults();
+    } else {
+      // Возвращаемся в режим Wiki
+      setChatMode("wiki");
     }
   };
 
@@ -161,6 +268,16 @@ const ChatIcon = () => {
     setIsInlineMode(false);
     setInlineQuery("");
     clearResults();
+
+    // Очищаем поле ввода от поискового запроса
+    setInputText("");
+
+    // Сбрасываем историю чата при смене территории
+    setTariffChatMessages([]);
+    localStorage.removeItem("tariffChatMessages");
+
+    // Переходим в режим чата с тарифами
+    setChatMode("tariffChat");
 
     // Загружаем тарифы для выбранного адреса
     setIsLoadingTariffs(true);
@@ -201,6 +318,7 @@ const ChatIcon = () => {
       }
 
       setIsInlineMode(true);
+      setChatMode("tariffSearch");
       setInlineQuery("");
       setInputText("");
       return;
@@ -211,6 +329,7 @@ const ChatIcon = () => {
       setIsInlineMode(false);
       setInlineQuery("");
       clearResults();
+      setChatMode("wiki");
     }
 
     const userMessage: Message = {
@@ -220,7 +339,7 @@ const ChatIcon = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setCurrentMessages((prev: Message[]) => [...prev, userMessage]);
     setInputText("");
     setIsLoading(true);
     setMessageId((prev) => prev + 1);
@@ -244,7 +363,7 @@ const ChatIcon = () => {
           isUser: false,
           timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, errorMsg]);
+        setCurrentMessages((prev: Message[]) => [...prev, errorMsg]);
       } else {
         const botMsg: Message = {
           id: messageId + 1,
@@ -252,10 +371,10 @@ const ChatIcon = () => {
           isUser: false,
           timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, botMsg]);
+        setCurrentMessages((prev: Message[]) => [...prev, botMsg]);
       }
     } catch (err) {
-      setMessages((prev) => [
+      setCurrentMessages((prev: Message[]) => [
         ...prev,
         {
           id: messageId + 1,
@@ -283,6 +402,7 @@ const ChatIcon = () => {
       setIsInlineMode(false);
       setInlineQuery("");
       clearResults();
+      setChatMode("wiki");
     }
   };
 
@@ -292,6 +412,7 @@ const ChatIcon = () => {
     setAddressTariffs(null);
     setTariffsError(null);
     setIsInlineMode(true);
+    setChatMode("tariffSearch");
     setInlineQuery("");
     clearResults();
     setShowTerritoryResetDialog(false);
@@ -341,10 +462,14 @@ const ChatIcon = () => {
             selectedAddress={selectedAddress}
             isLoadingTariffs={isLoadingTariffs}
             tariffsError={tariffsError}
+            chatMode={chatMode}
             onClearAddress={() => {
               setSelectedAddress(null);
               setAddressTariffs(null);
               setTariffsError(null);
+              setChatMode("wiki");
+              setIsInlineMode(false);
+              setInlineQuery("");
               localStorage.removeItem("selectedAddress");
               localStorage.removeItem("addressTariffs");
             }}
@@ -359,14 +484,15 @@ const ChatIcon = () => {
               addressTariffs={addressTariffs}
               isLoadingTariffs={isLoadingTariffs}
               tariffsError={tariffsError}
-              isInlineMode={isInlineMode}
               inlineQuery={inlineQuery}
               addressResults={addressResults}
               addressError={addressError}
+              chatMode={chatMode}
               onAddressSelect={handleAddressSelect}
               onCopyCommand={handleCopyCommand}
               onShowCopyNotification={showCopyNotification}
               messagesEndRef={messagesEndRef}
+              searchResultsRef={searchResultsRef}
             />
             <ChatInput
               inputText={inputText}

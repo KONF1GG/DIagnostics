@@ -215,3 +215,94 @@
 .clear-chat-btn svg {
   flex-shrink: 0;
 }
+
+.header-main {
+  display: flex;
+  align-items: center;
+}
+
+.mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  background: #10b981;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.mode-indicator.wiki {
+  background: #10b981;
+}
+
+.mode-indicator.tariffSearch {
+  background: #3b82f6;
+}
+
+.mode-indicator.tariffChat {
+  background: #8b5cf6;
+}
+
+.telegram-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0088cc;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-decoration: none;
+  margin-right: 8px;
+  box-shadow: 0 2px 8px rgba(0, 136, 204, 0.3);
+}
+
+.telegram-btn:hover {
+  background: #0077b3;
+  opacity: 1;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4);
+}
+
+.telegram-btn:active {
+  transform: scale(0.95);
+}
+
+.telegram-btn svg {
+  flex-shrink: 0;
+}
+
+/* Адаптивные стили для кнопки Telegram */
+@media (max-width: 768px) {
+  .telegram-btn {
+    width: 28px;
+    height: 28px;
+    margin-right: 6px;
+  }
+  
+  .telegram-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .telegram-btn {
+    width: 26px;
+    height: 26px;
+    margin-right: 4px;
+  }
+  
+  .telegram-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}

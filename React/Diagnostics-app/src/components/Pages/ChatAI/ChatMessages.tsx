@@ -8,14 +8,15 @@ interface ChatMessagesProps {
   addressTariffs: any;
   isLoadingTariffs: boolean;
   tariffsError: string | null;
-  isInlineMode: boolean;
   inlineQuery: string;
   addressResults: any[];
   addressError: string | null;
+  chatMode: "wiki" | "tariffSearch" | "tariffChat";
   onAddressSelect: (address: any) => void;
   onCopyCommand: (command: string) => void;
   onShowCopyNotification: (text: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
+  searchResultsRef?: React.RefObject<HTMLDivElement>;
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
@@ -25,60 +26,64 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   addressTariffs,
   isLoadingTariffs,
   tariffsError,
-  isInlineMode,
   inlineQuery,
   addressResults,
   addressError,
+  chatMode,
   onAddressSelect,
   onCopyCommand,
   onShowCopyNotification,
   messagesEndRef,
+  searchResultsRef,
 }) => (
   <div className="chat-messages adaptive-scroll">
     {/* Описание тарифов */}
-    {selectedAddress && addressTariffs && messages.length === 0 && (
-      <div className="info-panel fixed">
-        <div className="info-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle cx="12" cy="12" r="2" fill="currentColor" />
-          </svg>
-        </div>
-        <h3>Режим поиска по тарифам активен</h3>
-        <div className="description-content">
-          <p>
-            Ваши вопросы будут обрабатываться с учетом доступных тарифов для
-            территории <strong>{selectedAddress.territory_name}</strong>.
-            Спрашивайте о конкретных услугах, их стоимости, подключении или
-            других тарифных вопросах.
-          </p>
-          <p className="note">
-            💡 Поиск по Wiki временно недоступен в этом режиме. Для возврата к
-            обычному поиску очистите территорию.
-          </p>
-          <div className="description-steps">
-            <div className="step">
-              <span className="step-number">1</span>
-              <span className="step-text">Задайте вопрос</span>
-            </div>
-            <div className="step">
-              <span className="step-number">2</span>
-              <span className="step-text">Получите ответ по тарифам</span>
-            </div>
-            <div className="step">
-              <span className="step-number">3</span>
-              <span className="step-text">Уточните детали</span>
+    {messages.length === 0 &&
+      chatMode === "tariffChat" &&
+      selectedAddress &&
+      addressTariffs && (
+        <div className="info-panel fixed">
+          <div className="info-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="12" cy="12" r="2" fill="currentColor" />
+            </svg>
+          </div>
+          <h3>Режим поиска по тарифам активен</h3>
+          <div className="description-content">
+            <p>
+              Ваши вопросы будут обрабатываться с учетом доступных тарифов для
+              территории <strong>{selectedAddress.territory_name}</strong>.
+              Спрашивайте о конкретных услугах, их стоимости, подключении или
+              других тарифных вопросах.
+            </p>
+            <p className="note">
+              💡 Поиск по Wiki временно недоступен в этом режиме. Для возврата к
+              обычному поиску очистите территорию.
+            </p>
+            <div className="description-steps">
+              <div className="step">
+                <span className="step-number">1</span>
+                <span className="step-text">Задайте вопрос</span>
+              </div>
+              <div className="step">
+                <span className="step-number">2</span>
+                <span className="step-text">Получите ответ по тарифам</span>
+              </div>
+              <div className="step">
+                <span className="step-number">3</span>
+                <span className="step-text">Уточните детали</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
     {selectedAddress && isLoadingTariffs && (
       <div className="loading-tariffs-description fixed">
         <div className="loading-header">
@@ -172,7 +177,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       </div>
     )}
     {/* Описание обычного режима поиска по Wiki */}
-    {messages.length === 0 && !isInlineMode && !selectedAddress && (
+    {messages.length === 0 && chatMode === "wiki" && (
       <div className="info-panel fixed">
         <div className="info-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -240,7 +245,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       </div>
     )}
     {/* Описание инлайн-режима */}
-    {isInlineMode && !inlineQuery && messages.length === 0 && (
+    {messages.length === 0 && chatMode === "tariffSearch" && (
       <div className="info-panel fixed">
         <div className="info-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -290,9 +295,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       </div>
     )}
 
-    {/* Результаты поиска адресов в инлайн-режиме */}
-    {isInlineMode && (
-      <div className="search-results-panel">
+    {/* Результаты поиска адресов в режиме поиска тарифов */}
+    {chatMode === "tariffSearch" && (
+      <div className="search-results-panel" ref={searchResultsRef}>
         <div className="search-results-header">
           <h4>
             {inlineQuery
