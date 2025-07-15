@@ -594,7 +594,9 @@ class MistralRequest(BaseModel):
     input_type: Literal["voice", "csv", "text"] = Field(
         default="text", description="Тип входных данных: голос, csv или текст"
     )
-    model: Optional[str | None] = Field(default=None, description='Выбор запрашиваемой модели')
+    model: Optional[str | None] = Field(
+        default=None, description="Выбор запрашиваемой модели"
+    )
 
 
 class FixManualBlockRequest(BaseModel):
@@ -611,8 +613,10 @@ class FixManualBlockResponse(BaseModel):
     changed: bool
     house_flat_id: int
 
+
 class TVOperatorData(BaseModel):
     """Данные оператора ТВ"""
+
     login: Optional[str] = None
     password: Optional[str] = None
     service1c: List[Service1c] = []
@@ -624,12 +628,14 @@ class TVOperatorData(BaseModel):
 
 class TV24Phone(BaseModel):
     """Телефон для 24ТВ"""
+
     phone: str
     operator: str
 
 
 class TV24Data(BaseModel):
     """Данные 24ТВ"""
+
     phone: Optional[TV24Phone] = None
     service1c: List[Service1c] = []
     serviceOp: List[ServiceOp] = []
@@ -642,6 +648,7 @@ class TV24Data(BaseModel):
 
 class TVResponse(BaseModel):
     """Ответ эндпоинта ТВ"""
+
     smotreshka: TVOperatorData
     tvip: TVOperatorData
     tv24: TV24Data
@@ -650,12 +657,14 @@ class TVResponse(BaseModel):
 
 class ServiceTuple(BaseModel):
     """Кортеж данных сервиса для сравнения"""
+
     id: int
     status: str
 
 
 class TVDiscrepancy(BaseModel):
     """Расхождение в данных ТВ"""
+
     service1c_data: List[ServiceTuple] = []
     serviceOp_data: List[ServiceTuple] = []
     missing_in_operator: List[ServiceTuple] = []
@@ -664,6 +673,7 @@ class TVDiscrepancy(BaseModel):
 
 class TVFixResult(BaseModel):
     """Результат исправления ТВ"""
+
     status: str
     message: str
     error_details: Optional[str] = None
@@ -671,6 +681,7 @@ class TVFixResult(BaseModel):
 
 class TVFixResponse(BaseModel):
     """Ответ эндпоинта исправления ТВ"""
+
     status: str
     message: str
     discrepancies: Dict[str, TVDiscrepancy] = {}
@@ -679,5 +690,27 @@ class TVFixResponse(BaseModel):
 
 class TVCorrectRequest(BaseModel):
     """Запрос на исправление ТВ"""
+
     login: str
     operator: str
+
+
+class RedisAddressModel(BaseModel):
+    """Схема адреса для поиска тарифа Фрида"""
+
+    id: int
+    address: str
+    territory_id: str
+    territory_name: str
+
+
+class RedisAddressModelResponse(BaseModel):
+    """Схема ответа для запроса адресов (Для поиска тарифа)"""
+
+    addresses: List[RedisAddressModel]
+
+
+class RedisTariffsResponse(BaseModel):
+    """Схема ответа для запроса тарифов"""
+
+    tariffs: Any

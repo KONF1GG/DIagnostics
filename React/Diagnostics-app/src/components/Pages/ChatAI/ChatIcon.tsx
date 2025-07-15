@@ -1,9 +1,14 @@
 import { useState, KeyboardEvent, useRef, useEffect } from "react";
+import ChatHeader from "./ChatHeader";
+import ChatMessages from "./ChatMessages";
+import ChatInput from "./ChatInput";
+import "./ChatModal.css";
 import "../../CSS/Chat.css";
 import { useDataContext } from "../../../DataContext/FridaContext";
 import { GetFridaAnswer } from "../../../API/frida";
-import { useAddressSearch } from "../../../hooks/useAddressSearch";
-import { AddressResult } from "../../../API/addressSearch";
+import { useRedisAddressSearch } from "../../../hooks/useRedisAddressSearch";
+import { RedisAddressModel } from "../../../API/redisAddresses";
+import { GetRedisTariff } from "../../../API/redisTariff";
 
 interface SourceLink {
   source: string;
@@ -31,24 +36,30 @@ const ChatIcon = () => {
   );
   const [isInlineMode, setIsInlineMode] = useState<boolean>(false);
   const [inlineQuery, setInlineQuery] = useState<string>("");
+  const [selectedAddress, setSelectedAddress] =
+    useState<RedisAddressModel | null>(null);
+  const [addressTariffs, setAddressTariffs] = useState<any | null>(null);
+  const [isLoadingTariffs, setIsLoadingTariffs] = useState<boolean>(false);
+  const [tariffsError, setTariffsError] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState<boolean>(false);
+  const [copyNotification, setCopyNotification] = useState<string>("");
+  const [showTerritoryResetDialog, setShowTerritoryResetDialog] =
+    useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     results: addressResults,
-    isLoading: isAddressLoading,
+    error: addressError,
     clearResults,
-  } = useAddressSearch(inlineQuery, isInlineMode);
-
-  const exampleQuestions: string[] = [
-    "Что делать, если горит LOS?",
-    "Что такое приостановка услуг?",
-  ];
+  } = useRedisAddressSearch(inlineQuery, isInlineMode);
 
   useEffect(() => {
     const savedMessages = localStorage.getItem("chatMessages");
     const savedModel = localStorage.getItem("selectedModel");
+    const savedAddress = localStorage.getItem("selectedAddress");
+    const savedTariffs = localStorage.getItem("addressTariffs");
 
     if (savedMessages) {
       setMessages(JSON.parse(savedMessages));
@@ -57,6 +68,14 @@ const ChatIcon = () => {
 
     if (savedModel) {
       setSelectedModel(savedModel);
+    }
+
+    if (savedAddress) {
+      setSelectedAddress(JSON.parse(savedAddress));
+    }
+
+    if (savedTariffs) {
+      setAddressTariffs(JSON.parse(savedTariffs));
     }
   }, [setMessages]);
 
@@ -69,6 +88,18 @@ const ChatIcon = () => {
   }, [selectedModel]);
 
   useEffect(() => {
+    if (selectedAddress) {
+      localStorage.setItem("selectedAddress", JSON.stringify(selectedAddress));
+    }
+  }, [selectedAddress]);
+
+  useEffect(() => {
+    if (addressTariffs) {
+      localStorage.setItem("addressTariffs", JSON.stringify(addressTariffs));
+    }
+  }, [addressTariffs]);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
 
@@ -76,14 +107,36 @@ const ChatIcon = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleQuestionClick = (question: string): void => {
-    setInputText(question);
-    if (chatContainerRef.current) {
-      chatContainerRef.current.focus();
+  const handleCopyCommand = async (command: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error("Не удалось скопировать команду:", err);
     }
   };
 
+  const handleClearChat = (): void => {
+    setMessages([]);
+    setMessageId(0);
+    localStorage.removeItem("chatMessages");
+    setCopyNotification("Чат очищен ✨");
+    setTimeout(() => setCopyNotification(""), 2000);
+  };
+
+  const showCopyNotification = (text: string): void => {
+    setCopyNotification(text);
+    setTimeout(() => setCopyNotification(""), 2000);
+  };
+
   const toggleInlineMode = (): void => {
+    // Если территория уже выбрана и мы включаем режим поиска, спрашиваем подтверждение
+    if (!isInlineMode && selectedAddress) {
+      setShowTerritoryResetDialog(true);
+      return;
+    }
+
     setIsInlineMode(!isInlineMode);
     if (!isInlineMode) {
       setInlineQuery("");
@@ -101,11 +154,38 @@ const ChatIcon = () => {
     }
   };
 
-  const handleAddressSelect = (address: AddressResult): void => {
-    setInputText(address.address);
+  const handleAddressSelect = async (
+    address: RedisAddressModel
+  ): Promise<void> => {
+    setSelectedAddress(address);
     setIsInlineMode(false);
     setInlineQuery("");
     clearResults();
+
+    // Загружаем тарифы для выбранного адреса
+    setIsLoadingTariffs(true);
+    setTariffsError(null);
+
+    try {
+      const tariffsResult = await GetRedisTariff(address.territory_id);
+
+      if (tariffsResult && "detail" in tariffsResult) {
+        setTariffsError("Не удалось загрузить тарифы");
+        setAddressTariffs(null);
+      } else if (tariffsResult?.tariffs) {
+        setAddressTariffs(tariffsResult.tariffs);
+        setTariffsError(null);
+      } else {
+        setTariffsError("Тарифы для данного адреса не найдены");
+        setAddressTariffs(null);
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки тарифов:", error);
+      setTariffsError("Не удалось загрузить тарифы");
+      setAddressTariffs(null);
+    } finally {
+      setIsLoadingTariffs(false);
+    }
   };
 
   const handleSendMessage = async (): Promise<void> => {
@@ -113,6 +193,13 @@ const ChatIcon = () => {
 
     // Если отправили ровно "/tariff", включаем инлайн-режим
     if (inputText.trim() === "/tariff") {
+      // Если территория уже выбрана, спрашиваем подтверждение
+      if (selectedAddress) {
+        setShowTerritoryResetDialog(true);
+        setInputText("");
+        return;
+      }
+
       setIsInlineMode(true);
       setInlineQuery("");
       setInputText("");
@@ -142,16 +229,18 @@ const ChatIcon = () => {
     const historyCount = messageCount < 3 ? messageCount : 3;
 
     try {
+      // Отправляем запрос с тарифами как отдельным параметром
       const apiResult = await GetFridaAnswer(
         inputText,
         historyCount,
-        selectedModel
+        selectedModel,
+        addressTariffs
       );
 
       if (!apiResult || "detail" in apiResult) {
         const errorMsg: Message = {
           id: messageId + 1,
-          text: apiResult?.detail || "Ошибка получения ответа от сервера",
+          text: "Извините, не удалось получить ответ. Попробуйте переформулировать вопрос или повторите запрос позже.",
           isUser: false,
           timestamp: new Date(),
         };
@@ -170,7 +259,7 @@ const ChatIcon = () => {
         ...prev,
         {
           id: messageId + 1,
-          text: "Что-то пошло не так при запросе к серверу.",
+          text: "Произошла ошибка при обработке запроса. Пожалуйста, попробуйте еще раз.",
           isUser: false,
           timestamp: new Date(),
         },
@@ -195,6 +284,26 @@ const ChatIcon = () => {
       setInlineQuery("");
       clearResults();
     }
+  };
+
+  const handleTerritoryReset = (): void => {
+    // Сбрасываем территорию и включаем режим поиска
+    setSelectedAddress(null);
+    setAddressTariffs(null);
+    setTariffsError(null);
+    setIsInlineMode(true);
+    setInlineQuery("");
+    clearResults();
+    setShowTerritoryResetDialog(false);
+
+    // Очищаем localStorage
+    localStorage.removeItem("selectedAddress");
+    localStorage.removeItem("addressTariffs");
+  };
+
+  const handleTerritoryKeep = (): void => {
+    // Остаемся с текущей территорией
+    setShowTerritoryResetDialog(false);
   };
 
   const toggleModal = (): void => {
@@ -228,261 +337,89 @@ const ChatIcon = () => {
           className={`chat-modal ${isOpen ? "open" : ""}`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="chat-modal-header">
-            <h3>Фрида Wiki ИИ</h3>
-            <button className="chat-modal-close" onClick={toggleModal}>
-              ×
-            </button>
-          </div>
-
+          <ChatHeader
+            selectedAddress={selectedAddress}
+            isLoadingTariffs={isLoadingTariffs}
+            tariffsError={tariffsError}
+            onClearAddress={() => {
+              setSelectedAddress(null);
+              setAddressTariffs(null);
+              setTariffsError(null);
+              localStorage.removeItem("selectedAddress");
+              localStorage.removeItem("addressTariffs");
+            }}
+            onClearChat={handleClearChat}
+            onClose={toggleModal}
+          />
           <div className="chat-content" ref={chatContainerRef}>
-            <div className="chat-description">
-              <p>
-                Привет! Я Фрида — ваш корпоративный помощник. Работаю с
-                внутренней Wiki. Ответы могут содержать неточности - проверяйте
-                важную информацию.
-              </p>
-            </div>
-
-            <div className="chat-messages">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`message ${msg.isUser ? "user" : "bot"}`}
-                >
-                  {msg.isUser ? (
-                    <div className="message-text">{msg.text}</div>
-                  ) : (
-                    <div
-                      className="message-text"
-                      dangerouslySetInnerHTML={{ __html: msg.text }}
-                    />
-                  )}
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="message bot loading">
-                  <div className="loader"></div>
-                  <span>Ищу ответ...</span>
-                </div>
-              )}
-
-              {/* Описание инлайн-режима */}
-              {isInlineMode && !inlineQuery && messages.length === 0 && (
-                <div className="inline-mode-description">
-                  <div className="inline-mode-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        cx="11"
-                        cy="11"
-                        r="8"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <line
-                        x1="21"
-                        y1="21"
-                        x2="16.65"
-                        y2="16.65"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      />
-                      <circle
-                        cx="11"
-                        cy="11"
-                        r="3"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                      />
-                    </svg>
-                  </div>
-                  <h3>Режим поиска по адресу</h3>
-                  <div className="description-content">
-                    <p>
-                      Введите адрес в поле ниже для быстрого поиска. Система
-                      найдет подходящие адреса и предложит их для выбора.
-                    </p>
-                    <p>
-                      После выбора адреса будут найдены доступные тарифы и
-                      услуги для этого местоположения. Вы сможете задавать
-                      вопросы по конкретному адресу и получать точную
-                      информацию.
-                    </p>
-                    <div className="description-steps">
-                      <div className="step">
-                        <span className="step-number">1</span>
-                        <span className="step-text">Введите адрес</span>
-                      </div>
-                      <div className="step">
-                        <span className="step-number">2</span>
-                        <span className="step-text">Выберите из списка</span>
-                      </div>
-                      <div className="step">
-                        <span className="step-number">3</span>
-                        <span className="step-text">
-                          Получите тарифы и задайте вопрос
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Примеры вопросов показываем только если НЕ инлайн режим */}
-            {messages.length === 0 && !isInlineMode && (
-              <div className="chat-examples">
-                <h4>Примеры вопросов:</h4>
-                <div className="example-buttons">
-                  {exampleQuestions.map((question, index) => (
-                    <button
-                      key={index}
-                      className="example-button"
-                      onClick={() => handleQuestionClick(question)}
-                    >
-                      {question}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Результаты поиска адресов */}
-            {isInlineMode && (
-              <div className="inline-search-container">
-                {isAddressLoading ? (
-                  <div className="address-search-loading">
-                    <div className="loader"></div>
-                    <span>Поиск адресов...</span>
-                  </div>
-                ) : addressResults.length > 0 ? (
-                  <div className="address-search-results">
-                    <div className="address-results-header">
-                      <span>Найдено адресов: {addressResults.length}</span>
-                    </div>
-                    <div className="address-results-list">
-                      {addressResults.map((address) => (
-                        <button
-                          key={address.id}
-                          className="address-result-item"
-                          onClick={() => handleAddressSelect(address)}
-                        >
-                          <div className="address-main">{address.address}</div>
-                          {(address.city || address.district) && (
-                            <div className="address-details">
-                              {address.city && (
-                                <span className="address-city">
-                                  {address.city}
-                                </span>
-                              )}
-                              {address.district && (
-                                <span className="address-district">
-                                  {address.district}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  inlineQuery && (
-                    <div className="address-search-empty">
-                      <span>Адреса не найдены</span>
-                    </div>
-                  )
-                )}
-              </div>
-            )}
-
-            <div className="chat-input-container">
-              <div className="mobile-input-wrapper">
-                <button
-                  className={`inline-mode-button ${
-                    isInlineMode ? "active" : ""
-                  }`}
-                  onClick={toggleInlineMode}
-                  title="Поиск адресов"
-                  disabled={isLoading}
-                  aria-pressed={isInlineMode}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle
-                      cx="11"
-                      cy="11"
-                      r="8"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="m21 21-4.35-4.35"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span className="inline-mode-label">
-                    {isInlineMode ? "Поиск ВКЛ" : "Поиск адреса"}
-                  </span>
-                </button>
-
-                <input
-                  type="text"
-                  value={inputText}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder={
-                    isInlineMode
-                      ? "Введите адрес для поиска тарифа"
-                      : "Спроси меня о чем-нибудь..."
-                  }
-                  disabled={isLoading}
-                  className={isInlineMode ? "inline-mode" : ""}
-                />
-
-                {inputText.trim() && (
-                  <button
-                    className="send-button"
-                    onClick={handleSendMessage}
-                    disabled={isLoading}
-                    title="Отправить"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M7 11L12 6L17 11M12 18V7"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        transform="rotate(90 12 12)"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
-
-              <select
-                className="model-select"
-                onChange={(e) => setSelectedModel(e.target.value)}
-                value={selectedModel}
-                disabled={isLoading}
-                title="Выберите AI модель"
-              >
-                <option value="mistral-large-latest">Mistral Large</option>
-                <option value="gpt-4o-mini">GPT-4o Mini</option>
-                <option value="deepseek/deepseek-chat-v3-0324:free">
-                  DeepSeek V3
-                </option>
-              </select>
-            </div>
+            <ChatMessages
+              messages={messages}
+              isLoading={isLoading}
+              selectedAddress={selectedAddress}
+              addressTariffs={addressTariffs}
+              isLoadingTariffs={isLoadingTariffs}
+              tariffsError={tariffsError}
+              isInlineMode={isInlineMode}
+              inlineQuery={inlineQuery}
+              addressResults={addressResults}
+              addressError={addressError}
+              onAddressSelect={handleAddressSelect}
+              onCopyCommand={handleCopyCommand}
+              onShowCopyNotification={showCopyNotification}
+              messagesEndRef={messagesEndRef}
+            />
+            <ChatInput
+              inputText={inputText}
+              isLoading={isLoading}
+              isInlineMode={isInlineMode}
+              onInputChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              onSend={handleSendMessage}
+              onToggleInline={toggleInlineMode}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+            />
           </div>
         </div>
       </div>
+      {copySuccess && (
+        <div className="copy-notification">Команда скопирована! 📋</div>
+      )}
+      {copyNotification && (
+        <div className="copy-notification">{copyNotification}</div>
+      )}
+
+      {/* Диалог подтверждения сброса территории */}
+      {showTerritoryResetDialog && (
+        <div className="dialog-overlay" onClick={handleTerritoryKeep}>
+          <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
+            <div className="dialog-header">
+              <h3>Смена территории</h3>
+            </div>
+            <div className="dialog-body">
+              <p>
+                У вас уже выбрана территория{" "}
+                <strong>{selectedAddress?.territory_name}</strong>.
+              </p>
+              <p>Хотите сбросить текущую территорию и начать поиск новой?</p>
+            </div>
+            <div className="dialog-actions">
+              <button
+                className="dialog-button dialog-button-secondary"
+                onClick={handleTerritoryKeep}
+              >
+                Остаться
+              </button>
+              <button
+                className="dialog-button dialog-button-primary"
+                onClick={handleTerritoryReset}
+              >
+                Сбросить и искать новую
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
