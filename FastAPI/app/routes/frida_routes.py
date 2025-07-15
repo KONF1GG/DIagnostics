@@ -6,6 +6,7 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel
 
 from app.schemas import RedisAddressModelResponse, RedisTariffsResponse
 from app.models import FridaLogs
@@ -24,6 +25,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+class FridaRequest(BaseModel):
+    """Модель для POST запроса к Frida API."""
+    query: str
+    history_count: Optional[int] = None
+    model: Optional[str] = None
+    tariffs: Optional[dict] = None
+
+
 def format_frida_history(logs: list[FridaLogs]) -> str:
     """
     Преобразует список логов в текстовую историю для отправки в AI.
@@ -40,33 +49,37 @@ def format_frida_history(logs: list[FridaLogs]) -> str:
         ) from e
 
 
-@router.get("/v1/frida", tags=["Фрида"])
+@router.post("/v1/frida", tags=["Фрида"])
 async def make_request_and_get_response_from_mistral(
+    request: FridaRequest,
     token: TokenDependency,
     session: SessionDependency,  # type: ignore
-    query: str,
-    history_count: Optional[int] = Query(None, ge=0, le=3),
-    model: Optional[str] = Query(None),
-    tariffs: Optional[str] = Query(None, description="JSON строка с тарифами"),
 ):
     """Эндпоинт для обработки запроса и получения ответа от AI."""
     try:
         user_id = token.user_id
+        
+        # Извлекаем данные из request body
+        query = request.query
+        history_count = request.history_count
+        model = request.model
+        tariffs = request.tariffs
 
         # Проверяем, переданы ли тарифы
         if tariffs:
             try:
                 import json
-
-                tariffs_data = json.loads(tariffs)
+                
+                # В POST запросе tariffs уже dict, не нужно парсить JSON
+                tariffs_data = tariffs
                 # Используем тарифы как контекст вместо Milvus
                 combined_context = (
                     f"Контекст тарифов: {json.dumps(tariffs_data, ensure_ascii=False)}"
                 )
                 mlv_hashes = []
-            except json.JSONDecodeError:
-                logger.warning(f"Некорректный JSON в параметре tariffs: {tariffs}")
-                # Если JSON некорректный, делаем обычный запрос к Milvus
+            except Exception as e:
+                logger.warning(f"Ошибка при обработке тарифов: {e}")
+                # Если ошибка, делаем обычный запрос к Milvus
                 mlv_data = await get_milvus_data(query)
                 combined_context = mlv_data.combined_context
                 mlv_hashes = mlv_data.hashs
