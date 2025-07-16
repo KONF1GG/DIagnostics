@@ -1,6 +1,5 @@
 import React from "react";
 import "./ChatMessages.css";
-import { copyToClipboard } from "../../../utils/copyUtils";
 
 interface ChatMessagesProps {
   messages: any[];
@@ -15,7 +14,6 @@ interface ChatMessagesProps {
   chatMode: "wiki" | "tariffSearch" | "tariffChat";
   onAddressSelect: (address: any) => void;
   onCopyCommand: (command: string) => void;
-  onShowCopyNotification: (text: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   searchResultsRef?: React.RefObject<HTMLDivElement>;
 }
@@ -33,7 +31,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatMode,
   onAddressSelect,
   onCopyCommand,
-  onShowCopyNotification,
   messagesEndRef,
   searchResultsRef,
 }) => (
@@ -223,7 +220,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <span
               className="copyable-command"
               onClick={() => onCopyCommand("/tariff")}
-              title="Нажмите для копирования"
+              title="Нажмите для вставки в поле ввода"
             >
               /tariff
             </span>
@@ -416,43 +413,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             />
           )}
         </div>
-        {!msg.isUser && (
-          <button
-            className="copy-message-btn"
-            onClick={async () => {
-              const textContent = msg.text.replace(/<[^>]*>/g, ""); // Remove HTML tags
-              const success = await copyToClipboard(textContent);
-              if (success) {
-                onShowCopyNotification("Ответ скопирован! 📋");
-              } else {
-                onShowCopyNotification(
-                  "Не удалось скопировать. Попробуйте выделить текст вручную."
-                );
-              }
-            }}
-            title="Скопировать ответ"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <rect
-                x="9"
-                y="9"
-                width="13"
-                height="13"
-                rx="2"
-                ry="2"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-              />
-              <path
-                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-              />
-            </svg>
-          </button>
-        )}
       </div>
     ))}
     {isLoading && (

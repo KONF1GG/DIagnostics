@@ -8,7 +8,6 @@ import { useDataContext } from "../../../DataContext/FridaContext";
 import { GetFridaAnswer } from "../../../API/frida";
 import { useRedisAddressSearch } from "../../../hooks/useRedisAddressSearch";
 import { RedisAddressModel } from "../../../API/redisAddresses";
-import { copyToClipboard } from "../../../utils/copyUtils";
 import { GetRedisTariff } from "../../../API/redisTariff";
 
 interface SourceLink {
@@ -50,7 +49,6 @@ const ChatIcon = () => {
   const [addressTariffs, setAddressTariffs] = useState<any | null>(null);
   const [isLoadingTariffs, setIsLoadingTariffs] = useState<boolean>(false);
   const [tariffsError, setTariffsError] = useState<string | null>(null);
-  const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const [copyNotification, setCopyNotification] = useState<string>("");
   const [showTerritoryResetDialog, setShowTerritoryResetDialog] =
     useState<boolean>(false);
@@ -124,12 +122,8 @@ const ChatIcon = () => {
       const address = JSON.parse(savedAddress);
       setSelectedAddress(address);
 
-      // Если есть сохраненный режим, используем его, иначе устанавливаем tariffChat
-      if (savedChatMode) {
-        setChatMode(savedChatMode as any);
-      } else {
-        setChatMode("tariffChat");
-      }
+      // Если есть адрес, то всегда должен быть режим tariffChat
+      setChatMode("tariffChat");
     } else {
       // Если нет адреса, устанавливаем режим по умолчанию
       if (savedChatMode) {
@@ -198,20 +192,19 @@ const ChatIcon = () => {
   };
 
   const handleCopyCommand = async (command: string): Promise<void> => {
-    const success = await copyToClipboard(command);
-
-    if (success) {
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } else {
-      setCopyNotification(
-        "Не удалось скопировать. Попробуйте выделить текст вручную."
-      );
-      setTimeout(() => setCopyNotification(""), 3000);
-    }
+    // Вместо копирования вставляем команду в поле ввода
+    setInputText(command);
   };
 
   const handleClearChat = (): void => {
+    // Если идет загрузка, отменяем запрос
+    if (isLoading) {
+      setIsLoading(false);
+      setCopyNotification("Запрос отменен ❌");
+      setTimeout(() => setCopyNotification(""), 2000);
+      return;
+    }
+
     setCurrentMessages([]);
     setMessageId(0);
     // Удаляем из localStorage только для текущего режима
@@ -227,11 +220,6 @@ const ChatIcon = () => {
         break;
     }
     setCopyNotification("Чат очищен ✨");
-    setTimeout(() => setCopyNotification(""), 2000);
-  };
-
-  const showCopyNotification = (text: string): void => {
-    setCopyNotification(text);
     setTimeout(() => setCopyNotification(""), 2000);
   };
 
@@ -397,6 +385,14 @@ const ChatIcon = () => {
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      if (chatMode === "tariffSearch") {
+        // В режиме поиска тарифов можем только выбрать адрес, если есть результаты
+        if (addressResults.length > 0) {
+          handleAddressSelect(addressResults[0]);
+        }
+        return;
+      }
+
       if (isInlineMode && addressResults.length > 0) {
         // Выбираем первый результат
         handleAddressSelect(addressResults[0]);
@@ -495,7 +491,6 @@ const ChatIcon = () => {
               chatMode={chatMode}
               onAddressSelect={handleAddressSelect}
               onCopyCommand={handleCopyCommand}
-              onShowCopyNotification={showCopyNotification}
               messagesEndRef={messagesEndRef}
               searchResultsRef={searchResultsRef}
             />
@@ -503,6 +498,7 @@ const ChatIcon = () => {
               inputText={inputText}
               isLoading={isLoading}
               isInlineMode={isInlineMode}
+              chatMode={chatMode}
               onInputChange={handleInputChange}
               onKeyPress={handleKeyPress}
               onSend={handleSendMessage}
@@ -513,9 +509,6 @@ const ChatIcon = () => {
           </div>
         </div>
       </div>
-      {copySuccess && (
-        <div className="copy-notification">Команда скопирована! 📋</div>
-      )}
       {copyNotification && (
         <div className="copy-notification">{copyNotification}</div>
       )}
