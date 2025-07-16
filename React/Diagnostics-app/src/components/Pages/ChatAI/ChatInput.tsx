@@ -5,6 +5,7 @@ interface ChatInputProps {
   inputText: string;
   isLoading: boolean;
   isInlineMode: boolean;
+  chatMode: "wiki" | "tariffSearch" | "tariffChat";
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onSend: () => void;
@@ -17,6 +18,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   inputText,
   isLoading,
   isInlineMode,
+  chatMode,
   onInputChange,
   onKeyPress,
   onSend,
@@ -181,8 +183,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <button
             className="send-button"
             onClick={onSend}
-            disabled={isLoading || !inputText.trim()}
-            title="Отправить сообщение"
+            disabled={
+              isLoading || !inputText.trim() || chatMode === "tariffSearch"
+            }
+            title={
+              chatMode === "tariffSearch"
+                ? "Выберите территорию для продолжения"
+                : "Отправить сообщение"
+            }
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path
