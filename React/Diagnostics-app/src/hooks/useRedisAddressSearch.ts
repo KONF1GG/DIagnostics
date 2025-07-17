@@ -12,6 +12,7 @@ export const useRedisAddressSearch = (query: string, enabled: boolean = true) =>
   const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim() || !enabled || searchQuery.length < 3) {
       setResults([]);
+      setError(null);
       return;
     }
 
@@ -23,6 +24,7 @@ export const useRedisAddressSearch = (query: string, enabled: boolean = true) =>
       
       if (!response) {
         setResults([]);
+        setError(null);
         return;
       }
       
@@ -35,6 +37,7 @@ export const useRedisAddressSearch = (query: string, enabled: boolean = true) =>
       
       // Нормальный ответ или 404 (пустой список)
       setResults(response.addresses);
+      setError(null); // Очищаем ошибку при успешном ответе
     } catch (err) {
       setError('Сервис поиска недоступен');
       setResults([]);

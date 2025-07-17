@@ -134,6 +134,7 @@
   border-bottom-left-radius: 6px;
   max-width: 200px;
   animation: messageAppear 0.3s ease;
+  justify-content: space-between;
 }
 
 .loader {
@@ -741,4 +742,31 @@
     align-self: center;
     padding: 6px 12px;
   }
+}
+
+/* Стили для кнопки отмены запроса */
+.cancel-request-button {
+  background: #ef4444;
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 8px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.cancel-request-button:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.cancel-request-button:active {
+  transform: scale(0.95);
 }

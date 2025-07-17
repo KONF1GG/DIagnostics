@@ -13,7 +13,8 @@ const GetFridaAnswer = async (
   query: string,
   historyCount: number,
   model?: string,
-  tariffs?: any
+  tariffs?: any,
+  abortSignal?: AbortSignal
 ): Promise<FridaResponse | ApiError | null> => {
   const token = localStorage.getItem("token");
 
@@ -34,6 +35,7 @@ const GetFridaAnswer = async (
       headers: {
         "x-token": token,
       },
+      signal: abortSignal,
     });
 
     return response.data as FridaResponse;
@@ -43,6 +45,11 @@ const GetFridaAnswer = async (
     if (error.response?.status === 401) {
       window.location.href = "/login";
       return null;
+    }
+
+    // Проверяем на отмену запроса
+    if (error.code === 'ERR_CANCELED' || error.name === 'CanceledError') {
+      return { detail: "Запрос отменен" };
     }
 
     if (error.response?.data?.detail) {

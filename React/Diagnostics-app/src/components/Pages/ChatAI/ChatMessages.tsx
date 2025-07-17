@@ -14,6 +14,7 @@ interface ChatMessagesProps {
   chatMode: "wiki" | "tariffSearch" | "tariffChat";
   onAddressSelect: (address: any) => void;
   onCopyCommand: (command: string) => void;
+  onCancelRequest?: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   searchResultsRef?: React.RefObject<HTMLDivElement>;
 }
@@ -31,6 +32,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatMode,
   onAddressSelect,
   onCopyCommand,
+  onCancelRequest,
   messagesEndRef,
   searchResultsRef,
 }) => (
@@ -319,41 +321,44 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           </div>
         )}
 
-        {addressError && (
-          <div className="search-error">
-            <div className="error-header">
-              <div className="error-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <line
-                    x1="12"
-                    y1="8"
-                    x2="12"
-                    y2="12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <line
-                    x1="12"
-                    y1="16"
-                    x2="12.01"
-                    y2="16"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
+        {addressError &&
+          addressResults.length === 0 &&
+          inlineQuery &&
+          inlineQuery.length >= 3 && (
+            <div className="search-error">
+              <div className="error-header">
+                <div className="error-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1="12"
+                      y1="8"
+                      x2="12"
+                      y2="12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1="12"
+                      y1="16"
+                      x2="12.01"
+                      y2="16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </div>
+                <h5>Ошибка поиска</h5>
               </div>
-              <h5>Ошибка поиска</h5>
+              <p>{addressError}</p>
             </div>
-            <p>Территории не найдены. Попробуйте изменить запрос.</p>
-          </div>
-        )}
+          )}
 
         {inlineQuery &&
           inlineQuery.length >= 3 &&
@@ -420,6 +425,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         <div className="message bot loading">
           <div className="loader"></div>
           <span>Ищу ответ...</span>
+          {onCancelRequest && (
+            <button
+              className="cancel-request-button"
+              onClick={onCancelRequest}
+              title="Отменить запрос"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
     )}

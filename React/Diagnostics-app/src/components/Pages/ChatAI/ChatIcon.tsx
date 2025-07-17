@@ -52,6 +52,9 @@ const ChatIcon = () => {
   const [copyNotification, setCopyNotification] = useState<string>("");
   const [showTerritoryResetDialog, setShowTerritoryResetDialog] =
     useState<boolean>(false);
+  const [abortController, setAbortController] =
+    useState<AbortController | null>(null);
+  const [requestCancelled, setRequestCancelled] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -198,7 +201,10 @@ const ChatIcon = () => {
 
   const handleClearChat = (): void => {
     // Если идет загрузка, отменяем запрос
-    if (isLoading) {
+    if (isLoading && abortController) {
+      setRequestCancelled(true);
+      abortController.abort();
+      setAbortController(null);
       setIsLoading(false);
       setCopyNotification("Запрос отменен ❌");
       setTimeout(() => setCopyNotification(""), 2000);
@@ -221,6 +227,17 @@ const ChatIcon = () => {
     }
     setCopyNotification("Чат очищен ✨");
     setTimeout(() => setCopyNotification(""), 2000);
+  };
+
+  const handleCancelRequest = (): void => {
+    if (isLoading && abortController) {
+      setRequestCancelled(true);
+      abortController.abort();
+      setAbortController(null);
+      setIsLoading(false);
+      setCopyNotification("Запрос отменен ❌");
+      setTimeout(() => setCopyNotification(""), 2000);
+    }
   };
 
   const toggleInlineMode = (): void => {
@@ -333,6 +350,7 @@ const ChatIcon = () => {
     };
 
     setCurrentMessages((prev: Message[]) => [...prev, userMessage]);
+    const currentInputText = inputText;
     setInputText("");
     setIsLoading(true);
     setMessageId((prev) => prev + 1);
@@ -340,19 +358,40 @@ const ChatIcon = () => {
     const messageCount = messages.length / 2;
     const historyCount = messageCount < 3 ? messageCount : 3;
 
+    // Создаем новый AbortController для этого запроса
+    const controller = new AbortController();
+    setAbortController(controller);
+    setRequestCancelled(false);
+
     try {
       // Отправляем запрос с тарифами как отдельным параметром
       const apiResult = await GetFridaAnswer(
-        inputText,
+        currentInputText,
         historyCount,
         selectedModel,
-        addressTariffs
+        addressTariffs,
+        controller.signal
       );
+
+      // Проверяем, был ли запрос отменен перед обработкой результата
+      if (requestCancelled) {
+        const cancelMsg: Message = {
+          id: messageId + 1,
+          text: "Запрос отменен",
+          isUser: false,
+          timestamp: new Date(),
+        };
+        setCurrentMessages((prev: Message[]) => [...prev, cancelMsg]);
+        return;
+      }
 
       if (!apiResult || "detail" in apiResult) {
         const errorMsg: Message = {
           id: messageId + 1,
-          text: "Извините, не удалось получить ответ. Попробуйте переформулировать вопрос или повторите запрос позже.",
+          text:
+            apiResult?.detail === "Запрос отменен"
+              ? "Запрос отменен"
+              : "Извините, не удалось получить ответ. Попробуйте переформулировать вопрос или повторите запрос позже.",
           isUser: false,
           timestamp: new Date(),
         };
@@ -367,17 +406,36 @@ const ChatIcon = () => {
         setCurrentMessages((prev: Message[]) => [...prev, botMsg]);
       }
     } catch (err) {
-      setCurrentMessages((prev: Message[]) => [
-        ...prev,
-        {
-          id: messageId + 1,
-          text: "Произошла ошибка при обработке запроса. Пожалуйста, попробуйте еще раз.",
-          isUser: false,
-          timestamp: new Date(),
-        },
-      ]);
+      // Проверяем, был ли запрос отменен
+      if (
+        err instanceof Error &&
+        (err.name === "CanceledError" || err.name === "AbortError")
+      ) {
+        // Добавляем сообщение об отмене только если это не было обработано выше
+        if (!requestCancelled) {
+          const cancelMsg: Message = {
+            id: messageId + 1,
+            text: "Запрос отменен",
+            isUser: false,
+            timestamp: new Date(),
+          };
+          setCurrentMessages((prev: Message[]) => [...prev, cancelMsg]);
+        }
+      } else {
+        setCurrentMessages((prev: Message[]) => [
+          ...prev,
+          {
+            id: messageId + 1,
+            text: "Произошла ошибка при обработке запроса. Пожалуйста, попробуйте еще раз.",
+            isUser: false,
+            timestamp: new Date(),
+          },
+        ]);
+      }
     } finally {
       setIsLoading(false);
+      setAbortController(null);
+      setRequestCancelled(false);
       setMessageId((prev) => prev + 1);
     }
   };
@@ -478,6 +536,7 @@ const ChatIcon = () => {
             onClose={toggleModal}
           />
           <div className="chat-content" ref={chatContainerRef}>
+            {" "}
             <ChatMessages
               messages={messages}
               isLoading={isLoading}
@@ -491,6 +550,7 @@ const ChatIcon = () => {
               chatMode={chatMode}
               onAddressSelect={handleAddressSelect}
               onCopyCommand={handleCopyCommand}
+              onCancelRequest={handleCancelRequest}
               messagesEndRef={messagesEndRef}
               searchResultsRef={searchResultsRef}
             />
