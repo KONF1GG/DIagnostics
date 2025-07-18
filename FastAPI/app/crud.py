@@ -867,7 +867,6 @@ async def delete_from_houses_flats_subscribers(
             )
 
     except HTTPException as http_exc:
-        print(http_exc)
         raise http_exc
 
     except Exception as e:

@@ -175,8 +175,10 @@ async def delete_user_from_houses_flats_subscribers_RBT(
     """Эндпоинт для удаления пользователя из houses_flats_subscribers в RBT"""
     try:
         return await delete_from_houses_flats_subscribers(house_id, flat_id, rbt)
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка удаления пользователя: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка удаления пользователя: {e}") from e
 
 
 @router.patch("/v1/app/relocate", response_model=StatusResponse, tags=["Приложение"])
